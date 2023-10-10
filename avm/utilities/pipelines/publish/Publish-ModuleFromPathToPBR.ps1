@@ -42,10 +42,10 @@ function Publish-ModuleFromPathToPBR {
   $moduleJsonFilePath = Join-Path $moduleFolderPath 'main.json'
 
   # 1. Test if module qualifies for publishing
-  if (-not (Get-ModulesToPublish -ModuleFolderPath $moduleFolderPath)) {
-    Write-Verbose "No changes detected. Skipping publishing" -Verbose
-    return
-  }
+  # if (-not (Get-ModulesToPublish -ModuleFolderPath $moduleFolderPath)) {
+  #   Write-Verbose "No changes detected. Skipping publishing" -Verbose
+  #   return
+  # }
 
   # 2. Calculate the version that we would publish with
   $targetVersion = Get-ModuleTargetVersion -ModuleFolderPath $moduleFolderPath
@@ -57,7 +57,13 @@ function Publish-ModuleFromPathToPBR {
   $tagName = New-ModuleReleaseTag -ModuleFolderPath $moduleFolderPath -TargetVersion $targetVersion
 
   # 5. Get the documentation link
-  $documentationUri = Get-ModuleReadmeLink -TagName $tagName -ModuleFolderPath $moduleFolderPath
+  $docInputObject = @{
+    ModuleFolderPath = $moduleFolderPath
+    TagName          = $tagName
+  }
+  Write-Verbose "Invoke function with" -Verbose
+  Write-Verbose ($docInputObject | ConvertTo-Json | Out-String) -Verbose
+  $documentationUri = Get-ModuleReadmeLink @docInputObject
 
   # 6. Replace telemetry version value (in JSON)
   $tokenConfiguration = @{
@@ -92,6 +98,8 @@ function Publish-ModuleFromPathToPBR {
     '--documentationUri', $documentationUri
     '--force'
   )
+  Write-Verbose "Invoke function with" -Verbose
+  Write-Verbose ($publishInput | ConvertTo-Json | Out-String) -Verbose
   # TODO move to its own task to show that as skipped if no file qualifies for new version
   bicep publish @publishInput
 }
