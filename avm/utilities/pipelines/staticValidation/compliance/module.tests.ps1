@@ -298,13 +298,17 @@ Describe 'Module tests' -Tag 'Module' {
         return # Skipping if test was failing
       }
 
-      $originalJson = Remove-JSONMetadata -TemplateObject (Get-Content $armTemplatePath -Raw | ConvertFrom-Json -Depth 99 -AsHashtable)
+      Write-Verbose 'Original Json' -Verbose
+      Write-Verbose ((Get-Content $armTemplatePath -Raw)) -Verbose
+      $originalJson = Remove-JSONMetadata -TemplateObject (Get-Content $armTemplatePath -Raw | ConvertFrom-Json -Depth 99 -AsHashtable) -Verbose
       $originalJson = ConvertTo-OrderedHashtable -JSONInputObject (ConvertTo-Json $originalJson -Depth 99)
 
       # Recompile json
       $null = Remove-Item -Path $armTemplatePath -Force
       bicep build $templateFilePath
 
+      Write-Verbose 'New Json' -Verbose
+      Write-Verbose ((Get-Content $armTemplatePath -Raw)) -Verbose
       $newJson = Remove-JSONMetadata -TemplateObject (Get-Content $armTemplatePath -Raw | ConvertFrom-Json -Depth 99 -AsHashtable)
       $newJson = ConvertTo-OrderedHashtable -JSONInputObject (ConvertTo-Json $newJson -Depth 99)
 
