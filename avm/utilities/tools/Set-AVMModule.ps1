@@ -27,9 +27,6 @@ Optional. Set this parameter if you don't want to setup the file & folder struct
 .PARAMETER ThrottleLimit
 Optional. The number of parallel threads to use for the generation. Defaults to 5.
 
-.PARAMETER ReadMeScriptFilePath
-Optional. The absolute path to the `Set-ModuleReadMe` script. Relevant only if `SkipReadMe` is not set and defaults to the default path of the script in the repository.
-
 .EXAMPLE
 Set-AVMModule -ModuleFolderPath 'C:\avm\res\key-vault\vault'
 
