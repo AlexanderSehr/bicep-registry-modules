@@ -1889,7 +1889,7 @@ function Set-ModuleReadMe {
     if ($SectionsToRefresh -contains 'CrossReferences') {
         # Handle [CrossReferences] section
         # ========================
-        if (-not $CrossReferencedModuleList) {
+        if ($CrossReferencedModuleList.Count -eq 0) {
             . (Join-Path $PSScriptRoot  'helper' 'Get-CrossReferencedModuleList.ps1')
             $CrossReferencedModuleList = Get-CrossReferencedModuleList
         }
