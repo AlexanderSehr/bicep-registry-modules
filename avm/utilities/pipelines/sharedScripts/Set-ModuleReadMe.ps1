@@ -456,10 +456,10 @@ Mandatory. The readme file content array to update
 Optional. The identifier of the 'outputs' section. Defaults to '## Cross-referenced modules'
 
 .PARAMETER CrossReferencedModuleList
-Optional. The Cross Module References to consider when refreshing the readme.
+Required. The Cross Module References to consider when refreshing the readme.
 
 .EXAMPLE
-Set-CrossReferencesSection -ModuleRoot 'C:/key-vault/vault' -FullModuleIdentifier 'key-vault/vault' -TemplateFileContent @{ resource = @{}; ... } -ReadMeFileContent @('# Title', '', '## Section 1', ...)
+Set-CrossReferencesSection -ModuleRoot 'C:/key-vault/vault' -FullModuleIdentifier 'key-vault/vault' -TemplateFileContent @{ resource = @{}; ... } -ReadMeFileContent @('# Title', '', '## Section 1', ...) -CrossReferencedModuleList @{}
 Update the given readme file's 'Cross-referenced modules' section based on the given template file content
 #>
 function Set-CrossReferencesSection {
@@ -478,8 +478,8 @@ function Set-CrossReferencesSection {
         [Parameter(Mandatory)]
         [object[]] $ReadMeFileContent,
 
-        [Parameter(Mandatory = $false)]
-        [hashtable] $CrossReferencedModuleList = @{},
+        [Parameter(Mandatory)]
+        [hashtable] $CrossReferencedModuleList,
 
         [Parameter(Mandatory = $false)]
         [string] $SectionStartIdentifier = '## Cross-referenced modules'
