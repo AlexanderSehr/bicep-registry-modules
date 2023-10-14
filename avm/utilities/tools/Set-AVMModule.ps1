@@ -70,10 +70,7 @@ function Set-AVMModule {
         [switch] $SkipFileAndFolderSetup,
 
         [Parameter(Mandatory = $false)]
-        [int] $ThrottleLimit = 5,
-
-        [Parameter(Mandatory = $false)]
-        [string] $ReadMeScriptFilePath = (Join-Path (Get-Item $PSScriptRoot).Parent.FullName 'pipelines' 'sharedScripts' 'Set-ModuleReadMe.ps1')
+        [int] $ThrottleLimit = 5
     )
 
     # Load helper scripts
@@ -92,6 +89,16 @@ function Set-AVMModule {
     }
     else {
         $relevantTemplatePaths = Join-Path $resolvedPath 'main.bicep'
+    }
+
+    # Load recurring information we'll need for the modules
+    if (-not $SkipReadMe) {
+        .  (Join-Path (Get-Item $PSScriptRoot).Parent.FullName 'pipelines' 'sharedScripts' 'helper' 'Get-CrossReferencedModuleList.ps1')
+        # load cross-references
+        $crossReferencedModuleList = Get-CrossReferencedModuleList
+
+        # create reference as it must be loaded in the thread to work
+        $ReadMeScriptFilePath = (Join-Path (Get-Item $PSScriptRoot).Parent.FullName 'pipelines' 'sharedScripts' 'Set-ModuleReadMe.ps1')
     }
 
     # Using threading to speed up the process
@@ -118,7 +125,7 @@ function Set-AVMModule {
                 # If the template was just build, we can pass the JSON into the readme script to be more efficient
                 $readmeTemplateFilePath = (-not $using:SkipBuild) ? (Join-Path (Split-Path $_ -Parent) 'main.json') : $_
 
-                Set-ModuleReadMe -TemplateFilePath $readmeTemplateFilePath
+                Set-ModuleReadMe -TemplateFilePath $readmeTemplateFilePath -CrossReferencedModuleList $using:crossReferencedModuleList
             }
         }
     }

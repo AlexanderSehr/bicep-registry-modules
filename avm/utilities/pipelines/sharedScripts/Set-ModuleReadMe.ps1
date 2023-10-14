@@ -455,6 +455,9 @@ Mandatory. The readme file content array to update
 .PARAMETER SectionStartIdentifier
 Optional. The identifier of the 'outputs' section. Defaults to '## Cross-referenced modules'
 
+.PARAMETER CrossReferencedModuleList
+Optional. The Cross Module References to consider when refreshing the readme.
+
 .EXAMPLE
 Set-CrossReferencesSection -ModuleRoot 'C:/key-vault/vault' -FullModuleIdentifier 'key-vault/vault' -TemplateFileContent @{ resource = @{}; ... } -ReadMeFileContent @('# Title', '', '## Section 1', ...)
 Update the given readme file's 'Cross-referenced modules' section based on the given template file content
@@ -476,10 +479,11 @@ function Set-CrossReferencesSection {
         [object[]] $ReadMeFileContent,
 
         [Parameter(Mandatory = $false)]
+        [hashtable] $CrossReferencedModuleList = @{},
+
+        [Parameter(Mandatory = $false)]
         [string] $SectionStartIdentifier = '## Cross-referenced modules'
     )
-
-    . (Join-Path $PSScriptRoot  'helper' 'Get-CrossReferencedModuleList.ps1')
 
     # Process content
     $SectionContent = [System.Collections.ArrayList]@(
@@ -489,7 +493,7 @@ function Set-CrossReferencesSection {
         '| :-- | :-- |'
     )
 
-    $dependencies = (Get-CrossReferencedModuleList)[$FullModuleIdentifier]
+    $dependencies = $CrossReferencedModuleList[$FullModuleIdentifier]
 
     if ($dependencies.Keys -contains 'localPathReferences' -and $dependencies['localPathReferences']) {
         foreach ($reference in ($dependencies['localPathReferences'] | Sort-Object)) {
@@ -1730,6 +1734,9 @@ Optional. The path to the readme to update. If not provided assumes a 'README.md
 Optional. The sections to update. By default it refreshes all that are supported.
 Currently supports: 'Resource Types', 'Parameters', 'Outputs', 'Template references'
 
+.PARAMETER CrossReferencedModuleList
+Optional. Cross Module References to consider when refreshing the readme. Can be provided to speed up the generation. If not provided, is fetched by this script.
+
 .EXAMPLE
 Set-ModuleReadMe -TemplateFilePath 'C:\main.bicep'
 
@@ -1768,6 +1775,9 @@ function Set-ModuleReadMe {
 
         [Parameter(Mandatory = $false)]
         [string] $ReadMeFilePath = (Join-Path (Split-Path $TemplateFilePath -Parent) 'README.md'),
+
+        [Parameter(Mandatory = $false)]
+        [hashtable] $CrossReferencedModuleList = @{},
 
         [Parameter(Mandatory = $false)]
         [ValidateSet(
@@ -1879,11 +1889,16 @@ function Set-ModuleReadMe {
     if ($SectionsToRefresh -contains 'CrossReferences') {
         # Handle [CrossReferences] section
         # ========================
+        if (-not $CrossReferencedModuleList) {
+            . (Join-Path $PSScriptRoot  'helper' 'Get-CrossReferencedModuleList.ps1')
+            $CrossReferencedModuleList = Get-CrossReferencedModuleList
+        }
         $inputObject = @{
-            ModuleRoot           = $ModuleRoot
-            FullModuleIdentifier = $fullModuleIdentifier
-            ReadMeFileContent    = $readMeFileContent
-            TemplateFileContent  = $templateFileContent
+            ModuleRoot                = $ModuleRoot
+            FullModuleIdentifier      = $fullModuleIdentifier
+            ReadMeFileContent         = $readMeFileContent
+            TemplateFileContent       = $templateFileContent
+            CrossReferencedModuleList = $CrossReferencedModuleList
         }
         $readMeFileContent = Set-CrossReferencesSection @inputObject
     }
