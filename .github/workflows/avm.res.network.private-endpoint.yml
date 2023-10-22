@@ -70,7 +70,7 @@ jobs:
   #   Call reusable workflow   #
   ##############################
   call-workflow-passing-data:
-    name: "Module"
+    name: "Test"
     needs:
       - job_initialize_pipeline
     uses: ./.github/workflows/avm.template.module.yml
