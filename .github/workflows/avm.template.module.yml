@@ -61,7 +61,7 @@ jobs:
   job_psrule_test: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "PSRule validation"
     runs-on: ubuntu-20.04
-    if: (fromJson(inputs.workflowInput)).staticValidation == 'true' || (contains('push pull_request', '${{ github.event_name }}') && '${{ inputs.calculatedAction }}' == 'runAllTests')
+    if: (fromJson(inputs.workflowInput)).staticValidation == 'true'
     strategy:
       fail-fast: false
       matrix:

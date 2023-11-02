@@ -20,10 +20,13 @@ function Get-CalculatedWorkflowControl {
         $deploymentTestRelevantFiles = $diffFiles | Where-Object {
             $_ -match "$bicepTemplateRegex|$jsonTemplateRegex"
         }
+        Write-Verbose ("Changed files that justify deployment tests: `n[{0}]" -f ($deploymentTestRelevantFiles | ConvertTo-Json)) -Verbose
 
         $staticTestRelevantFiles = $diffFiles | Where-Object {
             $_ -match "$markdownRegex|$unitTestRegex"
         }
+        Write-Verbose ("Changed files that justify static tests: `n[{0}]" -f ($staticTestRelevantFiles | ConvertTo-Json)) -Verbose
+
 
         if ($deploymentTestRelevantFiles.Count -gt 0) {
             $calculatedAction = 'runAllTests'
