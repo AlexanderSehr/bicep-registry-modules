@@ -12,7 +12,7 @@ function Get-CalculatedWorkflowControl {
     $diffFiles = git diff 'origin/main' --name-only -- $ModulePath | Sort-Object -Unique
 
     if (-not $diffFiles) {
-        Write-Verbose "No files changed in $ModulePath" -Verbose
+        Write-Verbose "No files changed in path [$ModulePath]" -Verbose
         return
     }
 
