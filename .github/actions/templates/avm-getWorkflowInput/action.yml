@@ -68,6 +68,7 @@ runs:
         if(Test-Path $filePath) {
           $content = Get-Content $filePath -Raw | ConvertFrom-Json
           $commit = $content.after
+          Write-Verbose "Commit: [$commit]" -Verbose
 
           $files = git diff $commit --name-only -- *
           Write-Verbose ($files | ConvertTo-Json) -Verbose
