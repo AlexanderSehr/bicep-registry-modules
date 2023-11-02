@@ -23,12 +23,14 @@ function Get-CalculatedWorkflowControl {
         $_ -match '(.+\.md)|(.+[\\|\/]tests[\\|\/].+\.ps1)'
     }
 
-    $calculatedAction = ''
+    $calculatedAction = 'runNoTests'
     if ($deploymentTestRelevantFiles.Count -gt 0) {
         $calculatedAction = 'runAllTests'
     } elseif ($staticTestRelevantFiles.Count -gt 0) {
         $calculatedAction = 'runStaticTestsOnly'
     }
+
+    Write-Verbose "Performing calculated action [$calculatedAction] for commit [$Commit]"
 
     return $calculatedAction
 }
