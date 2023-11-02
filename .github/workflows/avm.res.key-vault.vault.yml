@@ -66,6 +66,7 @@ jobs:
     outputs:
       workflowInput: ${{ steps.get-workflow-param.outputs.workflowInput }}
       moduleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.moduleTestFilePaths }}
+      calculatedAction: ${{ steps.get-calculated-workflow-action.outputs.calculatedAction }}
       modulePath: "${{ env.modulePath }}"
 
   # ##############################

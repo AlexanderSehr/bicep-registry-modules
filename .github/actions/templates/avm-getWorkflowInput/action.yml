@@ -52,13 +52,13 @@ outputs:
     value: ${{ steps.get-input-param-action.outputs.workflowInput }}
   calculatedAction:
     description: "The calculated action to be executed, based on which files changed."
-    value: ${{ steps.get-github-event-data.outputs.calculatedAction }}
+    value: ${{ steps.get-calculated-workflow-action.outputs.calculatedAction }}
 
 runs:
   using: "composite"
   steps:
-    - name: Investigate GitHub event
-      id: get-github-event-data
+    - name: Evaluate required workflow actions
+      id: get-calculated-workflow-action
       run: |
         # Grouping task logs
         Write-Output '::group::Investigate GitHub event'
@@ -79,8 +79,6 @@ runs:
 
           $result = Get-CalculatedWorkflowControl @functionInput
           Write-Output ('{0}={1}' -f 'calculatedAction', $result) >> $env:GITHUB_OUTPUT
-
-          $env:GITHUB_OUTPUT
         }
         Write-Output '::endgroup::'
       shell: pwsh
