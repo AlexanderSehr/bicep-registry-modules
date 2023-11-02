@@ -61,8 +61,13 @@ runs:
         Write-Output '::group::Investigate GitHub event'
 
         Write-Verbose "Event: [$env:GITHUB_EVENT_NAME]" -Verbose
-        Write-Verbose "Path: [$env:GITHUB_EVENT_PATH]" -Verbose
         Write-Verbose "Module path: [${{ inputs.modulePath }}]" -Verbose
+
+        $branch = git branch --show-current
+        Write-Verbose "Branch: [$branch]" -Verbose
+
+        git checkout main
+        git checkout $branch
 
         $filePath = $env:GITHUB_EVENT_PATH
         if(Test-Path $filePath) {
