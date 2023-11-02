@@ -16,5 +16,9 @@ function Get-CalculatedWorkflowControl {
         return ''
     }
 
+    # TODO filter
+    # - If only readme files -> static validation
+    # - If bicep files -> deployment validation
+
     return $diffFiles
 }
