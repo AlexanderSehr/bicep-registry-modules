@@ -69,16 +69,17 @@ jobs:
       calculatedAction: ${{ steps.get-workflow-param.outputs.calculatedAction }}
       modulePath: "${{ env.modulePath }}"
 
-  # ##############################
-  # #   Call reusable workflow   #
-  # ##############################
-  # call-workflow-passing-data:
-  #   name: "Module"
-  #   needs:
-  #     - job_initialize_pipeline
-  #   uses: ./.github/workflows/avm.template.module.yml
-  #   with:
-  #     workflowInput: "${{ needs.job_initialize_pipeline.outputs.workflowInput }}"
-  #     moduleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.moduleTestFilePaths }}"
-  #     modulePath: "${{ needs.job_initialize_pipeline.outputs.modulePath}}"
-  #   secrets: inherit
+  ##############################
+  #   Call reusable workflow   #
+  ##############################
+  call-workflow-passing-data:
+    name: "Module"
+    needs:
+      - job_initialize_pipeline
+    uses: ./.github/workflows/avm.template.module.yml
+    with:
+      workflowInput: "${{ needs.job_initialize_pipeline.outputs.workflowInput }}"
+      moduleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.moduleTestFilePaths }}"
+      modulePath: "${{ needs.job_initialize_pipeline.outputs.modulePath}}"
+      calculatedAction: "${{ needs.job_initialize_pipeline.outputs.calculatedAction}}"
+    secrets: inherit

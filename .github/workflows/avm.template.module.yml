@@ -15,6 +15,10 @@ on:
         type: string
         description: "Relative path to the module folder"
         required: true
+      calculatedAction:
+        type: string
+        description: "The pipeline action to run based on the changed files"
+        required: true
 
 permissions:
   id-token: write # For OIDC
@@ -33,7 +37,7 @@ jobs:
   job_module_static_validation: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "Static validation"
     runs-on: ubuntu-20.04
-    if: (fromJson(inputs.workflowInput)).staticValidation == 'true'
+    if: (fromJson(inputs.workflowInput)).staticValidation == 'true' || (contains('push pull_request', '${{ github.event_name }}') && '${{ inputs.calculatedAction }}' == 'runStaticTestsOnly')
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
@@ -52,7 +56,7 @@ jobs:
   job_psrule_test: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "PSRule validation"
     runs-on: ubuntu-20.04
-    if: (fromJson(inputs.workflowInput)).staticValidation == 'true'
+    if: (fromJson(inputs.workflowInput)).staticValidation == 'true' || (contains('push pull_request', '${{ github.event_name }}') && '${{ inputs.calculatedAction }}' == 'runAllTests')
     strategy:
       fail-fast: false
       matrix:
@@ -78,7 +82,8 @@ jobs:
     runs-on: ubuntu-20.04
     if: |
       !cancelled() &&
-      (fromJson(inputs.workflowInput)).deploymentValidation == 'true' && needs.job_module_static_validation.result != 'failure'
+      ((fromJson(inputs.workflowInput)).deploymentValidation == 'true' || (contains('push pull_request', '${{ github.event_name }}') && '${{ inputs.calculatedAction }}' == 'runAllTests')) &&
+      needs.job_module_static_validation.result != 'failure'
     needs:
       - job_module_static_validation
       # - job_psrule_test # Ignoring dependency whilst PSRule gets bedded in, in this project
