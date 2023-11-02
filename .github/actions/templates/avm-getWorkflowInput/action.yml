@@ -80,6 +80,8 @@ runs:
           Write-Verbose $content -Verbose
         }
 
+        ls $env:GITHUB_WORKSPACE
+
         Write-Output '::endgroup::'
       shell: pwsh
     # - name: Get workflow input parameters
