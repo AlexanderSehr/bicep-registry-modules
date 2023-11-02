@@ -57,6 +57,7 @@ jobs:
         uses: ./.github/actions/templates/avm-getWorkflowInput
         with:
           workflowPath: "${{ env.workflowPath}}"
+          modulePath: "${{ env.modulePath }}"
       - name: "Get parameter file paths"
         id: get-module-test-file-paths
         uses: ./.github/actions/templates/avm-getModuleTestFiles

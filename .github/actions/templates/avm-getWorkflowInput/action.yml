@@ -42,6 +42,9 @@ inputs:
   workflowPath:
     description: "The path to the workflow file used to retrieve default workflow input parameters."
     required: true
+  modulePath:
+    description: "The path to the module's folder"
+    required: true
 
 # outputs:
 #   workflowInput:
@@ -58,43 +61,21 @@ runs:
         Write-Output '::group::Investigate GitHub event'
 
         Write-Verbose "Event: [$env:GITHUB_EVENT_NAME]" -Verbose
-
-        $filePath = Join-Path $env:GITHUB_WORKSPACE '/github/workflow/event.json'
-        if(Test-Path $filePath) {
-          Write-Verbose "1 [$filePath] exists" -Verbose
-          $content = Get-Content $filePath -Raw
-          Write-Verbose $content -Verbose
-        }
-
-        $filePath = Join-Path $env:GITHUB_WORKSPACE '.github/workflows/event.json'
-        if(Test-Path $filePath) {
-          Write-Verbose "2 [$filePath] exists" -Verbose
-          $content = Get-Content $filePath -Raw
-          Write-Verbose $content -Verbose
-        }
-
-        $filePath = '.github/workflows/event.json'
-        if(Test-Path $filePath) {
-          Write-Verbose "3 [$filePath] exists" -Verbose
-          $content = Get-Content $filePath -Raw
-          Write-Verbose $content -Verbose
-        }
+        Write-Verbose "Path: [$env:GITHUB_EVENT_PATH]" -Verbose
+        Write-Verbose "Module path: [${{ inputs.modulePath }}]" -Verbose
 
         $filePath = $env:GITHUB_EVENT_PATH
         if(Test-Path $filePath) {
-          Write-Verbose "4 [$filePath] exists" -Verbose
-          $content = Get-Content $filePath -Raw
-          Write-Verbose $content -Verbose
-        }
+          $content = Get-Content $filePath -Raw | ConvertFrom-Json
+          $commit = $content.after
 
-        $filePath = Join-Path $env:GITHUB_WORKSPACE $env:GITHUB_EVENT_PATH
-        if(Test-Path $filePath) {
-          Write-Verbose "5 [$filePath] exists" -Verbose
-          $content = Get-Content $filePath -Raw
-          Write-Verbose $content -Verbose
-        }
+          $files = git diff $commit --name-only -- *
+          Write-Verbose ($files | ConvertTo-Json) -Verbose
 
-        ls $env:GITHUB_WORKSPACE
+          $files2 = git diff $commit --name-only -- '${{ inputs.modulePath }}'
+          Write-Verbose ($files2 | ConvertTo-Json) -Verbose
+
+        }
 
         Write-Output '::endgroup::'
       shell: pwsh
