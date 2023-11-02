@@ -31,7 +31,6 @@ on:
       - ".github/workflows/avm.res.key-vault.vault.yml"
       - "avm/res/key-vault/vault/**"
       - "avm/utilities/pipelines/**"
-      - "!*/**/README.md"
 
 env:
   modulePath: "avm/res/key-vault/vault"
@@ -81,5 +80,5 @@ jobs:
       workflowInput: "${{ needs.job_initialize_pipeline.outputs.workflowInput }}"
       moduleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.moduleTestFilePaths }}"
       modulePath: "${{ needs.job_initialize_pipeline.outputs.modulePath}}"
-      calculatedAction: "${{ needs.job_initialize_pipeline.outputs.calculatedAction}}"
+      calculatedAction: "${{ needs.job_initialize_pipeline.outputs.calculatedAction }}"
     secrets: inherit
