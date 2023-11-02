@@ -61,21 +61,35 @@ runs:
 
         $filePath = Join-Path $env:GITHUB_WORKSPACE '/github/workflow/event.json'
         if(Test-Path $filePath) {
-          Write-Verbose "1 exists" -Verbose
+          Write-Verbose "1 [$filePath] exists" -Verbose
           $content = Get-Content $filePath -Raw
           Write-Verbose $content -Verbose
         }
 
         $filePath = Join-Path $env:GITHUB_WORKSPACE '.github/workflows/event.json'
         if(Test-Path $filePath) {
-          Write-Verbose "2 exists" -Verbose
+          Write-Verbose "2 [$filePath] exists" -Verbose
           $content = Get-Content $filePath -Raw
           Write-Verbose $content -Verbose
         }
 
         $filePath = '.github/workflows/event.json'
         if(Test-Path $filePath) {
-          Write-Verbose "3 exists" -Verbose
+          Write-Verbose "3 [$filePath] exists" -Verbose
+          $content = Get-Content $filePath -Raw
+          Write-Verbose $content -Verbose
+        }
+
+        $filePath = $env:GITHUB_EVENT_PATH
+        if(Test-Path $filePath) {
+          Write-Verbose "4 [$filePath] exists" -Verbose
+          $content = Get-Content $filePath -Raw
+          Write-Verbose $content -Verbose
+        }
+
+        $filePath = Join-Path $env:GITHUB_WORKSPACE $env:GITHUB_EVENT_PATH
+        if(Test-Path $filePath) {
+          Write-Verbose "5 [$filePath] exists" -Verbose
           $content = Get-Content $filePath -Raw
           Write-Verbose $content -Verbose
         }
