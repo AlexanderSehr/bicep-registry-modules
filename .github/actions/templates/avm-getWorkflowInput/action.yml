@@ -51,6 +51,30 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Investigate GitHub event
+      id: get-input-param-action
+      run: |
+        # Grouping task logs
+        Write-Output '::group::Investigate GitHub event'
+
+        Write-Verbose "Event: [$env:GITHUB_EVENT_NAME]" -Verbose
+
+        $filePath = Join-Path $env:GITHUB_WORKSPACE '/github/workflow/event.json'
+        if(Test-Path $filePath) {
+          Write-Verbose "1 exists" -Verbose
+          $content = Get-Content $filePath -Raw
+          Write-Verbose $content -Verbose
+        }
+
+        $filePath = Join-Path $env:GITHUB_WORKSPACE '.github/workflows/event.json'
+        if(Test-Path $filePath) {
+          Write-Verbose "2 exists" -Verbose
+          $content = Get-Content $filePath -Raw
+          Write-Verbose $content -Verbose
+        }
+
+        Write-Output '::endgroup::'
+      shell: pwsh
     - name: Get workflow input parameters
       id: get-input-param-action
       run: |
