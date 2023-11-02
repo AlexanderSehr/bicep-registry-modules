@@ -72,7 +72,7 @@ runs:
           $commit = $content.after
           Write-Verbose "Commit: [$commit]" -Verbose
 
-          git diff 'origin/main' --name-only -- *
+          git diff 'origin/main' --name-only
 
           if($files = git diff 'origin/main' $commit --name-only -- *) {
             Write-Verbose ($files | ConvertTo-Json) -Verbose
