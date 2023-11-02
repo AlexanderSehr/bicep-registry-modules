@@ -77,11 +77,11 @@ runs:
 
           git status
 
-          if($files = git diff $commit 'main' --name-only -- *) {
+          if($files = git diff=AM $commit 'main' --name-only -- *) {
             Write-Verbose ($files | ConvertTo-Json) -Verbose
           }
 
-          if($files2 = git diff $commit 'main' --name-only -- '${{ inputs.modulePath }}') {
+          if($files2 = git diff=AM $commit 'main' --name-only -- '${{ inputs.modulePath }}') {
             Write-Verbose ($files2 | ConvertTo-Json) -Verbose
           }
         }
