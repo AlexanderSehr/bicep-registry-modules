@@ -70,12 +70,15 @@ runs:
           $commit = $content.after
           Write-Verbose "Commit: [$commit]" -Verbose
 
-          $files = git diff $commit --name-only -- *
-          Write-Verbose ($files | ConvertTo-Json) -Verbose
+          git status
 
-          $files2 = git diff $commit --name-only -- '${{ inputs.modulePath }}'
-          Write-Verbose ($files2 | ConvertTo-Json) -Verbose
+          if($files = git diff $commit --name-only -- *) {
+            Write-Verbose ($files | ConvertTo-Json) -Verbose
+          }
 
+          if($files2 = git diff $commit --name-only -- '${{ inputs.modulePath }}') {
+            Write-Verbose ($files2 | ConvertTo-Json) -Verbose
+          }
         }
 
         Write-Output '::endgroup::'
