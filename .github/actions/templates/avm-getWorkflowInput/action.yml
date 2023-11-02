@@ -52,7 +52,7 @@ runs:
   using: "composite"
   steps:
     - name: Investigate GitHub event
-      id: get-input-param-action
+      id: get-github-event-data
       run: |
         # Grouping task logs
         Write-Output '::group::Investigate GitHub event'
