@@ -66,8 +66,8 @@ runs:
         $branch = git branch --show-current
         Write-Verbose "Branch: [$branch]" -Verbose
 
-        git checkout main; git fetch
-        git checkout $branch; git fetch
+        # git checkout main; git fetch
+        # git checkout $branch; git fetch
 
         $filePath = $env:GITHUB_EVENT_PATH
         if(Test-Path $filePath) {
@@ -75,13 +75,13 @@ runs:
           $commit = $content.after
           Write-Verbose "Commit: [$commit]" -Verbose
 
-          git diff
+          git diff 'origin/main'
 
-          if($files = git diff $commit 'main' --name-only -- *) {
+          if($files = git diff 'origin/main' $commit --name-only -- *) {
             Write-Verbose ($files | ConvertTo-Json) -Verbose
           }
 
-          if($files2 = git diff $commit 'main' --name-only -- '${{ inputs.modulePath }}') {
+          if($files2 = git diff 'origin/main' $commit --name-only -- '${{ inputs.modulePath }}') {
             Write-Verbose ($files2 | ConvertTo-Json) -Verbose
           }
         }
