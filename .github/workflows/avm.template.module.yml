@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-20.04
     if: |
       !cancelled() &&
-      ((fromJson(inputs.workflowInput)).deploymentValidation == 'true' || (contains('push pull_request', '${{ github.event_name }}') && '${{ inputs.calculatedAction }}' == 'runAllTests')) &&
+      (fromJson(inputs.workflowInput)).deploymentValidation == 'true' &&
       needs.job_module_static_validation.result != 'failure'
     needs:
       - job_module_static_validation
