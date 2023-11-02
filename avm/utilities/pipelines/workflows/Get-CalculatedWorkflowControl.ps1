@@ -30,7 +30,7 @@ function Get-CalculatedWorkflowControl {
         $calculatedAction = 'runStaticTestsOnly'
     }
 
-    Write-Verbose "Performing calculated action [$calculatedAction] for commit [$Commit]"
+    Write-Verbose "Performing calculated action [$calculatedAction] for commit [$Commit]" -Verbose
 
     return $calculatedAction
 }
