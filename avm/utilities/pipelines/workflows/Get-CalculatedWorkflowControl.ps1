@@ -16,9 +16,20 @@ function Get-CalculatedWorkflowControl {
         return ''
     }
 
-    # TODO filter
-    # - If only readme files -> static validation
-    # - If bicep files -> deployment validation
+    $deploymentTestRelevantFiles = $diffFiles | Where-Object {
+        $_ -match '(.+\.bicep)|(.+main\.json)'
+    }
+    $staticTestRelevantFiles = $diffFiles | Where-Object {
+        $_ -match '(.+\.md)|(.+[\\|\/]tests[\\|\/].+\.ps1)'
+    }
 
-    return $diffFiles
+    if ($deploymentTestRelevantFiles.Count -gt 0) {
+        return 'runAllTests'
+    }
+
+    if ($staticTestRelevantFiles.Count -gt 0) {
+        return 'runStaticTestsOnly'
+    }
+
+    return '' # No tests required
 }
