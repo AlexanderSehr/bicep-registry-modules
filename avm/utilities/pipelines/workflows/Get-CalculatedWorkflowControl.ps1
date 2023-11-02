@@ -23,13 +23,12 @@ function Get-CalculatedWorkflowControl {
         $_ -match '(.+\.md)|(.+[\\|\/]tests[\\|\/].+\.ps1)'
     }
 
+    $calculatedAction = ''
     if ($deploymentTestRelevantFiles.Count -gt 0) {
-        return 'runAllTests'
+        $calculatedAction = 'runAllTests'
+    } elseif ($staticTestRelevantFiles.Count -gt 0) {
+        $calculatedAction = 'runStaticTestsOnly'
     }
 
-    if ($staticTestRelevantFiles.Count -gt 0) {
-        return 'runStaticTestsOnly'
-    }
-
-    return '' # No tests required
+    return $calculatedAction
 }
