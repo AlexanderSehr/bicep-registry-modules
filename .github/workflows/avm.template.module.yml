@@ -37,7 +37,12 @@ jobs:
   job_module_static_validation: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "Static validation"
     runs-on: ubuntu-20.04
-    if: (fromJson(inputs.workflowInput)).staticValidation == 'true' || (contains('push pull_request', '${{ github.event_name }}') && '${{ inputs.calculatedAction }}' == 'runStaticTestsOnly')
+    if: |
+      (
+        (fromJson(inputs.workflowInput)).staticValidation == 'true' && contains('workflow_dispatch', '${{ github.event_name }}')
+      ) || (
+        contains('push pull_request', '${{ github.event_name }}') && contains('runStaticTestsOnly runAllTests' ,'${{ inputs.calculatedAction }}'
+      )
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
@@ -82,8 +87,14 @@ jobs:
     runs-on: ubuntu-20.04
     if: |
       !cancelled() &&
-      (fromJson(inputs.workflowInput)).deploymentValidation == 'true' &&
-      needs.job_module_static_validation.result != 'failure'
+      needs.job_module_static_validation.result != 'failure' &&
+      (
+        (
+          (fromJson(inputs.workflowInput)).deploymentValidation == 'true' && contains('workflow_dispatch', '${{ github.event_name }}')
+        ) || (
+          contains('push pull_request', '${{ github.event_name }}') && contains('runAllTests' ,'${{ inputs.calculatedAction }}'
+        )
+      )
     needs:
       - job_module_static_validation
       # - job_psrule_test # Ignoring dependency whilst PSRule gets bedded in, in this project
@@ -119,6 +130,7 @@ jobs:
     runs-on: ubuntu-20.04
     if: github.ref == 'refs/heads/main' && success()
     needs:
+      - job_module_static_validation
       - job_module_deploy_validation
     steps:
       - name: "Checkout"
