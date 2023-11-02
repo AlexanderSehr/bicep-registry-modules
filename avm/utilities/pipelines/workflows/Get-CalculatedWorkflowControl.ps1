@@ -13,7 +13,7 @@ function Get-CalculatedWorkflowControl {
 
     if (-not $diffFiles) {
         Write-Verbose "No files changed in path [$ModulePath]" -Verbose
-        return
+        return ''
     }
 
     return $diffFiles
