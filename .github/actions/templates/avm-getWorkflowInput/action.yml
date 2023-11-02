@@ -64,7 +64,7 @@ runs:
         . (Join-Path $env:GITHUB_WORKSPACE 'avm' 'utilities' 'pipelines' 'workflows' 'Get-CalculatedWorkflowControl.ps1')
 
         if(Test-Path $env:GITHUB_EVENT_PATH) {
-          $content = Get-Content $filePath -Raw | ConvertFrom-Json
+          $content = Get-Content $env:GITHUB_EVENT_PATH -Raw | ConvertFrom-Json
 
           $functionInput = @{
             Commit     = $content.after
