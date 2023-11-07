@@ -58,11 +58,10 @@ param networkAcls object?
 
 @description('Optional. Whether or not public network access is allowed for this resource. For security reasons it should be disabled. If not specified, it will be disabled by default if private endpoints are set and networkAcls are not set.')
 @allowed([
-  ''
   'Enabled'
   'Disabled'
 ])
-param publicNetworkAccess string = ''
+param publicNetworkAccess string?
 
 @description('Optional. The lock settings of the service.')
 param lock lockType
@@ -159,7 +158,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       virtualNetworkRules: networkAcls.?virtualNetworkRules ?? []
       ipRules: networkAcls.?ipRules ?? []
     } : null
-    publicNetworkAccess: !empty(publicNetworkAccess) ? publicNetworkAccess : ((!empty(privateEndpoints ?? []) && empty(networkAcls ?? {})) ? 'Disabled' : null)
+    publicNetworkAccess: publicNetworkAccess ?? ((!empty(privateEndpoints ?? []) && empty(networkAcls ?? {})) ? 'Disabled' : null)
   }
 }
 
