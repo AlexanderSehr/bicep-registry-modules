@@ -17,10 +17,15 @@ Get modified files between previous and current commit depending on if you are r
 #>
 function Get-ModifiedFileList {
 
-  # if ((Get-GitBranchName) -eq 'main') {
   Write-Verbose 'Gathering modified files from the previous head'
-  $Diff = git diff --name-only --diff-filter=AM HEAD^ HEAD # TODO: check if we can compare with latest main instead of just head-1. Do we need a if-else for main?
-  # }
+  if ((Get-GitBranchName) -eq 'main') {
+    # in main
+    $Diff = git diff --name-only --diff-filter=AM HEAD^ HEAD
+  } else {
+    # In branch
+    # TODO: Figure out how to always compare the latest commit to latest main (in branch)
+    $Diff = git diff --name-only --diff-filter=AM HEAD^
+  }
   $ModifiedFiles = $Diff | Get-Item -Force
 
   return $ModifiedFiles
@@ -149,7 +154,7 @@ function Find-TemplateFile {
 
   $FolderPath = Split-Path $Path -Parent
   $FolderName = Split-Path $Path -Leaf
-  if ($FolderName -eq 'modules') {
+  if ($FolderName -eq 'avm') {
     return $null
   }
 
