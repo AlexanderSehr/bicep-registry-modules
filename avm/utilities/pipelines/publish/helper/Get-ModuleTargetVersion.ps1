@@ -48,18 +48,17 @@ function Get-ModuleTargetVersion {
 
   if ($versionChange) {
     # If [version.json] file version property was updated, reset the patch/bug version back to 0
-    Write-Verbose "[version.json] file version property was updated. Resetting PATCH back to 0." -Verbose
+    Write-Verbose "[version.json] file version property was updated. Resetting PATCH back to 0."
     $patch = '0'
-  }
-  else {
+  } else {
     # Otherwise calculate the patch version
-    Write-Verbose "[version.json] file version property was not updated. Calculating new PATCH version." -Verbose
+    Write-Verbose "[version.json] file version property was not updated. Calculating new PATCH version."
     $patch = Get-ModuleTargetPatchVersion -ModuleFolderPath $ModuleFolderPath -MajMinVersion "$major.$minor"
   }
 
   # 4. Get full Semver as MAJOR.MINOR.PATCH
   $targetModuleVersion = '{0}.{1}.{2}' -f $major, $minor, $patch
-  Write-Verbose "Target version is [$targetModuleVersion]." -Verbose
+  Write-Verbose "Target version is [$targetModuleVersion]."
 
   # 5. Return the version
   return $targetModuleVersion

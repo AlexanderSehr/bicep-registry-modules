@@ -42,13 +42,13 @@ function Publish-ModuleFromPathToPBR {
   $moduleJsonFilePath = Join-Path $moduleFolderPath 'main.json'
 
   # 1. Test if module qualifies for publishing
-  if (-not (Get-ModulesToPublish -ModuleFolderPath $moduleFolderPath)) {
+  if (-not (Get-ModulesToPublish -ModuleFolderPath $moduleFolderPath -Verbose)) {
     Write-Verbose "No changes detected. Skipping publishing" -Verbose
     return
   }
 
   # 2. Calculate the version that we would publish with
-  $targetVersion = Get-ModuleTargetVersion -ModuleFolderPath $moduleFolderPath
+  $targetVersion = Get-ModuleTargetVersion -ModuleFolderPath $moduleFolderPath -Verbose
 
   # 3. Get Target Published Module Name
   $publishedModuleName = Get-BRMRepositoryName -TemplateFilePath $TemplateFilePath
