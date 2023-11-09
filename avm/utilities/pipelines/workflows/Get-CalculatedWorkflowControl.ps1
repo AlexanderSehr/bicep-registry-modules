@@ -30,9 +30,18 @@ function Get-CalculatedWorkflowControl {
         [string] $ModulePath
     )
 
-    $calculatedAction = 'runNoTests'
     # TODO: What to do with the `Commit param` ?
-    if ($diffFiles = git diff 'origin/main' --name-only -- $ModulePath | Sort-Object -Unique) {
+
+    if ((git branch --show-current) -eq 'main') {
+        # If already in main, we'd want to compare with the previous commit
+        $diffFiles = git diff HEAD^ --name-only -- $ModulePath | Sort-Object -Unique
+    } else {
+        # If in a branch, we'd want to compare with main
+        $diffFiles = git diff 'origin/main' --name-only -- $ModulePath | Sort-Object -Unique
+    }
+
+    $calculatedAction = 'runNoTests'
+    if ($diffFiles) {
 
         $bicepTemplateRegex = '(.+\.bicep)'
         $jsonTemplateRegex = '(.+main\.json)'
@@ -60,4 +69,4 @@ function Get-CalculatedWorkflowControl {
 
     return $calculatedAction
 }
-# Get-CalculatedWorkflowControl -Commit 'e1f088f7f807db040e79e17d28a656d40dbb2cd8' -ModulePath 'avm/res/key-vault/vault'
+Get-CalculatedWorkflowControl -Commit 'e1f088f7f807db040e79e17d28a656d40dbb2cd8' -ModulePath 'avm/res/key-vault/vault'
