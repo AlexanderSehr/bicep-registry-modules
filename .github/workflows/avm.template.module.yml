@@ -63,7 +63,7 @@ jobs:
 
           Write-Host 'Static validation: ${{ fromJson(inputs.workflowInput).staticValidation }}'
           Write-Host 'GH event: ${{ github.event_name }}'
-          Write-Host 'Calculation: ${{ inputs.calculatedAction }}'
+          Write-Host 'Calculated: ${{ inputs.calculatedAction }}'
           Write-Host 'Contains 1: ${{ contains('workflow_dispatch', github.event_name) }}'
           Write-Host 'Combined 1: ${{ (fromJson(inputs.workflowInput)).staticValidation == 'true' && contains('workflow_dispatch', github.event_name) }}'
           Write-Host 'Contains 2: ${{ contains('runStaticTestsOnly runAllTests' , inputs.calculatedAction) }}'
@@ -75,7 +75,13 @@ jobs:
   job_psrule_test: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "PSRule validation"
     runs-on: ubuntu-20.04
-    if: (fromJson(inputs.workflowInput)).staticValidation == 'true'
+    # We could also consider running this only for changed deployment files?
+    if: |
+      (
+        (fromJson(inputs.workflowInput)).staticValidation == 'true' && contains('workflow_dispatch', '${{ github.event_name }}')
+      ) || (
+        contains('push pull_request', '${{ github.event_name }}') && contains('runStaticTestsOnly runAllTests' ,'${{ inputs.calculatedAction }}')
+      )
     strategy:
       fail-fast: false
       matrix:
@@ -146,6 +152,14 @@ jobs:
         azPSVersion: "latest"
         inlineScript: |
           Write-Host 'Running Deployment test for [${{ matrix.moduleTestFilePaths }}]'
+
+          Write-Host 'Deployment validation: ${{ fromJson(inputs.workflowInput).deploymentValidation }}'
+          Write-Host 'GH event: ${{ github.event_name }}'
+          Write-Host 'Calculated: ${{ inputs.calculatedAction }}'
+          Write-Host 'Contains 1: ${{ contains('workflow_dispatch', github.event_name) }}'
+          Write-Host 'Combined 1: ${{ (fromJson(inputs.workflowInput)).deploymentValidation == 'true' && contains('workflow_dispatch', github.event_name) }}'
+          Write-Host 'Contains 2: ${{ contains('runStaticTestsOnly runAllTests' , inputs.calculatedAction) }}'
+          Write-Host 'Combined 2: ${{ contains('push pull_request', github.event_name ) && contains('runAllTests' , inputs.calculatedAction) }}'
   ##################
   #   Publishing   #
   ##################
