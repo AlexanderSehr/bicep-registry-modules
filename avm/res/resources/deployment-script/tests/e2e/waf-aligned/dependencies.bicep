@@ -65,7 +65,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
       virtualNetworkRules: [
         {
           id: virtualNetwork.properties.subnets[0].id
-          //id: '/subscriptions/cfa4dc0b-3d25-4e58-a70a-7085359080c5/resourceGroups/avm-#_namePrefix_#-resources.deploymentscripts-rdswaf-rg/providers/Microsoft.Network/virtualNetworks/dep-#_namePrefix_#-vnet-rdspwaf/subnets/defaultSubnet'
+          //id: '/subscriptions/cfa4dc0b-3d25-4e58-a70a-7085359080c5/resourceGroups/avm-alsv-resources.deploymentscripts-rdswaf-rg/providers/Microsoft.Network/virtualNetworks/dep-alsv-vnet-rdspwaf/subnets/defaultSubnet'
           action: 'Allow'
         }
       ]
