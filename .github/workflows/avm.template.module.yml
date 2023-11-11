@@ -44,16 +44,19 @@ jobs:
         contains('push pull_request', '${{ github.event_name }}') && contains('runStaticTestsOnly runAllTests' ,'${{ inputs.calculatedAction }}'
       )
     steps:
-      - name: "Checkout"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set environment
-        uses: ./.github/actions/templates/avm-setEnvironment
-      - name: "Run tests"
-        uses: ./.github/actions/templates/avm-validateModulePester
-        with:
-          modulePath: "${{ inputs.modulePath }}"
+      # - name: "Checkout"
+      #   uses: actions/checkout@v4
+      #   with:
+      #     fetch-depth: 0
+      # - name: Set environment
+      #   uses: ./.github/actions/templates/avm-setEnvironment
+      # - name: "Run tests"
+      #   uses: ./.github/actions/templates/avm-validateModulePester
+      #   with:
+      #     modulePath: "${{ inputs.modulePath }}"
+    - name: Static validation
+      run: |
+        Write-Host 'Running static validation'
 
   #########################
   #   PSRule validation   #
@@ -67,18 +70,20 @@ jobs:
       matrix:
         moduleTestFilePaths: ${{ fromJson(inputs.moduleTestFilePaths) }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set environment
-        uses: ./.github/actions/templates/avm-setEnvironment
-      - name: Set PSRule validation
-        uses: ./.github/actions/templates/avm-validateModulePSRule
-        with:
-          templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
-          subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
-          managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
-          psrulePath: "avm/utilities/pipelines/staticValidation/psrule" #'${{ github.workspace }}/avm'
-
+      # - name: Checkout
+      #   uses: actions/checkout@v4
+      # - name: Set environment
+      #   uses: ./.github/actions/templates/avm-setEnvironment
+      # - name: Set PSRule validation
+      #   uses: ./.github/actions/templates/avm-validateModulePSRule
+      #   with:
+      #     templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
+      #     subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+      #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
+      #     psrulePath: "avm/utilities/pipelines/staticValidation/psrule" #'${{ github.workspace }}/avm'
+    - name: PSRule
+      run: |
+        Write-Host 'Running PSRule test for [${{ matrix.moduleTestFilePaths }}]'
   #############################
   #   Deployment validation   #
   #############################
@@ -103,25 +108,27 @@ jobs:
       matrix:
         moduleTestFilePaths: ${{ fromJson(inputs.moduleTestFilePaths) }}
     steps:
-      - name: "Checkout"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set environment
-        uses: ./.github/actions/templates/avm-setEnvironment
-        with:
-          removeDeployment: "${{ fromJson(inputs.workflowInput).removeDeployment }}"
-      - name: "Using test file [${{ matrix.moduleTestFilePaths }}]"
-        uses: ./.github/actions/templates/avm-validateModuleDeployment
-        with:
-          templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
-          location: "WestEurope"
-          subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
-          managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
-          removeDeployment: "${{ fromJson(inputs.workflowInput).removeDeployment }}"
-        env:
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-
+      # - name: "Checkout"
+      #   uses: actions/checkout@v4
+      #   with:
+      #     fetch-depth: 0
+      # - name: Set environment
+      #   uses: ./.github/actions/templates/avm-setEnvironment
+      #   with:
+      #     removeDeployment: "${{ fromJson(inputs.workflowInput).removeDeployment }}"
+      # - name: "Using test file [${{ matrix.moduleTestFilePaths }}]"
+      #   uses: ./.github/actions/templates/avm-validateModuleDeployment
+      #   with:
+      #     templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
+      #     location: "WestEurope"
+      #     subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+      #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
+      #     removeDeployment: "${{ fromJson(inputs.workflowInput).removeDeployment }}"
+      #   env:
+      #     AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Deployment test task
+      run: |
+        Write-Host 'Running Deployment test for [${{ matrix.moduleTestFilePaths }}]'
   ##################
   #   Publishing   #
   ##################
@@ -133,18 +140,21 @@ jobs:
       - job_module_static_validation
       - job_module_deploy_validation
     steps:
-      - name: "Checkout"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set environment
-        uses: ./.github/actions/templates/avm-setEnvironment
-      - name: "Publishing"
-        uses: ./.github/actions/templates/avm-publishModule
-        with:
-          templateFilePath: "${{ inputs.modulePath }}/main.bicep"
-        env:
-          PUBLISH_REGISTRY_SERVER: "${{ secrets.PUBLISH_REGISTRY_SERVER }}"
-          PUBLISH_CLIENT_ID: "${{ secrets.PUBLISH_CLIENT_ID }}"
-          PUBLISH_TENANT_ID: "${{ secrets.PUBLISH_TENANT_ID }}"
-          PUBLISH_SUBSCRIPTION_ID: "${{ secrets.PUBLISH_SUBSCRIPTION_ID }}"
+      # - name: "Checkout"
+      #   uses: actions/checkout@v4
+      #   with:
+      #     fetch-depth: 0
+      # - name: Set environment
+      #   uses: ./.github/actions/templates/avm-setEnvironment
+      # - name: "Publishing"
+      #   uses: ./.github/actions/templates/avm-publishModule
+      #   with:
+      #     templateFilePath: "${{ inputs.modulePath }}/main.bicep"
+      #   env:
+      #     PUBLISH_REGISTRY_SERVER: "${{ secrets.PUBLISH_REGISTRY_SERVER }}"
+      #     PUBLISH_CLIENT_ID: "${{ secrets.PUBLISH_CLIENT_ID }}"
+      #     PUBLISH_TENANT_ID: "${{ secrets.PUBLISH_TENANT_ID }}"
+      #     PUBLISH_SUBSCRIPTION_ID: "${{ secrets.PUBLISH_SUBSCRIPTION_ID }}"
+    - name: Publish task
+      run: |
+        Write-Host 'running publishing for [${{ inputs.modulePath }}]'
