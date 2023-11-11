@@ -161,7 +161,7 @@ jobs:
           Write-Host 'Combined 1: ${{ (fromJson(inputs.workflowInput)).deploymentValidation == 'true' && contains('workflow_dispatch', github.event_name) }}'
           Write-Host 'Contains 2: ${{ contains('runStaticTestsOnly runAllTests' , inputs.calculatedAction) }}'
           Write-Host 'Combined 2: ${{ contains('push pull_request', github.event_name ) && contains('runAllTests' , inputs.calculatedAction) }}'
-          Write-Host 'All ${{ ((fromJson(inputs.workflowInput)).deploymentValidation == 'true' && contains('workflow_dispatch', github.event_name)) || (contains('push pull_request', github.event_name ) && contains('runAllTests' , inputs.calculatedAction)) }}'
+          Write-Host 'All ${{ needs.job_module_static_validation.result != 'failure' && (((fromJson(inputs.workflowInput)).deploymentValidation == 'true' && contains('workflow_dispatch', github.event_name)) || (contains('push pull_request', github.event_name ) && contains('runAllTests' , inputs.calculatedAction))) }}'
   ##################
   #   Publishing   #
   ##################
