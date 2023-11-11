@@ -41,7 +41,7 @@ jobs:
       (
         (fromJson(inputs.workflowInput)).staticValidation == 'true' && contains('workflow_dispatch', '${{ github.event_name }}')
       ) || (
-        contains('push pull_request', '${{ github.event_name }}') && contains('runStaticTestsOnly runAllTests' ,'${{ inputs.calculatedAction }}'
+        contains('push pull_request', '${{ github.event_name }}') && contains('runStaticTestsOnly runAllTests' ,'${{ inputs.calculatedAction }}')
       )
     steps:
       # - name: "Checkout"
@@ -60,6 +60,14 @@ jobs:
         azPSVersion: "latest"
         inlineScript: |
           Write-Host 'Running static validation'
+
+          Write-Host 'Static validation: ${{ fromJson(inputs.workflowInput).staticValidation }}'
+          Write-Host 'GH event: ${{ github.event_name }}'
+          Write-Host 'Calculation: ${{ inputs.calculatedAction }}'
+          Write-Host 'Contains 1: ${{ contains('workflow_dispatch', github.event_name) }}'
+          Write-Host 'Combined 1: ${{ (fromJson(inputs.workflowInput)).staticValidation == 'true' && contains('workflow_dispatch', github.event_name) }}'
+          Write-Host 'Contains 2: ${{ contains('runStaticTestsOnly runAllTests' , inputs.calculatedAction) }}'
+          Write-Host 'Combined 2: ${{ contains('push pull_request', github.event_name ) && contains('runStaticTestsOnly runAllTests' , inputs.calculatedAction) }}'
 
   #########################
   #   PSRule validation   #
@@ -103,7 +111,7 @@ jobs:
         (
           (fromJson(inputs.workflowInput)).deploymentValidation == 'true' && contains('workflow_dispatch', '${{ github.event_name }}')
         ) || (
-          contains('push pull_request', '${{ github.event_name }}') && contains('runAllTests' ,'${{ inputs.calculatedAction }}'
+          contains('push pull_request', '${{ github.event_name }}') && contains('runAllTests' ,'${{ inputs.calculatedAction }}')
         )
       )
     needs:
