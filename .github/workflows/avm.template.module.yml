@@ -55,8 +55,11 @@ jobs:
       #   with:
       #     modulePath: "${{ inputs.modulePath }}"
     - name: Static validation
-      run: |
-        Write-Host 'Running static validation'
+      uses: azure/powershell@v1
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          Write-Host 'Running static validation'
 
   #########################
   #   PSRule validation   #
@@ -82,8 +85,11 @@ jobs:
       #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
       #     psrulePath: "avm/utilities/pipelines/staticValidation/psrule" #'${{ github.workspace }}/avm'
     - name: PSRule
-      run: |
-        Write-Host 'Running PSRule test for [${{ matrix.moduleTestFilePaths }}]'
+      uses: azure/powershell@v1
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          Write-Host 'Running PSRule test for [${{ matrix.moduleTestFilePaths }}]'
   #############################
   #   Deployment validation   #
   #############################
@@ -127,8 +133,11 @@ jobs:
       #   env:
       #     AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
     - name: Deployment test task
-      run: |
-        Write-Host 'Running Deployment test for [${{ matrix.moduleTestFilePaths }}]'
+      uses: azure/powershell@v1
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          Write-Host 'Running Deployment test for [${{ matrix.moduleTestFilePaths }}]'
   ##################
   #   Publishing   #
   ##################
@@ -156,5 +165,8 @@ jobs:
       #     PUBLISH_TENANT_ID: "${{ secrets.PUBLISH_TENANT_ID }}"
       #     PUBLISH_SUBSCRIPTION_ID: "${{ secrets.PUBLISH_SUBSCRIPTION_ID }}"
     - name: Publish task
-      run: |
-        Write-Host 'running publishing for [${{ inputs.modulePath }}]'
+      uses: azure/powershell@v1
+      with:
+        azPSVersion: "latest"
+        inlineScript: |
+          Write-Host 'running publishing for [${{ inputs.modulePath }}]'
