@@ -114,13 +114,8 @@ jobs:
     if: |
       !cancelled() &&
       needs.job_module_static_validation.result != 'failure' &&
-      (
-        (
-          (fromJson(inputs.workflowInput)).deploymentValidation == 'true' && contains('workflow_dispatch', '${{ github.event_name }}')
-        ) || (
-          contains('push pull_request', '${{ github.event_name }}') && contains('runAllTests' ,'${{ inputs.calculatedAction }}')
-        )
-      )
+      (((fromJson(inputs.workflowInput)).deploymentValidation == 'true' && contains('workflow_dispatch', '${{ github.event_name }}')) ||
+      (contains('push pull_request', '${{ github.event_name }}') && contains('runAllTests' ,'${{ inputs.calculatedAction }}')))
     needs:
       - job_module_static_validation
       # - job_psrule_test # Ignoring dependency whilst PSRule gets bedded in, in this project
