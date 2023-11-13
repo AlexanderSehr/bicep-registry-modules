@@ -27,7 +27,13 @@ function Get-CalculatedWorkflowControl {
         [string] $Commit,
 
         [Parameter(Mandatory = $true)]
-        [string] $ModulePath
+        [string] $ModulePath,
+
+        [Parameter(Mandatory = $true)]
+        [string] $GitHubEvent,
+
+        [Parameter(Mandatory = $true)]
+        [string] $WorkflowPath
     )
 
     # TODO: What to do with the `Commit param` ?
@@ -40,13 +46,19 @@ function Get-CalculatedWorkflowControl {
         $diffFiles = git diff 'origin/main' --name-only -- $ModulePath | Sort-Object -Unique
     }
 
-    $calculatedAction = 'runNoTests'
+    $calculatedAction = 'runAllTests'
     if ($diffFiles) {
+
+        # Alternative:
+        # - Deployment test is default OR
+        # - If only markdown or tests/*.ps1 changed we run static tests
+
+        # Also: Move the workflow dispatch logic also here to do all the calculation here
 
         $bicepTemplateRegex = '(.+\.bicep)'
         $jsonTemplateRegex = '(.+main\.json)'
         $markdownRegex = '(.+\.md)'
-        $unitTestRegex = '(.+[\\|\/]tests[\\|\/].+\.ps1)'
+        $unitTestRegex = '(.+[\\|\/]tests[\\|\/]unit[\\|\/].*)'
 
         $deploymentTestRelevantFiles = $diffFiles | Where-Object {
             $_ -match "$bicepTemplateRegex|$jsonTemplateRegex"
@@ -58,10 +70,7 @@ function Get-CalculatedWorkflowControl {
         }
         Write-Verbose ("Changed files that justify static tests: `n{0}" -f ($staticTestRelevantFiles | ConvertTo-Json)) -Verbose
 
-
-        if ($deploymentTestRelevantFiles.Count -gt 0) {
-            $calculatedAction = 'runAllTests'
-        } elseif ($staticTestRelevantFiles.Count -gt 0) {
+        if ($deploymentTestRelevantFiles.Count -eq 0 -and $staticTestRelevantFiles.Count -gt 0) {
             $calculatedAction = 'runStaticTestsOnly'
         }
     }
@@ -69,4 +78,4 @@ function Get-CalculatedWorkflowControl {
 
     return $calculatedAction
 }
-Get-CalculatedWorkflowControl -Commit 'e1f088f7f807db040e79e17d28a656d40dbb2cd8' -ModulePath 'avm/res/key-vault/vault'
+# Get-CalculatedWorkflowControl -Commit 'e1f088f7f807db040e79e17d28a656d40dbb2cd8' -ModulePath 'avm/res/key-vault/vault'
