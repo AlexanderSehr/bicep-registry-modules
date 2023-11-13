@@ -72,8 +72,13 @@ runs:
           $content = Get-Content $env:GITHUB_EVENT_PATH -Raw | ConvertFrom-Json
 
           $functionInput = @{
-            Commit     = $content.after
-            ModulePath = '${{ inputs.modulePath }}'
+            Commit       = $content.after
+            ModulePath   = '${{ inputs.modulePath }}'
+            GitHubEvent  = '${{ github.event_name }}'
+            WorkflowPath = '${{ inputs.workflowPath }}'
+          }
+          if('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            $functionInput['GitHubDispatchEventInputs'] = ('${{ toJSON(github.event.inputs) }}' | ConvertFrom-Json -AsHashTable)
           }
 
           Write-Verbose "Invoke task with" -Verbose
