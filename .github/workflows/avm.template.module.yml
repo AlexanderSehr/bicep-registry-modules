@@ -56,11 +56,6 @@ jobs:
         inlineScript: |
           Write-Host 'Running static validation'
 
-          # Write-Host 'Static validation: ${{ fromJson(inputs.workflowInput).staticValidation }}'
-          # Write-Host 'GH event: ${{ github.event_name }}'
-          # Write-Host 'Calculated: ${{ inputs.calculatedAction }}'
-          # Write-Host 'Contains: ${{ contains('runStaticTestsOnly runAllTests', github.calculatedAction) }}'
-
   #########################
   #   PSRule validation   #
   #########################
