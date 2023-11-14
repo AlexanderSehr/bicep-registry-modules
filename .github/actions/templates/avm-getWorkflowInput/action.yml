@@ -78,7 +78,7 @@ runs:
             WorkflowPath = '${{ inputs.workflowPath }}'
           }
           if('${{ github.event_name }}' -eq 'workflow_dispatch') {
-            $functionInput['GitHubDispatchEventInputs'] = ('${{ toJSON(github.event.inputs) }}' | ConvertFrom-Json -AsHashTable)
+            $functionInput['WorkflowParameters'] = ('${{ toJSON(github.event.inputs) }}' | ConvertFrom-Json -AsHashTable)
           }
 
           Write-Verbose "Invoke task with" -Verbose
