@@ -85,9 +85,9 @@ runs:
 
           # Output values to be accessed by next jobs
           $calculatedActions = @{}
-          foreach($parameterName in $workflowParameters.Keys) {
-            Write-Verbose ('Passing output [{0}] with value [{1}]' -f $parameterName, $workflowParameters[$parameterName]) -Verbose
-            $calculatedActions[$parameterName] = $workflowParameters[$parameterName].toString()
+          foreach($parameterName in $result.Keys) {
+            Write-Verbose ('Passing output [{0}] with value [{1}]' -f $parameterName, $result[$parameterName]) -Verbose
+            $calculatedActions[$parameterName] = $result[$parameterName].toString()
           }
           Write-Output ('{0}={1}' -f 'calculatedActions', ($workflowInput | ConvertTo-Json -Compress)) >> $env:GITHUB_OUTPUT
 
