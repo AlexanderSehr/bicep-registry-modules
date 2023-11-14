@@ -84,17 +84,9 @@ function Get-CalculatedWorkflowControl {
 
             $calculatedAction = [calculatedAction]::runAllTests # Defaulting to run all tests
 
-            # $bicepTemplateRegex = '(.+\.bicep)'
-            # $jsonTemplateRegex = '(.+main\.json)'
             $markdownRegex = '(.+\.md)'
             $unitTestRegex = '(.+[\\|\/]tests[\\|\/]unit[\\|\/].*)'
             $versionRegex = '(.+[\\|\/]version\.json)'
-
-            # $deploymentTestRelevantFiles = $diffFiles | Where-Object {
-            #     $_ -match "$bicepTemplateRegex|$jsonTemplateRegex"
-            # }
-            # Write-Verbose ("Changed files that justify deployment tests: `n{0}" -f ($deploymentTestRelevantFiles | ConvertTo-Json)) -Verbose
-
             $staticTestRelevantFiles = $diffFiles | Where-Object {
                 $_ -match "$markdownRegex|$unitTestRegex|$versionRegex"
             }
@@ -104,6 +96,11 @@ function Get-CalculatedWorkflowControl {
                 # All files that changed only justify static tests
                 Write-Verbose 'Only files that justify static tests were changed.'
                 $calculatedAction = [calculatedAction]::runStaticTestsOnly
+            } else {
+                $deploymentTestRelevantFiles = $diffFiles | Where-Object {
+                    $_ -notIn $staticTestRelevantFiles
+                }
+                Write-Verbose ("Changed files that justify deployment tests: `n{0}" -f ($deploymentTestRelevantFiles | ConvertTo-Json)) -Verbose
             }
         } else {
             $calculatedAction = [calculatedAction]::runNoAction
