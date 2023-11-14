@@ -23,8 +23,8 @@ function Get-CalculatedWorkflowControl {
 
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
-        [string] $Commit,
+        # [Parameter(Mandatory = $true)]
+        # [string] $Commit,
 
         [Parameter(Mandatory = $true)]
         [string] $ModulePath,
