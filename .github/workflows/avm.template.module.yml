@@ -33,7 +33,7 @@ jobs:
   job_module_static_validation: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "Static validation"
     runs-on: ubuntu-20.04
-    if: contains('runStaticTestsOnly runAllTests' ,'${{ fromJson(inputs.calculatedActions).CalculatedAction }}')
+    if: contains('runStaticTestsOnly runAllTests' ,'${{ fromJson(inputs.calculatedActions).RunAction }}')
     steps:
       # - name: "Checkout"
       #   uses: actions/checkout@v4
@@ -59,7 +59,7 @@ jobs:
     name: "PSRule validation"
     runs-on: ubuntu-20.04
     # TODO: We could also consider running this only for changed deployment files?
-    if: contains('runStaticTestsOnly runAllTests' ,'${{ fromJson(inputs.calculatedActions).CalculatedAction }}')
+    if: contains('runStaticTestsOnly runAllTests' ,'${{ fromJson(inputs.calculatedActions).RunAction }}')
     strategy:
       fail-fast: false
       matrix:
@@ -90,8 +90,8 @@ jobs:
     runs-on: ubuntu-20.04
     if: |
       !cancelled() &&
-      needs.job_module_static_validation.result != 'failure' &&
-      contains('runDeploymentTestsOnly runAllTests' ,'${{ fromJson(inputs.calculatedActions).CalculatedAction }}')
+      (needs.job_module_static_validation.result != 'failure') &&
+      contains('runDeploymentTestsOnly runAllTests' ,'${{ fromJson(inputs.calculatedActions).RunAction }}')
     needs:
       - job_module_static_validation
       # - job_psrule_test # Ignoring dependency whilst PSRule gets bedded in, in this project
@@ -125,9 +125,8 @@ jobs:
         inlineScript: |
           Write-Host 'Running Deployment test for [${{ matrix.moduleTestFilePaths }}]'
 
-          Write-Host 'Deployment validation: ${{ fromJson(inputs.calculatedActions).deploymentValidation }}'
           Write-Host 'GH event: ${{ github.event_name }}'
-          Write-Host 'Calculated: ${{ fromJson(inputs.calculatedActions).CalculatedAction }}'
+          Write-Host 'Calculated: ${{ fromJson(inputs.calculatedActions).RunAction }}'
           Write-Host 'Remove: ${{ fromJson(inputs.calculatedActions).RemoveDeployment }}'
 
   ##################

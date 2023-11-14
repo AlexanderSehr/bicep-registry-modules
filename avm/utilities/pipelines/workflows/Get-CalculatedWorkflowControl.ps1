@@ -118,7 +118,7 @@ function Get-CalculatedWorkflowControl {
     Write-Verbose "Will remove deployed resources [$removeDeployment]"
 
     return @{
-        CalculatedAction = $calculatedAction
+        RunAction        = $calculatedAction
         RemoveDeployment = $removeDeployment
     }
 }
