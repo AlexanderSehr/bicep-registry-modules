@@ -42,83 +42,98 @@ function Get-CalculatedWorkflowControl {
         [string] $RepoRoot = (Get-Item $PSScriptRoot).Parent.Parent.Parent.Parent.FullName
     )
 
-    begin {
-        # Loading helper function
-        . (Join-Path $repoRoot 'avm' 'utilities' 'pipelines' 'workflows' 'Get-CalculatedWorkflowControl.ps1')
+    # Loading helper function
+    . (Join-Path $repoRoot 'avm' 'utilities' 'pipelines' 'workflows' 'Get-GitHubWorkflowDefaultInput.ps1')
+
+
+    # CASE 1 Workflow Dispatch
+    # ========================
+    if ($GitHubEvent -eq 'workflow_dispatch') {
+
+        # Calucate stages to execute
+        if ([System.Convert]::ToBoolean($WorkflowParameters.staticValidation) -and [System.Convert]::ToBoolean($WorkflowParameters.deploymentValidation)) {
+            $calculatedAction = 'runAllTests'
+        } elseif ([System.Convert]::ToBoolean($WorkflowParameters.staticValidation)) {
+            $calculatedAction = 'runStaticTestsOnly'
+        } elseif ([System.Convert]::ToBoolean($WorkflowParameters.deploymentValidation)) {
+            $calculatedAction = 'runDeploymentTestsOnly'
+        } else {
+            $calculatedAction = 'noAction'
+        }
+
+        # Calculate if deployment should be removed
+        $removeDeployment = $WorkflowParameters.removeDeployment
+
+        # TODO: Add removeDeployment handling
+    } else {
+        # CASE 2 - Literally anything else
+        # ================================
+        $workflowParameters = Get-GitHubWorkflowDefaultInput -WorkflowPath $WorkflowPaths
+
+        Write-Verbose "The workflow trigger is [$GitHubEvent]" -Verbose
+
+        # TODO: What to do with the `Commit param` ?
+
+        if ((git branch --show-current) -eq 'main') {
+            # If already in main, we'd want to compare with the previous commit
+            $diffFiles = git diff HEAD^ --name-only -- $ModulePath | Sort-Object -Unique
+        } else {
+            # If in a branch, we'd want to compare with main
+            $diffFiles = git diff 'origin/main' --name-only -- $ModulePath | Sort-Object -Unique
+        }
+
+        $calculatedAction = 'runAllTests'
+        if ($diffFiles) {
+
+            # Alternative:
+            # - Deployment test is default OR
+            # - If only markdown or tests/*.ps1 changed we run static tests
+
+            # Also: Move the workflow dispatch logic also here to do all the calculation here
+
+            $bicepTemplateRegex = '(.+\.bicep)'
+            $jsonTemplateRegex = '(.+main\.json)'
+            $markdownRegex = '(.+\.md)'
+            $unitTestRegex = '(.+[\\|\/]tests[\\|\/]unit[\\|\/].*)'
+
+            $deploymentTestRelevantFiles = $diffFiles | Where-Object {
+                $_ -match "$bicepTemplateRegex|$jsonTemplateRegex"
+            }
+            Write-Verbose ("Changed files that justify deployment tests: `n{0}" -f ($deploymentTestRelevantFiles | ConvertTo-Json)) -Verbose
+
+            $staticTestRelevantFiles = $diffFiles | Where-Object {
+                $_ -match "$markdownRegex|$unitTestRegex"
+            }
+            Write-Verbose ("Changed files that justify static tests: `n{0}" -f ($staticTestRelevantFiles | ConvertTo-Json)) -Verbose
+
+            if ($deploymentTestRelevantFiles.Count -eq 0 -and $staticTestRelevantFiles.Count -gt 0) {
+                $calculatedAction = 'runStaticTestsOnly'
+            }
+        }
+        Write-Verbose "Performing calculated action [$calculatedAction] for commit [$Commit]" -Verbose
+
     }
 
-    process {
+    Write-Verbose "Will execute action [$calculatedAction]"
+    Write-Verbose "Will remove deployed resources [$removeDeployment]"
 
-
-        # CASE 1 Workflow Dispatch
-        # ========================
-        if ($GitHubEvent -eq 'workflow_dispatch') {
-            Write-Verbose 'Workflow parameters' -Verbose
-            Write-Verbose ($WorkflowParameters | ConvertTo-Json) -Verbose
-
-            # TODO: Candle cases
-            $calculatedAction = 'runAllTests'
-            return
-
-
-        } else {
-            # CASE 2 - Literally anything else
-            # ================================
-            if ($GitHubEvent -ne 'workflow_dispatch') {
-                $workflowParameters = Get-GitHubWorkflowDefaultInput -WorkflowPath $WorkflowPaths
-            }
-
-            Write-Verbose "The workflow trigger is [$GitHubEvent]" -Verbose
-
-            # TODO: What to do with the `Commit param` ?
-
-            if ((git branch --show-current) -eq 'main') {
-                # If already in main, we'd want to compare with the previous commit
-                $diffFiles = git diff HEAD^ --name-only -- $ModulePath | Sort-Object -Unique
-            } else {
-                # If in a branch, we'd want to compare with main
-                $diffFiles = git diff 'origin/main' --name-only -- $ModulePath | Sort-Object -Unique
-            }
-
-            $calculatedAction = 'runAllTests'
-            if ($diffFiles) {
-
-                # Alternative:
-                # - Deployment test is default OR
-                # - If only markdown or tests/*.ps1 changed we run static tests
-
-                # Also: Move the workflow dispatch logic also here to do all the calculation here
-
-                $bicepTemplateRegex = '(.+\.bicep)'
-                $jsonTemplateRegex = '(.+main\.json)'
-                $markdownRegex = '(.+\.md)'
-                $unitTestRegex = '(.+[\\|\/]tests[\\|\/]unit[\\|\/].*)'
-
-                $deploymentTestRelevantFiles = $diffFiles | Where-Object {
-                    $_ -match "$bicepTemplateRegex|$jsonTemplateRegex"
-                }
-                Write-Verbose ("Changed files that justify deployment tests: `n{0}" -f ($deploymentTestRelevantFiles | ConvertTo-Json)) -Verbose
-
-                $staticTestRelevantFiles = $diffFiles | Where-Object {
-                    $_ -match "$markdownRegex|$unitTestRegex"
-                }
-                Write-Verbose ("Changed files that justify static tests: `n{0}" -f ($staticTestRelevantFiles | ConvertTo-Json)) -Verbose
-
-                if ($deploymentTestRelevantFiles.Count -eq 0 -and $staticTestRelevantFiles.Count -gt 0) {
-                    $calculatedAction = 'runStaticTestsOnly'
-                }
-            }
-            Write-Verbose "Performing calculated action [$calculatedAction] for commit [$Commit]" -Verbose
-
-            return $calculatedAction
-        }
+    return @{
+        CalculatedAction = $calculatedAction
+        RemoveDeployment = $removeDeployment
     }
 }
 
-# $inputObject = @{
-#     # Commit       = 'e1f088f7f807db040e79e17d28a656d40dbb2cd8'
-#     ModulePath   = 'avm/res/key-vault/vault'
-#     GitHubEvent  = 'push'
-#     WorkflowPath = 'C:\dev\ip\Azure-bicep-registry-modules\alexanderSehr-fork\.github\workflows\avm.res.key-vault.vault.yml'
-# }
-# Get-CalculatedWorkflowControl @inputObject
+$inputObject = @{
+    # Commit       = 'e1f088f7f807db040e79e17d28a656d40dbb2cd8'
+    ModulePath         = 'avm/res/key-vault/vault'
+    # GitHubEvent         = 'push'
+    WorkflowPath       = 'C:\dev\ip\Azure-bicep-registry-modules\alexanderSehr-fork\.github\workflows\avm.res.key-vault.vault.yml'
+
+    GitHubEvent        = 'workflow_dispatch'
+    WorkflowParameters = @{
+        deploymentValidation = "false"
+        staticValidation     = "true"
+        removeDeployment     = "true"
+    }
+}
+Get-CalculatedWorkflowControl @inputObject -Verbose

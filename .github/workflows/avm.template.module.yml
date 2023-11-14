@@ -3,10 +3,6 @@ name: "avm.template.module"
 on:
   workflow_call:
     inputs:
-      workflowInput:
-        type: string
-        description: "Input from the workflow caller in JSON format"
-        required: true
       moduleTestFilePaths:
         type: string
         description: "List of relative path to the module test files in JSON format"
@@ -15,9 +11,9 @@ on:
         type: string
         description: "Relative path to the module folder"
         required: true
-      calculatedAction:
+      calculatedActions:
         type: string
-        description: "The pipeline action to run based on the changed files"
+        description: "The pipeline actions to run based on the changed files"
         required: true
 
 permissions:
@@ -37,7 +33,7 @@ jobs:
   job_module_static_validation: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "Static validation"
     runs-on: ubuntu-20.04
-    if: contains('runStaticTestsOnly runAllTests' ,'${{ inputs.calculatedAction }}')
+    if: contains('runStaticTestsOnly runAllTests' ,'${{ fromJson(inputs.calculatedActions).CalculatedAction }}')
     steps:
       # - name: "Checkout"
       #   uses: actions/checkout@v4
@@ -63,7 +59,7 @@ jobs:
     name: "PSRule validation"
     runs-on: ubuntu-20.04
     # TODO: We could also consider running this only for changed deployment files?
-    if: contains('runStaticTestsOnly runAllTests' ,'${{ inputs.calculatedAction }}')
+    if: contains('runStaticTestsOnly runAllTests' ,'${{ fromJson(inputs.calculatedActions).CalculatedAction }}')
     strategy:
       fail-fast: false
       matrix:
@@ -95,7 +91,7 @@ jobs:
     if: |
       !cancelled() &&
       needs.job_module_static_validation.result != 'failure' &&
-      contains('runAllTests' ,'${{ inputs.calculatedAction }}')
+      contains('runDeploymentTestsOnly runAllTests' ,'${{ fromJson(inputs.calculatedActions).CalculatedAction }}')
     needs:
       - job_module_static_validation
       # - job_psrule_test # Ignoring dependency whilst PSRule gets bedded in, in this project
@@ -111,7 +107,7 @@ jobs:
       # - name: Set environment
       #   uses: ./.github/actions/templates/avm-setEnvironment
       #   with:
-      #     removeDeployment: "${{ fromJson(inputs.workflowInput).removeDeployment }}"
+      #     removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
       # - name: "Using test file [${{ matrix.moduleTestFilePaths }}]"
       #   uses: ./.github/actions/templates/avm-validateModuleDeployment
       #   with:
@@ -119,7 +115,7 @@ jobs:
       #     location: "WestEurope"
       #     subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
       #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
-      #     removeDeployment: "${{ fromJson(inputs.workflowInput).removeDeployment }}"
+      #     removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
       #   env:
       #     AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
     - name: Deployment test task
@@ -129,11 +125,11 @@ jobs:
         inlineScript: |
           Write-Host 'Running Deployment test for [${{ matrix.moduleTestFilePaths }}]'
 
-          Write-Host 'Deployment validation: ${{ fromJson(inputs.workflowInput).deploymentValidation }}'
+          Write-Host 'Deployment validation: ${{ fromJson(inputs.calculatedActions).deploymentValidation }}'
           Write-Host 'GH event: ${{ github.event_name }}'
-          Write-Host 'Calculated: ${{ inputs.calculatedAction }}'
-          Write-Host 'Contains: ${{ contains('runAllTests', inputs.calculatedAction) }}'
-          Write-Host 'All ${{ needs.job_module_static_validation.result != 'failure' && contains('runAllTests', inputs.calculatedAction) }}'
+          Write-Host 'Calculated: ${{ fromJson(inputs.calculatedActions).CalculatedAction }}'
+          Write-Host 'Remove: ${{ fromJson(inputs.calculatedActions).RemoveDeployment }}'
+
   ##################
   #   Publishing   #
   ##################

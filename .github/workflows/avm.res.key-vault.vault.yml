@@ -63,9 +63,8 @@ jobs:
         with:
           modulePath: "${{ env.modulePath }}"
     outputs:
-      workflowInput: ${{ steps.get-workflow-param.outputs.workflowInput }}
       moduleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.moduleTestFilePaths }}
-      calculatedAction: ${{ steps.get-workflow-param.outputs.calculatedAction }}
+      calculatedActions: ${{ steps.get-workflow-param.outputs.calculatedActions }}
       modulePath: "${{ env.modulePath }}"
 
   ##############################
@@ -77,8 +76,7 @@ jobs:
       - job_initialize_pipeline
     uses: ./.github/workflows/avm.template.module.yml
     with:
-      workflowInput: "${{ needs.job_initialize_pipeline.outputs.workflowInput }}"
       moduleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.moduleTestFilePaths }}"
       modulePath: "${{ needs.job_initialize_pipeline.outputs.modulePath}}"
-      calculatedAction: "${{ needs.job_initialize_pipeline.outputs.calculatedAction }}"
+      calculatedActions: "${{ needs.job_initialize_pipeline.outputs.calculatedActions }}"
     secrets: inherit
