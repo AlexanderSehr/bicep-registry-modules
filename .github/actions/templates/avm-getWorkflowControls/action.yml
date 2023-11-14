@@ -49,7 +49,7 @@ inputs:
 
 outputs:
   calculatedActions:
-    description: "The calculated actison to be executed, based on which files changed."
+    description: "The calculated actions to be executed, based on which files changed & inputs configured."
     value: ${{ steps.get-workflow-controls.outputs.calculatedActions }}
 
 runs:
@@ -89,7 +89,7 @@ runs:
             Write-Verbose ('Passing output [{0}] with value [{1}]' -f $parameterName, $result[$parameterName]) -Verbose
             $calculatedActions[$parameterName] = $result[$parameterName].toString()
           }
-          Write-Output ('{0}={1}' -f 'calculatedActions', ($workflowInput | ConvertTo-Json -Compress)) >> $env:GITHUB_OUTPUT
+          Write-Output ('{0}={1}' -f 'calculatedActions', ($calculatedActions | ConvertTo-Json -Compress)) >> $env:GITHUB_OUTPUT
 
         }
         Write-Output '::endgroup::'
