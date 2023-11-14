@@ -52,8 +52,8 @@ jobs:
         with:
           fetch-depth: 0
       - name: "Set input parameters to output variables"
-        id: get-workflow-param
-        uses: ./.github/actions/templates/avm-getWorkflowInput
+        id: get-workflow-controls
+        uses: ./.github/actions/templates/avm-getWorkflowControls
         with:
           workflowPath: "${{ env.workflowPath}}"
           modulePath: "${{ env.modulePath }}"
@@ -64,7 +64,7 @@ jobs:
           modulePath: "${{ env.modulePath }}"
     outputs:
       moduleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.moduleTestFilePaths }}
-      calculatedActions: ${{ steps.get-workflow-param.outputs.calculatedActions }}
+      calculatedActions: ${{ steps.get-workflow-controls.outputs.calculatedActions }}
       modulePath: "${{ env.modulePath }}"
 
   ##############################
