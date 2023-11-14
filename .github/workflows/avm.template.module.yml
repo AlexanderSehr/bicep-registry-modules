@@ -92,7 +92,10 @@ jobs:
   job_module_deploy_validation: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "Deployment validation"
     runs-on: ubuntu-20.04
-    if: !cancelled() && needs.job_module_static_validation.result != 'failure' && contains('runAllTests' ,'${{ inputs.calculatedAction }}')
+    if: |
+      !cancelled() &&
+      needs.job_module_static_validation.result != 'failure' &&
+      contains('runAllTests' ,'${{ inputs.calculatedAction }}')
     needs:
       - job_module_static_validation
       # - job_psrule_test # Ignoring dependency whilst PSRule gets bedded in, in this project
