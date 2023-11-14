@@ -129,8 +129,8 @@ jobs:
           Write-Host 'Deployment validation: ${{ fromJson(inputs.workflowInput).deploymentValidation }}'
           Write-Host 'GH event: ${{ github.event_name }}'
           Write-Host 'Calculated: ${{ inputs.calculatedAction }}'
-          Write-Host 'Contains: ${{ contains('runAllTests', github.calculatedAction) }}'
-          Write-Host 'All ${{ needs.job_module_static_validation.result != 'failure' && contains('runAllTests', github.calculatedAction) }}'
+          Write-Host 'Contains: ${{ contains('runAllTests', inputs.calculatedAction) }}'
+          Write-Host 'All ${{ needs.job_module_static_validation.result != 'failure' && contains('runAllTests', inputs.calculatedAction) }}'
   ##################
   #   Publishing   #
   ##################
