@@ -116,7 +116,7 @@ function Get-CalculatedWorkflowControl {
 }
 
 # $inputObject = @{
-#     Commit       = 'e1f088f7f807db040e79e17d28a656d40dbb2cd8'
+#     # Commit       = 'e1f088f7f807db040e79e17d28a656d40dbb2cd8'
 #     ModulePath   = 'avm/res/key-vault/vault'
 #     GitHubEvent  = 'push'
 #     WorkflowPath = 'C:\dev\ip\Azure-bicep-registry-modules\alexanderSehr-fork\.github\workflows\avm.res.key-vault.vault.yml'

@@ -76,6 +76,7 @@ runs:
             ModulePath   = '${{ inputs.modulePath }}'
             GitHubEvent  = '${{ github.event_name }}'
             WorkflowPath = '${{ inputs.workflowPath }}'
+            RepoRoot     = $env:GITHUB_WORKSPACE
           }
           if('${{ github.event_name }}' -eq 'workflow_dispatch') {
             $functionInput['WorkflowParameters'] = ('${{ toJSON(github.event.inputs) }}' | ConvertFrom-Json -AsHashTable)
