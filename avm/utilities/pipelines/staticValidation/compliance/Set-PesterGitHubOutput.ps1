@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 Parse a Pester output containing checks & results and generate formatted markdown file out of it.
 
@@ -288,9 +288,6 @@ function Set-PesterGitHubOutput {
     '</details>',
     ''
   )
-
-
-
 
   if ($PSCmdlet.ShouldProcess("Test results file in path [$OutputFilePath]", 'Create')) {
     $null = New-Item -Path $OutputFilePath -Force -Value ($fileContent | Out-String)
