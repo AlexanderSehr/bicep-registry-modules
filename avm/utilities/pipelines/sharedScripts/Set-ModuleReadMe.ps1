@@ -1111,6 +1111,9 @@ Optional. A switch to control whether or not to add a ARM-JSON-Parameter file ex
 .PARAMETER addBicep
 Optional. A switch to control whether or not to add a Bicep usage example. Defaults to true.
 
+.PARAMETER PreviousVersion
+Optional. The version of the module to fall back to if nothing was changed. Usually this would be the version that was previously referenced in the readme.
+
 .EXAMPLE
 Set-UsageExamplesSection -ModuleRoot 'C:/key-vault/vault' -FullModuleIdentifier 'key-vault/vault' -TemplateFileContent @{ resource = @{}; ... } -ReadMeFileContent @('# Title', '', '## Section 1', ...)
 
@@ -1139,11 +1142,20 @@ function Set-UsageExamplesSection {
         [bool] $addBicep = $true,
 
         [Parameter(Mandatory = $false)]
+        [string] $PreviousVersion = '<version>',
+
+        [Parameter(Mandatory = $false)]
         [string] $SectionStartIdentifier = '## Usage examples'
     )
 
     $brLink = Get-BRMRepositoryName -TemplateFilePath $TemplateFilePath
-    $targetVersion = '<version>'
+
+    # 1. Test if module qualifies for publishing
+    if ((Get-ModulesToPublish -ModuleFolderPath $ModuleRoot).count -gt 0) {
+        $targetVersion = Get-ModuleTargetVersion -ModuleFolderPath $ModuleRoot
+    } else {
+        $targetVersion = $PreviousVersion
+    }
 
     # Process content
     $SectionContent = [System.Collections.ArrayList]@(
@@ -1633,6 +1645,8 @@ function Set-ModuleReadMe {
     . (Join-Path $PSScriptRoot 'helper' 'Get-SpecsAlignedResourceName.ps1')
     . (Join-Path $PSScriptRoot 'helper' 'ConvertTo-OrderedHashtable.ps1')
     . (Join-Path (Split-Path $PSScriptRoot -Parent) 'publish' 'helper' 'Get-BRMRepositoryName.ps1')
+    . (Join-Path (Split-Path $PSScriptRoot -Parent) 'publish' 'helper' 'Get-ModulesToPublish.ps1')
+    . (Join-Path (Split-Path $PSScriptRoot -Parent) 'publish' 'helper' 'Get-ModuleTargetVersion.ps1')
 
     # Check template & make full path
     $TemplateFilePath = Resolve-Path -Path $TemplateFilePath -ErrorAction Stop
@@ -1667,19 +1681,24 @@ function Set-ModuleReadMe {
     # ===================== #
     # Read original readme, if any. Then delete it to build from scratch
     if ((Test-Path $ReadMeFilePath) -and -not ([String]::IsNullOrEmpty((Get-Content $ReadMeFilePath -Raw)))) {
-        $readMeFileContent = Get-Content -Path $ReadMeFilePath -Encoding 'utf8'
+        $originalReadMeFileContent = Get-Content -Path $ReadMeFilePath -Encoding 'utf8'
+
+        # Fetching additional information
+        if (($originalReadMeFileContent | Out-String) -match 'br/public:.+:([0-9]+\.[0-9]+\.[0-9]+).+') {
+            $PreviousVersion = $matches[1]
+        }
     }
     # Make sure we preserve any manual notes a user might have added in the corresponding section
-    if ($match = $readMeFileContent | Select-String -Pattern '## Notes') {
+    if ($match = $originalReadMeFileContent | Select-String -Pattern '## Notes') {
         $startIndex = $match.LineNumber
 
         $endIndex = $startIndex + 1
 
-        while (-not (($endIndex + 1) -gt $readMeFileContent.count) -and $readMeFileContent[($endIndex + 1)] -notlike '## *') {
+        while (-not (($endIndex + 1) -gt $originalReadMeFileContent.count) -and $originalReadMeFileContent[($endIndex + 1)] -notlike '## *') {
             $endIndex++
         }
 
-        $notes = $readMeFileContent[($startIndex - 1)..$endIndex]
+        $notes = $originalReadMeFileContent[($startIndex - 1)..$endIndex]
     } else {
         $notes = @()
     }
@@ -1714,6 +1733,10 @@ function Set-ModuleReadMe {
             FullModuleIdentifier = $fullModuleIdentifier
             ReadMeFileContent    = $readMeFileContent
             TemplateFileContent  = $templateFileContent
+            PreviousVersion      = $PreviousVersion
+        }
+        if (-not [String]::IsNullOrEmpty($PreviousVersion)) {
+            $inputObject['PreviousVersion'] = $PreviousVersion
         }
         $readMeFileContent = Set-UsageExamplesSection @inputObject
     }
