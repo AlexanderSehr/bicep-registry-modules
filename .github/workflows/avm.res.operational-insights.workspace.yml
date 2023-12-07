@@ -1,36 +1,10 @@
 name: "avm.res.operational-insights.workspace"
 
 on:
-  schedule:
-    - cron: "0 12 1/15 * *" # Bi-Weekly Test (on 1st & 15th of month)
   workflow_dispatch:
-    inputs:
-      staticValidation:
-        type: boolean
-        description: "Execute static validation"
-        required: false
-        default: true
-      deploymentValidation:
-        type: boolean
-        description: "Execute deployment validation"
-        required: false
-        default: true
-      removeDeployment:
-        type: boolean
-        description: "Remove deployed module"
-        required: false
-        default: true
-
   push:
     branches:
-      - main
-    paths:
-      - ".github/actions/templates/avm-**"
-      - ".github/workflows/avm.template.module.yml"
-      - ".github/workflows/avm.res.operational-insights.workspace.yml"
-      - "avm/res/operational-insights/workspace/**"
-      - "avm/utilities/pipelines/**"
-      - "!*/**/README.md"
+      - users/alsehr/threadingTest
 
 env:
   modulePath: "avm/res/operational-insights/workspace"
@@ -77,14 +51,13 @@ jobs:
 
           $builtTestFileMap = [System.Collections.Concurrent.ConcurrentDictionary[string, object]]::new()
           $pathsToBuild | ForEach-Object -Parallel {
-              Write-Output "Hola 1 [$_]"
               $dict = $using:builtTestFileMap
-              Write-Output "Hola 2 [$_]"
+              Write-Output "Made it past [`$dict] [$_]"
               $builtTemplate = bicep build $_ --stdout | ConvertFrom-Json -AsHashtable
-              Write-Output "Hola 3 [$_]"
+              Write-Output "Mate it past [`$buildTemplate] [$_]"
               $null = $dict.TryAdd($_, $builtTemplate)
-              Write-Output "Hola 4 [$_]"
-          }
+              Write-Output "Made it past [$null] [$_]"
+          } -ThrottleLimit 1
           $builtTestFileMap
 
     #   - name: "Set input parameters to output variables"
