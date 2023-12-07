@@ -84,8 +84,8 @@ jobs:
             $builtTestFileMap
           }
           finally {
-            Write-Verbose ('Post loop 2. Running [bicep build {0} --stdout]' -f $pathsToBuild[0]) -Verbose
-            bicep build $pathsToBuild[-1] --stdout | ConvertFrom-Json -AsHashtable
+            Write-Verbose ('Post loop 2. Running [bicep build {0} --stdout]' -f $pathsToBuild[-3]) -Verbose
+            bicep build $pathsToBuild[-3] --stdout | ConvertFrom-Json -AsHashtable
             Write-Verbose ('Post loop 3.') -Verbose
           }
 
