@@ -49,40 +49,44 @@ jobs:
           $pathsToBuild = [System.Collections.ArrayList]@()
           $pathsToBuild += $moduleFolderPaths | Where-Object { $_ } | ForEach-Object { Join-Path $_ 'main.bicep' }
 
-          $builtTestFileMap = [System.Collections.Concurrent.ConcurrentDictionary[string, object]]::new()
-          $pathsToBuild | ForEach-Object -Parallel {
-              try {
-                $dict = $using:builtTestFileMap
-                Write-Output "Made it past [`$dict] [$_]"
-              } catch {
-                Write-Output "x Made it NOT past [`$dict] [$_]"
-                return
-              }
+          try {
+            $builtTestFileMap = [System.Collections.Concurrent.ConcurrentDictionary[string, object]]::new()
+            $pathsToBuild | ForEach-Object -Parallel {
+                try {
+                  $dict = $using:builtTestFileMap
+                  Write-Output "Made it past [`$dict] [$_]"
+                } catch {
+                  Write-Output "x Made it NOT past [`$dict] [$_]"
+                  return
+                }
 
-              try {
-                # bicep build $_ | ConvertFrom-Json -AsHashtable
-                # $builtTemplate = Get-Content (Join-Path (Split-Path $_) 'main.json') | ConvertFrom-Json -AsHashtable
-                $builtTemplate = 'Oi!'
-                Write-Output "Made it past [`$buildTemplate] [$_]"
-              }
-              catch {
-                Write-Output "x Made it NOT past [`$buildTemplate] [$_]"
-                return
-              }
+                try {
+                  bicep build $_ --stdout | ConvertFrom-Json -AsHashtable
+                  # $builtTemplate = Get-Content (Join-Path (Split-Path $_) 'main.json') | ConvertFrom-Json -AsHashtable
+                  $builtTemplate = 'Oi!'
+                  Write-Output "Made it past [`$buildTemplate] [$_]"
+                }
+                catch {
+                  Write-Output "x Made it NOT past [`$buildTemplate] [$_]"
+                  return
+                }
 
-              try {
-                $null = $dict.TryAdd($_, $builtTemplate)
-                Write-Output "Made it past [`$null] [$_]"
-              } catch {
-                Write-Output "x Made it NOT past [`$null] [$_]"
-                return
-              }
-          } -ThrottleLimit 1
-          $builtTestFileMap
+                try {
+                  $null = $dict.TryAdd($_, $builtTemplate)
+                  Write-Output "Made it past [`$null] [$_]"
+                } catch {
+                  Write-Output "x Made it NOT past [`$null] [$_]"
+                  return
+                }
+            } -ThrottleLimit 1
 
-          Write-Verbose ('Post loop. Running [bicep build {0}]' -f $pathsToBuild[0]) -Verbose
-          bicep build $pathsToBuild[0]
-
+            Write-Verbose ('Post loop 1.') -Verbose
+            $builtTestFileMap
+          }
+          finally {
+            Write-Verbose ('Post loop 2. Running [bicep build {0} --stdout]' -f $pathsToBuild[0]) -Verbose
+            bicep build $pathsToBuild[0] --stdout
+          }
 
     #   - name: "Set input parameters to output variables"
     #     id: get-workflow-param
