@@ -72,13 +72,17 @@ jobs:
 
               try {
                 $null = $dict.TryAdd($_, $builtTemplate)
-                Write-Output "Made it past [$null] [$_]"
+                Write-Output "Made it past [`$null] [$_]"
               } catch {
-                Write-Output "x Made it NOT past [$null] [$_]"
+                Write-Output "x Made it NOT past [`$null] [$_]"
                 return
               }
           } -ThrottleLimit 1
           $builtTestFileMap
+
+          Write-Verbose ('Post loop. Running [bicep build {0}]' -f $pathsToBuild[0]) -Verbose
+          bicep build $pathsToBuild[0]
+
 
     #   - name: "Set input parameters to output variables"
     #     id: get-workflow-param
