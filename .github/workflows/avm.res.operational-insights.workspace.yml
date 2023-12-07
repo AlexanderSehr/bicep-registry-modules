@@ -86,6 +86,7 @@ jobs:
           finally {
             Write-Verbose ('Post loop 2. Running [bicep build {0} --stdout]' -f $pathsToBuild[0]) -Verbose
             bicep build $pathsToBuild[-1] --stdout
+            Write-Verbose ('Post loop 3.') -Verbose
           }
 
     #   - name: "Set input parameters to output variables"
