@@ -65,7 +65,7 @@ jobs:
           $repoRootPath = $env:GITHUB_WORKSPACE
 
           # Set test input module path
-          $moduleFolderPaths = @(Join-Path $repoRootPath "${{ inputs.modulePath }}")
+          $moduleFolderPaths = @(Join-Path $repoRootPath "${{ env.modulePath }}")
           $moduleFolderPaths += (Get-ChildItem $moduleFolderPaths -Recurse -Directory -Force).FullName | Where-Object {
             (Get-ChildItem $_ -File -Depth 0 -Include @('main.json', 'main.bicep') -Force).Count -gt 0
           }
