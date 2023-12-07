@@ -51,33 +51,67 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: "Set input parameters to output variables"
-        id: get-workflow-param
-        uses: ./.github/actions/templates/avm-getWorkflowInput
-        with:
-          workflowPath: "${{ env.workflowPath}}"
-      - name: "Get module test file paths"
-        id: get-module-test-file-paths
-        uses: ./.github/actions/templates/avm-getModuleTestFiles
-        with:
-          modulePath: "${{ env.modulePath }}"
-    outputs:
-      workflowInput: ${{ steps.get-workflow-param.outputs.workflowInput }}
-      moduleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.moduleTestFilePaths }}
-      psRuleModuleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.psRuleModuleTestFilePaths }}
-      modulePath: "${{ env.modulePath }}"
+      - name: "Run Pester tests"
+        id: pester_run_step
+        shell: pwsh
+        run: |
+          # Grouping task logs
+          Write-Output '::group::Run Pester tests'
 
-  ##############################
-  #   Call reusable workflow   #
-  ##############################
-  call-workflow-passing-data:
-    name: "Module"
-    needs:
-      - job_initialize_pipeline
-    uses: ./.github/workflows/avm.template.module.yml
-    with:
-      workflowInput: "${{ needs.job_initialize_pipeline.outputs.workflowInput }}"
-      moduleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.moduleTestFilePaths }}"
-      psRuleModuleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.psRuleModuleTestFilePaths }}"
-      modulePath: "${{ needs.job_initialize_pipeline.outputs.modulePath}}"
-    secrets: inherit
+          # Load used functions
+          . (Join-Path $env:GITHUB_WORKSPACE 'avm' 'utilities' 'pipelines' 'staticValidation' 'compliance' 'Set-PesterGitHubOutput.ps1')
+
+          # Set repo root path
+          $repoRootPath = $env:GITHUB_WORKSPACE
+
+          # Set test input module path
+          $moduleFolderPaths = @(Join-Path $repoRootPath "${{ inputs.modulePath }}")
+          $moduleFolderPaths += (Get-ChildItem $moduleFolderPaths -Recurse -Directory -Force).FullName | Where-Object {
+            (Get-ChildItem $_ -File -Depth 0 -Include @('main.json', 'main.bicep') -Force).Count -gt 0
+          }
+
+          $pathsToBuild = [System.Collections.ArrayList]@()
+          $pathsToBuild += $moduleFolderPaths | ForEach-Object { Join-Path $_ 'main.bicep' }
+
+          $builtTestFileMap = [System.Collections.Concurrent.ConcurrentDictionary[string, object]]::new()
+          $pathsToBuild | ForEach-Object -Parallel {
+              Write-Output "Hola 1 [$_]"
+              $dict = $using:builtTestFileMap
+              Write-Output "Hola 2 [$_]"
+              $builtTemplate = bicep build $_ --stdout | ConvertFrom-Json -AsHashtable
+              Write-Output "Hola 3 [$_]"
+              $null = $dict.TryAdd($_, $builtTemplate)
+              Write-Output "Hola 4 [$_]"
+          }
+          $builtTestFileMap
+
+    #   - name: "Set input parameters to output variables"
+    #     id: get-workflow-param
+    #     uses: ./.github/actions/templates/avm-getWorkflowInput
+    #     with:
+    #       workflowPath: "${{ env.workflowPath}}"
+    #   - name: "Get module test file paths"
+    #     id: get-module-test-file-paths
+    #     uses: ./.github/actions/templates/avm-getModuleTestFiles
+    #     with:
+    #       modulePath: "${{ env.modulePath }}"
+    # outputs:
+    #   workflowInput: ${{ steps.get-workflow-param.outputs.workflowInput }}
+    #   moduleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.moduleTestFilePaths }}
+    #   psRuleModuleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.psRuleModuleTestFilePaths }}
+    #   modulePath: "${{ env.modulePath }}"
+
+  # ##############################
+  # #   Call reusable workflow   #
+  # ##############################
+  # call-workflow-passing-data:
+  #   name: "Module"
+  #   needs:
+  #     - job_initialize_pipeline
+  #   uses: ./.github/workflows/avm.template.module.yml
+  #   with:
+  #     workflowInput: "${{ needs.job_initialize_pipeline.outputs.workflowInput }}"
+  #     moduleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.moduleTestFilePaths }}"
+  #     psRuleModuleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.psRuleModuleTestFilePaths }}"
+  #     modulePath: "${{ needs.job_initialize_pipeline.outputs.modulePath}}"
+  #   secrets: inherit
