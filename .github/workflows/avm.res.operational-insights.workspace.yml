@@ -70,8 +70,10 @@ jobs:
             (Get-ChildItem $_ -File -Depth 0 -Include @('main.json', 'main.bicep') -Force).Count -gt 0
           }
 
+          Write-Verbose "Module folder paths: $($moduleFolderPaths | ConvertTo-Json)" -Verbose
+
           $pathsToBuild = [System.Collections.ArrayList]@()
-          $pathsToBuild += $moduleFolderPaths | ForEach-Object { Join-Path $_ 'main.bicep' }
+          $pathsToBuild += $moduleFolderPaths | Where-Object { $_ } | ForEach-Object { Join-Path $_ 'main.bicep' }
 
           $builtTestFileMap = [System.Collections.Concurrent.ConcurrentDictionary[string, object]]::new()
           $pathsToBuild | ForEach-Object -Parallel {
