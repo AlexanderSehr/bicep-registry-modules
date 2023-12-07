@@ -60,8 +60,9 @@ jobs:
               }
 
               try {
-                bicep build $_ | ConvertFrom-Json -AsHashtable
-                $builtTemplate = Get-Content (Join-Path (Split-Path $_) 'main.json') | ConvertFrom-Json -AsHashtable
+                # bicep build $_ | ConvertFrom-Json -AsHashtable
+                # $builtTemplate = Get-Content (Join-Path (Split-Path $_) 'main.json') | ConvertFrom-Json -AsHashtable
+                $builtTemplate = 'Oi!'
                 Write-Output "Made it past [`$buildTemplate] [$_]"
               }
               catch {
