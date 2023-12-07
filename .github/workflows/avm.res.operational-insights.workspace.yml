@@ -51,12 +51,30 @@ jobs:
 
           $builtTestFileMap = [System.Collections.Concurrent.ConcurrentDictionary[string, object]]::new()
           $pathsToBuild | ForEach-Object -Parallel {
-              $dict = $using:builtTestFileMap
-              Write-Output "Made it past [`$dict] [$_]"
-              $builtTemplate = bicep build $_ --stdout | ConvertFrom-Json -AsHashtable
-              Write-Output "Mate it past [`$buildTemplate] [$_]"
-              $null = $dict.TryAdd($_, $builtTemplate)
-              Write-Output "Made it past [$null] [$_]"
+              try {
+                $dict = $using:builtTestFileMap
+                Write-Output "Made it past [`$dict] [$_]"
+              } catch {
+                Write-Output "x Made it NOT past [`$dict] [$_]"
+                return
+              }
+
+              try {
+                $builtTemplate = bicep build $_ --stdout | ConvertFrom-Json -AsHashtable
+                Write-Output "Made it past [`$buildTemplate] [$_]"
+              }
+              catch {
+                Write-Output "x Made it NOT past [`$buildTemplate] [$_]"
+                return
+              }
+
+              try {
+                $null = $dict.TryAdd($_, $builtTemplate)
+                Write-Output "Made it past [$null] [$_]"
+              } catch {
+                Write-Output "x Made it NOT past [$null] [$_]"
+                return
+              }
           } -ThrottleLimit 1
           $builtTestFileMap
 
