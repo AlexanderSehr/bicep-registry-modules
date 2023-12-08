@@ -41,7 +41,6 @@ resource savedSearch 'Microsoft.OperationalInsights/workspaces/savedSearches@202
   parent: workspace
   //etag: etag // According to API, the variable should be here, but it doesn't work here.
   properties: {
-    #disable-next-line BCP037
     etag: etag
     tags: tags ?? []
     displayName: displayName
