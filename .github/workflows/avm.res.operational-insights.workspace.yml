@@ -61,7 +61,7 @@ jobs:
                 }
 
                 try {
-                  $res = bicep build $_ --stdout --stderr 2>$errOut
+                  $res = bicep build $_ --stdout --stderr $errOut
 
                   Write-Output "ErrOut [$errOut] [$_]"
 
