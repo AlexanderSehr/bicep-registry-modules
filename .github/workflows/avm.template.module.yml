@@ -7,6 +7,10 @@ on:
         type: string
         description: "List of relative path to the module test files in JSON format"
         required: true
+      psRuleModuleTestFilePaths:
+        type: string
+        description: "List of relative path to the PSRule module test files in JSON format"
+        required: true
       modulePath:
         type: string
         description: "Relative path to the module folder"
@@ -45,25 +49,25 @@ jobs:
       #   uses: ./.github/actions/templates/avm-validateModulePester
       #   with:
       #     modulePath: "${{ inputs.modulePath }}"
-    - name: Static validation
-      uses: azure/powershell@v1
-      with:
-        azPSVersion: "latest"
-        inlineScript: |
-          Write-Host 'Running static validation'
+      - name: Static validation
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: "latest"
+          inlineScript: |
+            Write-Host 'Running static validation'
 
   #########################
   #   PSRule validation   #
   #########################
   job_psrule_test: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
-    name: "PSRule validation"
+    name: "PSRule [${{ matrix.testCases.name }}]"
     runs-on: ubuntu-20.04
     # TODO: We could also consider running this only for changed deployment files?
     if: contains('runStaticTestsOnly runAllTests', fromJson(inputs.calculatedActions).RunAction)
     strategy:
       fail-fast: false
       matrix:
-        moduleTestFilePaths: ${{ fromJson(inputs.moduleTestFilePaths) }}
+        testCases: ${{ fromJson(inputs.psRuleModuleTestFilePaths) }}
     steps:
       # - name: Checkout
       #   uses: actions/checkout@v4
@@ -76,17 +80,17 @@ jobs:
       #     subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
       #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
       #     psrulePath: "avm/utilities/pipelines/staticValidation/psrule" #'${{ github.workspace }}/avm'
-    - name: PSRule
-      uses: azure/powershell@v1
-      with:
-        azPSVersion: "latest"
-        inlineScript: |
-          Write-Host 'Running PSRule test for [${{ matrix.moduleTestFilePaths }}]'
+      - name: PSRule
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: "latest"
+          inlineScript: |
+            Write-Host 'Running PSRule test for [${{ matrix.moduleTestFilePaths }}]'
   #############################
   #   Deployment validation   #
   #############################
   job_module_deploy_validation: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
-    name: "Deployment validation"
+    name: "Deploy [${{ matrix.testCases.name}}]"
     runs-on: ubuntu-20.04
     if: |
       !cancelled() &&
@@ -98,7 +102,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        moduleTestFilePaths: ${{ fromJson(inputs.moduleTestFilePaths) }}
+        testCases: ${{ fromJson(inputs.moduleTestFilePaths) }}
     steps:
       # - name: "Checkout"
       #   uses: actions/checkout@v4
@@ -118,16 +122,16 @@ jobs:
       #     removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
       #   env:
       #     AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-    - name: Deployment test task
-      uses: azure/powershell@v1
-      with:
-        azPSVersion: "latest"
-        inlineScript: |
-          Write-Host 'Running Deployment test for [${{ matrix.moduleTestFilePaths }}]'
+      - name: Deployment test task
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: "latest"
+          inlineScript: |
+            Write-Host 'Running Deployment test for [${{ matrix.moduleTestFilePaths }}]'
 
-          Write-Host 'GH event: ${{ github.event_name }}'
-          Write-Host 'Calculated: ${{ fromJson(inputs.calculatedActions).RunAction }}'
-          Write-Host 'Remove: ${{ fromJson(inputs.calculatedActions).RemoveDeployment }}'
+            Write-Host 'GH event: ${{ github.event_name }}'
+            Write-Host 'Calculated: ${{ fromJson(inputs.calculatedActions).RunAction }}'
+            Write-Host 'Remove: ${{ fromJson(inputs.calculatedActions).RemoveDeployment }}'
 
   ##################
   #   Publishing   #
@@ -155,9 +159,9 @@ jobs:
       #     PUBLISH_CLIENT_ID: "${{ secrets.PUBLISH_CLIENT_ID }}"
       #     PUBLISH_TENANT_ID: "${{ secrets.PUBLISH_TENANT_ID }}"
       #     PUBLISH_SUBSCRIPTION_ID: "${{ secrets.PUBLISH_SUBSCRIPTION_ID }}"
-    - name: Publish task
-      uses: azure/powershell@v1
-      with:
-        azPSVersion: "latest"
-        inlineScript: |
-          Write-Host 'running publishing for [${{ inputs.modulePath }}]'
+      - name: Publish task
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: "latest"
+          inlineScript: |
+            Write-Host 'running publishing for [${{ inputs.modulePath }}]'
