@@ -1,13 +1,8 @@
 #########################################################
-## 'Get workflow input' Composite Action               ## TODO: Update
+## 'Get Workflow Controls' Composite Action            ##
 #########################################################
 ##
-## This composite action contains the logic to read workflow runtime parameters and publih their value as a workflow output.
-## This is essential in case a module workflow was not triggered via the 'workflow_dispatch' method, so these runtime parameters will not be available to use when the workflow runs.
-## To solve this, the action reads the workflow file for the module, and looks for the default values of the workflow inputs and publishes them as an output, regardless of how the workflow was triggered.
-##
-## Currently publishes the runtime parameter(s):
-## - removeDeployment
+## This composite action contains the logic to calcuate the actions the workflow should run (e.g. only static, static + deployment, etc.) based on the type of trigger & the files changed.
 ##
 #########################################################
 ##
