@@ -39,16 +39,16 @@ jobs:
     runs-on: ubuntu-20.04
     if: contains('runStaticTestsOnly runAllTests', fromJson(inputs.calculatedActions).RunAction)
     steps:
-      # - name: "Checkout"
-      #   uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
-      # - name: Set environment
-      #   uses: ./.github/actions/templates/avm-setEnvironment
-      # - name: "Run tests"
-      #   uses: ./.github/actions/templates/avm-validateModulePester
-      #   with:
-      #     modulePath: "${{ inputs.modulePath }}"
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set environment
+        uses: ./.github/actions/templates/avm-setEnvironment
+      - name: "Run tests"
+        uses: ./.github/actions/templates/avm-validateModulePester
+        with:
+          modulePath: "${{ inputs.modulePath }}"
       - name: Static validation
         uses: azure/powershell@v1
         with:
@@ -69,17 +69,17 @@ jobs:
       matrix:
         testCases: ${{ fromJson(inputs.psRuleModuleTestFilePaths) }}
     steps:
-      # - name: Checkout
-      #   uses: actions/checkout@v4
-      # - name: Set environment
-      #   uses: ./.github/actions/templates/avm-setEnvironment
-      # - name: "Run PSRule validation with [${{ matrix.testCases.path }}]"
-      #   uses: ./.github/actions/templates/avm-validateModulePSRule
-      #   with:
-      #     templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
-      #     subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
-      #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
-      #     psrulePath: "avm/utilities/pipelines/staticValidation/psrule" #'${{ github.workspace }}/avm'
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set environment
+        uses: ./.github/actions/templates/avm-setEnvironment
+      - name: "Run PSRule validation with [${{ matrix.testCases.path }}]"
+        uses: ./.github/actions/templates/avm-validateModulePSRule
+        with:
+          templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
+          subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+          managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
+          psrulePath: "avm/utilities/pipelines/staticValidation/psrule" #'${{ github.workspace }}/avm'
       - name: PSRule
         uses: azure/powershell@v1
         with:
@@ -104,24 +104,24 @@ jobs:
       matrix:
         testCases: ${{ fromJson(inputs.moduleTestFilePaths) }}
     steps:
-      # - name: "Checkout"
-      #   uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
-      # - name: Set environment
-      #   uses: ./.github/actions/templates/avm-setEnvironment
-      #   with:
-      #     removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
-      # - name: "Using test file [${{ matrix.moduleTestFilePaths }}]"
-      #   uses: ./.github/actions/templates/avm-validateModuleDeployment
-      #   with:
-      #     templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
-      #     location: "WestEurope"
-      #     subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
-      #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
-      #     removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
-      #   env:
-      #     AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set environment
+        uses: ./.github/actions/templates/avm-setEnvironment
+        with:
+          removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
+      - name: "Using test file [${{ matrix.moduleTestFilePaths }}]"
+        uses: ./.github/actions/templates/avm-validateModuleDeployment
+        with:
+          templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
+          location: "WestEurope"
+          subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
+          managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
+          removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Deployment test task
         uses: azure/powershell@v1
         with:
@@ -144,21 +144,21 @@ jobs:
       - job_module_static_validation
       - job_module_deploy_validation
     steps:
-      # - name: "Checkout"
-      #   uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
-      # - name: Set environment
-      #   uses: ./.github/actions/templates/avm-setEnvironment
-      # - name: "Publishing"
-      #   uses: ./.github/actions/templates/avm-publishModule
-      #   with:
-      #     templateFilePath: "${{ inputs.modulePath }}/main.bicep"
-      #   env:
-      #     PUBLISH_REGISTRY_SERVER: "${{ secrets.PUBLISH_REGISTRY_SERVER }}"
-      #     PUBLISH_CLIENT_ID: "${{ secrets.PUBLISH_CLIENT_ID }}"
-      #     PUBLISH_TENANT_ID: "${{ secrets.PUBLISH_TENANT_ID }}"
-      #     PUBLISH_SUBSCRIPTION_ID: "${{ secrets.PUBLISH_SUBSCRIPTION_ID }}"
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set environment
+        uses: ./.github/actions/templates/avm-setEnvironment
+      - name: "Publishing"
+        uses: ./.github/actions/templates/avm-publishModule
+        with:
+          templateFilePath: "${{ inputs.modulePath }}/main.bicep"
+        env:
+          PUBLISH_REGISTRY_SERVER: "${{ secrets.PUBLISH_REGISTRY_SERVER }}"
+          PUBLISH_CLIENT_ID: "${{ secrets.PUBLISH_CLIENT_ID }}"
+          PUBLISH_TENANT_ID: "${{ secrets.PUBLISH_TENANT_ID }}"
+          PUBLISH_SUBSCRIPTION_ID: "${{ secrets.PUBLISH_SUBSCRIPTION_ID }}"
       - name: Publish task
         uses: azure/powershell@v1
         with:
