@@ -1666,4 +1666,4 @@ This section gives you an overview of all local-referenced module files (i.e., o
 
 ## Notes
 
-This should trigger static tests
+This should trigger static tests. And this is just an addition.
