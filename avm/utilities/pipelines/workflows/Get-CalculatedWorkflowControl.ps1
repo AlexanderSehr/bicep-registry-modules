@@ -72,12 +72,13 @@ function Get-CalculatedWorkflowControl {
         $removeDeployment = $WorkflowParameters.removeDeployment
 
         # TODO: What to do with the `Commit param` ?
+        # TODO: Note, if we only filter down to the module path, we might miss changes in CI folders + the pipeline. He hence may need to include those in the filter
         if ((git branch --show-current) -eq 'main') {
             # If already in main, we'd want to compare with the previous commit
-            $diffFiles = git diff HEAD^ --name-only -- $ModulePath | Sort-Object -Unique
+            $diffFiles = git diff HEAD^ --name-only -- $ModulePath $WorkflowPath 'avm/utilities' | Sort-Object -Unique
         } else {
             # If in a branch, we'd want to compare with main
-            $diffFiles = git diff 'origin/main' --name-only -- $ModulePath | Sort-Object -Unique
+            $diffFiles = git diff 'origin/main' --name-only -- $ModulePath $WorkflowPath 'avm/utilities' | Sort-Object -Unique
         }
 
         if ($diffFiles) {
@@ -116,17 +117,17 @@ function Get-CalculatedWorkflowControl {
     }
 }
 
-# $inputObject = @{
-#     # Commit       = 'e1f088f7f807db040e79e17d28a656d40dbb2cd8'
-#     ModulePath   = 'avm/res/key-vault/vault'
-#     GitHubEvent  = 'push'
-#     WorkflowPath = 'C:\dev\ip\Azure-bicep-registry-modules\alexanderSehr-fork\.github\workflows\avm.res.key-vault.vault.yml'
+$inputObject = @{
+    # Commit       = 'e1f088f7f807db040e79e17d28a656d40dbb2cd8'
+    ModulePath   = 'avm/res/key-vault/vault'
+    GitHubEvent  = 'push'
+    WorkflowPath = 'C:\dev\ip\Azure-bicep-registry-modules\alexanderSehr-fork\.github\workflows\avm.res.key-vault.vault.yml'
 
-#     # GitHubEvent        = 'workflow_dispatch'
-#     # WorkflowParameters = @{
-#     #     deploymentValidation = "false"
-#     #     staticValidation     = "true"
-#     #     removeDeployment     = "true"
-#     # }
-# }
-# Get-CalculatedWorkflowControl @inputObject -Verbose
+    # GitHubEvent        = 'workflow_dispatch'
+    # WorkflowParameters = @{
+    #     deploymentValidation = "false"
+    #     staticValidation     = "true"
+    #     removeDeployment     = "true"
+    # }
+}
+Get-CalculatedWorkflowControl @inputObject -Verbose
