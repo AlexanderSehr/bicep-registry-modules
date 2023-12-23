@@ -59,8 +59,6 @@ runs:
         # Load used functions
         . (Join-Path $env:GITHUB_WORKSPACE 'avm' 'utilities' 'pipelines' 'workflows' 'Get-CalculatedWorkflowControl.ps1')
 
-        Write-Verbose (Get-ChildItem env:* | Out-String) -Verbose
-
         if(Test-Path $env:GITHUB_EVENT_PATH) {
           # $content = Get-Content $env:GITHUB_EVENT_PATH -Raw | ConvertFrom-Json
 
