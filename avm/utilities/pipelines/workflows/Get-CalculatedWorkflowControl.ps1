@@ -99,7 +99,10 @@ function Get-CalculatedWorkflowControl {
             $staticTestRelevantFiles = $diffFiles | Where-Object {
                 $_ -match "$markdownRegex|$unitTestRegex|$versionRegex"
             }
-            Write-Verbose ("Changed files that justify static tests: `n{0}" -f ((@() + $staticTestRelevantFiles) | ConvertTo-Json))
+            Write-Verbose 'Changed files that justify static tests:' -Verbose
+            $staticTestRelevantFiles | ForEach-Object {
+                Write-Verbose "- $_" -Verbose
+            }
 
             if ($staticTestRelevantFiles.Count -eq $diffFiles.count) {
                 # All files that changed only justify static tests
@@ -109,7 +112,10 @@ function Get-CalculatedWorkflowControl {
                 $deploymentTestRelevantFiles = $diffFiles | Where-Object {
                     $_ -notIn $staticTestRelevantFiles
                 }
-                Write-Verbose ("Changed files that justify deployment tests: `n{0}" -f ((@() + $deploymentTestRelevantFiles) | ConvertTo-Json)) -Verbose
+                Write-Verbose 'Changed files that justify deployment tests:' -Verbose
+                $deploymentTestRelevantFiles | ForEach-Object {
+                    Write-Verbose "- $_" -Verbose
+                }
             }
         } else {
             $calculatedAction = [calculatedAction]::runNoAction
