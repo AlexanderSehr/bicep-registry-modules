@@ -101,7 +101,7 @@ function Get-CalculatedWorkflowControl {
             }
             Write-Verbose 'Changed files that justify static tests:' -Verbose
             $staticTestRelevantFiles | ForEach-Object {
-                Write-Verbose "- $_" -Verbose
+                Write-Verbose "- [$_]" -Verbose
             }
 
             if ($staticTestRelevantFiles.Count -eq $diffFiles.count) {
@@ -114,7 +114,7 @@ function Get-CalculatedWorkflowControl {
                 }
                 Write-Verbose 'Changed files that justify deployment tests:' -Verbose
                 $deploymentTestRelevantFiles | ForEach-Object {
-                    Write-Verbose "- $_" -Verbose
+                    Write-Verbose "- [$_]" -Verbose
                 }
             }
         } else {
