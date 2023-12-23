@@ -1663,3 +1663,7 @@ This section gives you an overview of all local-referenced module files (i.e., o
 | Reference | Type |
 | :-- | :-- |
 | `br/public:avm/res/network/private-endpoint:0.3.1` | Remote reference |
+
+## Notes
+
+This should trigger static tests
