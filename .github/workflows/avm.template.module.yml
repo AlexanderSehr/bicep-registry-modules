@@ -20,10 +20,6 @@ on:
         description: "The pipeline actions to run based on the changed files"
         required: true
 
-permissions:
-  id-token: write # For OIDC
-  contents: write # For release tags
-
 env:
   ARM_SUBSCRIPTION_ID: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
   ARM_MGMTGROUP_ID: "${{ secrets.ARM_MGMTGROUP_ID }}"
@@ -36,7 +32,7 @@ jobs:
   #########################
   job_module_static_validation: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "Static validation"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: contains('runStaticTestsOnly runAllTests', fromJson(inputs.calculatedActions).RunAction)
     steps:
       # - name: "Checkout"
@@ -61,7 +57,7 @@ jobs:
   #########################
   job_psrule_test: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "PSRule [${{ matrix.testCases.name }}]"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     # TODO: We could also consider running this only for changed deployment files?
     if: contains('runStaticTestsOnly runAllTests', fromJson(inputs.calculatedActions).RunAction)
     strategy:
@@ -76,7 +72,7 @@ jobs:
       # - name: "Run PSRule validation with [${{ matrix.testCases.path }}]"
       #   uses: ./.github/actions/templates/avm-validateModulePSRule
       #   with:
-      #     templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
+      #     templateFilePath: "${{ inputs.modulePath }}/${{ matrix.testCases.path }}"
       #     subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
       #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
       #     psrulePath: "avm/utilities/pipelines/staticValidation/psrule" #'${{ github.workspace }}/avm'
@@ -85,20 +81,19 @@ jobs:
         with:
           azPSVersion: "latest"
           inlineScript: |
-            Write-Host 'Running PSRule test for [${{ matrix.moduleTestFilePaths }}]'
+            Write-Host 'Running PSRule test for [${{ matrix.testCases.path }}]'
   #############################
   #   Deployment validation   #
   #############################
   job_module_deploy_validation: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "Deploy [${{ matrix.testCases.name}}]"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: |
       !cancelled() &&
       needs.job_module_static_validation.result != 'failure' &&
       contains('runDeploymentTestsOnly runAllTests', fromJson(inputs.calculatedActions).RunAction)
     needs:
       - job_module_static_validation
-      # - job_psrule_test # Ignoring dependency whilst PSRule gets bedded in, in this project
     strategy:
       fail-fast: false
       matrix:
@@ -112,11 +107,12 @@ jobs:
       #   uses: ./.github/actions/templates/avm-setEnvironment
       #   with:
       #     removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
-      # - name: "Using test file [${{ matrix.moduleTestFilePaths }}]"
+      # - name: "Run deployment validation with test file [${{ matrix.testCases.path }}]"
       #   uses: ./.github/actions/templates/avm-validateModuleDeployment
       #   with:
-      #     templateFilePath: "${{ inputs.modulePath }}/${{ matrix.moduleTestFilePaths }}"
-      #     location: "WestEurope"
+      #     modulePath: "${{ inputs.modulePath }}"
+      #     templateFilePath: "${{ inputs.modulePath }}/${{ matrix.testCases.path }}"
+      #     deploymentMetadataLocation: "WestEurope"
       #     subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
       #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
       #     removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
@@ -127,7 +123,7 @@ jobs:
         with:
           azPSVersion: "latest"
           inlineScript: |
-            Write-Host 'Running Deployment test for [${{ matrix.moduleTestFilePaths }}]'
+            Write-Host 'Running Deployment test for [${{ matrix.testCases.path }}]'
 
             Write-Host 'GH event: ${{ github.event_name }}'
             Write-Host 'Calculated: ${{ fromJson(inputs.calculatedActions).RunAction }}'
@@ -138,7 +134,7 @@ jobs:
   ##################
   job_publish_module: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "Publishing"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && success()
     needs:
       - job_module_static_validation

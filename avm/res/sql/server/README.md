@@ -15,6 +15,7 @@ This module deploys an Azure SQL Server.
 - [Outputs](#Outputs)
 - [Cross-referenced modules](#Cross-referenced-modules)
 - [Notes](#Notes)
+- [Data Collection](#Data-Collection)
 
 ## Resource Types
 
@@ -64,7 +65,7 @@ This instance deploys the module with a Microsoft Entra ID identity as SQL admin
 
 ```bicep
 module server 'br/public:avm/res/sql/server:<version>' = {
-  name: '${uniqueString(deployment().name, location)}-test-sqlsadmin'
+  name: '${uniqueString(deployment().name, resourceLocation)}-test-sqlsadmin'
   params: {
     // Required parameters
     name: 'sqlsadmin'
@@ -126,7 +127,7 @@ This instance deploys the module with the minimum set of required parameters.
 
 ```bicep
 module server 'br/public:avm/res/sql/server:<version>' = {
-  name: '${uniqueString(deployment().name, location)}-test-ssmin'
+  name: '${uniqueString(deployment().name, resourceLocation)}-test-ssmin'
   params: {
     // Required parameters
     name: 'ssmin001'
@@ -182,7 +183,7 @@ This instance deploys the module with most of its features enabled.
 
 ```bicep
 module server 'br/public:avm/res/sql/server:<version>' = {
-  name: '${uniqueString(deployment().name, location)}-test-sqlsmax'
+  name: '${uniqueString(deployment().name, resourceLocation)}-test-sqlsmax'
   params: {
     // Required parameters
     name: 'sqlsmax'
@@ -516,7 +517,7 @@ This instance deploys the module with Private Endpoints.
 
 ```bicep
 module server 'br/public:avm/res/sql/server:<version>' = {
-  name: '${uniqueString(deployment().name, location)}-test-sqlspe'
+  name: '${uniqueString(deployment().name, resourceLocation)}-test-sqlspe'
   params: {
     // Required parameters
     name: 'sqlspe'
@@ -648,7 +649,7 @@ This instance deploys the module with a secondary database.
 
 ```bicep
 module server 'br/public:avm/res/sql/server:<version>' = {
-  name: '${uniqueString(deployment().name, location)}-test-sqlsec'
+  name: '${uniqueString(deployment().name, resourceLocation)}-test-sqlsec'
   params: {
     // Required parameters
     name: 'sqlsec-sec'
@@ -738,7 +739,7 @@ This instance deploys the module with a vulnerability assessment.
 
 ```bicep
 module server 'br/public:avm/res/sql/server:<version>' = {
-  name: '${uniqueString(deployment().name, location)}-test-sqlsvln'
+  name: '${uniqueString(deployment().name, resourceLocation)}-test-sqlsvln'
   params: {
     // Required parameters
     name: 'sqlsvln'
@@ -866,7 +867,7 @@ This instance deploys the module in alignment with the best-practices of the Azu
 
 ```bicep
 module server 'br/public:avm/res/sql/server:<version>' = {
-  name: '${uniqueString(deployment().name, location)}-test-sqlswaf'
+  name: '${uniqueString(deployment().name, resourceLocation)}-test-sqlswaf'
   params: {
     // Required parameters
     name: 'sqlswaf'
@@ -1512,7 +1513,7 @@ Array of role assignments to create.
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
-| [`condition`](#parameter-privateendpointsroleassignmentscondition) | string | The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container" |
+| [`condition`](#parameter-privateendpointsroleassignmentscondition) | string | The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container". |
 | [`conditionVersion`](#parameter-privateendpointsroleassignmentsconditionversion) | string | Version of the condition. |
 | [`delegatedManagedIdentityResourceId`](#parameter-privateendpointsroleassignmentsdelegatedmanagedidentityresourceid) | string | The Resource Id of the delegated managed identity resource. |
 | [`description`](#parameter-privateendpointsroleassignmentsdescription) | string | The description of the role assignment. |
@@ -1534,7 +1535,7 @@ The role to assign. You can provide either the display name of the role definiti
 
 ### Parameter: `privateEndpoints.roleAssignments.condition`
 
-The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container"
+The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container".
 
 - Required: No
 - Type: string
@@ -1647,7 +1648,7 @@ Array of role assignments to create.
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
-| [`condition`](#parameter-roleassignmentscondition) | string | The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container" |
+| [`condition`](#parameter-roleassignmentscondition) | string | The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container". |
 | [`conditionVersion`](#parameter-roleassignmentsconditionversion) | string | Version of the condition. |
 | [`delegatedManagedIdentityResourceId`](#parameter-roleassignmentsdelegatedmanagedidentityresourceid) | string | The Resource Id of the delegated managed identity resource. |
 | [`description`](#parameter-roleassignmentsdescription) | string | The description of the role assignment. |
@@ -1669,7 +1670,7 @@ The role to assign. You can provide either the display name of the role definiti
 
 ### Parameter: `roleAssignments.condition`
 
-The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container"
+The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase "foo_storage_container".
 
 - Required: No
 - Type: string
@@ -1809,3 +1810,7 @@ administrators: {
 
 </details>
 <p>
+
+## Data Collection
+
+The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the [repository](https://aka.ms/avm/telemetry). There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at <https://go.microsoft.com/fwlink/?LinkID=824704>. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
