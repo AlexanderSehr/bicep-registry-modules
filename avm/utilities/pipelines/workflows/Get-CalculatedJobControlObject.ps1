@@ -98,6 +98,7 @@ function Get-CalculatedJobControlObject {
                 Write-Verbose 'Only files that justify static tests were changed.'
                 $RunDeploymentValidation = $false
             } else {
+                # Also other module files were changed which justify deployment tests
                 $deploymentTestRelevantFiles = $diffFiles | Where-Object {
                     $_ -notIn $staticTestRelevantFiles
                 }
@@ -107,7 +108,10 @@ function Get-CalculatedJobControlObject {
                 }
             }
         } else {
-            $calculatedAction = [calculatedAction]::runNoAction
+            # Run no action
+            $RunStaticValidation = $false
+            $RunDeploymentValidation = $false
+            $RunDeploymentRemoval = $false
         }
     }
 
