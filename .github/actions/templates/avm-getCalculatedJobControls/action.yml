@@ -76,7 +76,7 @@ runs:
           Write-Verbose "Invoke task with" -Verbose
           Write-Verbose ($functionInput | ConvertTo-Json | Out-String) -Verbose
 
-          $result = Get-CalculatedJobControlObject @functionInput -Verbose
+          $result = Get-CalculatedJobControlObject @functionInput
 
           # Output values to be accessed by next jobs
           $calculatedJobControls = @{}
