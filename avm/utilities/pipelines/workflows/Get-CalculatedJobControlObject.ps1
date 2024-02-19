@@ -81,6 +81,7 @@ function Get-CalculatedJobControlObject {
             $RunStaticValidation = $true
             $RunDeploymentValidation = $true
             $RunDeploymentRemoval = $true
+            $RunPublishing = $true
 
             $markdownRegex = '(.+\.md)'
             $unitTestRegex = '(.+[\\|\/]tests[\\|\/]unit[\\|\/].*)'
@@ -112,11 +113,14 @@ function Get-CalculatedJobControlObject {
             $RunStaticValidation = $false
             $RunDeploymentValidation = $false
             $RunDeploymentRemoval = $false
+            $RunPublishing = $false
         }
     }
 
-    Write-Verbose "Will execute action [$calculatedAction]"
+    Write-Verbose "Will execute static validation [$RunStaticValidation]"
+    Write-Verbose "Will execute deployment validation [$RunDeploymentValidation]"
     Write-Verbose "Will remove deployed resources [$RunDeploymentRemoval]"
+    Write-Verbose "Will execute publishing [$RunPublishing]"
 
 
     return @{
