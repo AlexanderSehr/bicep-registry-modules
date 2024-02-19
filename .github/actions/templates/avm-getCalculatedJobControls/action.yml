@@ -26,7 +26,7 @@
 ##   |==============================================================================================|
 ##   | Output            | Description                                                              |
 ##   |-------------------|--------------------------------------------------------------------------|
-##   | calculatedActions | An estimated pipeline action caluclated by evaluation changed files.     |
+##   | calculatedJobControls | An estimated pipeline action caluclated by evaluation changed files.     |
 ##   |==============================================================================================|
 ##
 ##---------------------------------------------##
@@ -43,9 +43,9 @@ inputs:
     required: true
 
 outputs:
-  calculatedActions:
+  calculatedJobControls:
     description: "The calculated actions to be executed, based on which files changed & inputs configured."
-    value: ${{ steps.get-workflow-controls.outputs.calculatedActions }}
+    value: ${{ steps.get-workflow-controls.outputs.calculatedJobControls }}
 
 runs:
   using: "composite"
@@ -79,12 +79,12 @@ runs:
           $result = Get-CalculatedJobControlObject @functionInput -Verbose
 
           # Output values to be accessed by next jobs
-          $calculatedActions = @{}
+          $calculatedJobControls = @{}
           foreach($parameterName in $result.Keys) {
             Write-Verbose ('Passing output [{0}] with value [{1}]' -f $parameterName, $result[$parameterName]) -Verbose
-            $calculatedActions[$parameterName] = $result[$parameterName].toString()
+            $calculatedJobControls[$parameterName] = $result[$parameterName].toString()
           }
-          Write-Output ('{0}={1}' -f 'calculatedActions', ($calculatedActions | ConvertTo-Json -Compress)) >> $env:GITHUB_OUTPUT
+          Write-Output ('{0}={1}' -f 'calculatedJobControls', ($calculatedJobControls | ConvertTo-Json -Compress)) >> $env:GITHUB_OUTPUT
 
         }
         Write-Output '::endgroup::'
