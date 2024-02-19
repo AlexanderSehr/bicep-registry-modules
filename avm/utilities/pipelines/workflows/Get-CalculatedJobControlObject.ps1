@@ -15,11 +15,11 @@ Mandatory. The commit to compare
 Mandatory. The path to filter changed files down to
 
 .EXAMPLE
-Get-CalculatedWorkflowControl -Commit 'e1f088f7f807db040e79e17d28a656d40dbb2cd8' -ModulePath 'avm/res/key-vault/vault'
+Get-CalculatedJobControlObject -Commit 'e1f088f7f807db040e79e17d28a656d40dbb2cd8' -ModulePath 'avm/res/key-vault/vault'
 
 Calculate which pipeline stages should be run based on the currently changed files.
 #>
-function Get-CalculatedWorkflowControl {
+function Get-CalculatedJobControlObject {
 
     [CmdletBinding()]
     param (
@@ -45,31 +45,18 @@ function Get-CalculatedWorkflowControl {
     # Loading helper function
     . (Join-Path $repoRoot 'avm' 'utilities' 'pipelines' 'workflows' 'Get-GitHubWorkflowDefaultInput.ps1')
 
-    enum calculatedAction {
-        runAllTests
-        runStaticTestsOnly
-        runDeploymentTestsOnly
-        runNoAction
-    }
-
     # CASE 1 Workflow Dispatch
     # ========================
     if ($GitHubEvent -eq 'workflow_dispatch') {
-        if ([System.Convert]::ToBoolean($WorkflowParameters.staticValidation) -and [System.Convert]::ToBoolean($WorkflowParameters.deploymentValidation)) {
-            $calculatedAction = [calculatedAction]::runAllTests
-        } elseif ([System.Convert]::ToBoolean($WorkflowParameters.staticValidation)) {
-            $calculatedAction = [calculatedAction]::runStaticTestsOnly
-        } elseif ([System.Convert]::ToBoolean($WorkflowParameters.deploymentValidation)) {
-            $calculatedAction = [calculatedAction]::runDeploymentTestsOnly
-        } else {
-            $calculatedAction = [calculatedAction]::runNoAction
-        }
-        $removeDeployment = $WorkflowParameters.removeDeployment
+        $RunStaticValidation = $WorkflowParameters.staticDeployment
+        $RunDeploymentValidation = $WorkflowParameters.triggerDeployment
+        $RunDeploymentRemoval = $WorkflowParameters.RunDeploymentRemoval
+        $RunPublishing = $true
     } else {
         # CASE 2 - Literally anything else
         # ================================
         $workflowParameters = Get-GitHubWorkflowDefaultInput -WorkflowPath $WorkflowPath
-        $removeDeployment = $WorkflowParameters.removeDeployment
+        $RunDeploymentRemoval = $WorkflowParameters.RunDeploymentRemoval
 
         # Note: Currently it's not possible to fetch the filters from the triggering workflow. Hence, we'll have to hardcode them here
         $pathFilters = @(
@@ -91,7 +78,9 @@ function Get-CalculatedWorkflowControl {
 
         if ($diffFiles) {
 
-            $calculatedAction = [calculatedAction]::runAllTests # Defaulting to run all tests
+            $RunStaticValidation = $true
+            $RunDeploymentValidation = $true
+            $RunDeploymentRemoval = $true
 
             $markdownRegex = '(.+\.md)'
             $unitTestRegex = '(.+[\\|\/]tests[\\|\/]unit[\\|\/].*)'
@@ -107,7 +96,7 @@ function Get-CalculatedWorkflowControl {
             if ($staticTestRelevantFiles.Count -eq $diffFiles.count) {
                 # All files that changed only justify static tests
                 Write-Verbose 'Only files that justify static tests were changed.'
-                $calculatedAction = [calculatedAction]::runStaticTestsOnly
+                $RunDeploymentValidation = $false
             } else {
                 $deploymentTestRelevantFiles = $diffFiles | Where-Object {
                     $_ -notIn $staticTestRelevantFiles
@@ -123,11 +112,14 @@ function Get-CalculatedWorkflowControl {
     }
 
     Write-Verbose "Will execute action [$calculatedAction]"
-    Write-Verbose "Will remove deployed resources [$removeDeployment]"
+    Write-Verbose "Will remove deployed resources [$RunDeploymentRemoval]"
+
 
     return @{
-        RunAction        = $calculatedAction
-        RemoveDeployment = $removeDeployment
+        RunStaticValidation     = $RunStaticValidation
+        RunDeploymentValidation = $RunDeploymentValidation
+        RunDeploymentRemoval    = $RunDeploymentRemoval
+        RunPublishing           = $RunPublishing
     }
 }
 
@@ -141,7 +133,7 @@ function Get-CalculatedWorkflowControl {
 #     # WorkflowParameters = @{
 #     #     deploymentValidation = "false"
 #     #     staticValidation     = "true"
-#     #     removeDeployment     = "true"
+#     #     RunDeploymentRemoval     = "true"
 #     # }
 # }
-# Get-CalculatedWorkflowControl @inputObject -Verbose
+# Get-CalculatedJobControlObject @inputObject -Verbose

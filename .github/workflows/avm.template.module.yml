@@ -15,7 +15,7 @@ on:
         type: string
         description: "Relative path to the module folder"
         required: true
-      calculatedActions:
+      calculatedJobControls :
         type: string
         description: "The pipeline actions to run based on the changed files"
         required: true
@@ -33,7 +33,7 @@ jobs:
   job_module_static_validation: # Note: Please don't change this job name. It is used by the setEnvironment action to define which PS modules to install on runners.
     name: "Static validation"
     runs-on: ubuntu-latest
-    if: contains('runStaticTestsOnly runAllTests', fromJson(inputs.calculatedActions).RunAction)
+    if: (fromJson(inputs.calculatedJobControls)).RunStaticValidation == 'true'
     steps:
       # - name: "Checkout"
       #   uses: actions/checkout@v4
@@ -50,7 +50,8 @@ jobs:
         with:
           azPSVersion: "latest"
           inlineScript: |
-            Write-Host 'Running static validation'
+            Write-Host 'Calculated static validation: ${{ fromJson(inputs.calculatedJobControls).RunStaticValidation }}'
+            Write-Host 'Calculated deployment validation: ${{ fromJson(inputs.calculatedJobControls).RunDeploymentValidation }}'
 
   #########################
   #   PSRule validation   #
@@ -59,7 +60,7 @@ jobs:
     name: "PSRule [${{ matrix.testCases.name }}]"
     runs-on: ubuntu-latest
     # TODO: We could also consider running this only for changed deployment files?
-    if: contains('runStaticTestsOnly runAllTests', fromJson(inputs.calculatedActions).RunAction)
+    if: (fromJson(inputs.calculatedJobControls)).RunStaticValidation == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -82,6 +83,8 @@ jobs:
           azPSVersion: "latest"
           inlineScript: |
             Write-Host 'Running PSRule test for [${{ matrix.testCases.path }}]'
+            Write-Host 'Calculated static validation: ${{ fromJson(inputs.calculatedJobControls).RunStaticValidation }}'
+            Write-Host 'Calculated deployment validation: ${{ fromJson(inputs.calculatedJobControls).RunDeploymentValidation }}'
   #############################
   #   Deployment validation   #
   #############################
@@ -91,7 +94,7 @@ jobs:
     if: |
       !cancelled() &&
       needs.job_module_static_validation.result != 'failure' &&
-      contains('runDeploymentTestsOnly runAllTests', fromJson(inputs.calculatedActions).RunAction)
+      (fromJson(inputs.calculatedJobControls)).RunDeploymentValidation == 'true'
     needs:
       - job_module_static_validation
     strategy:
@@ -106,7 +109,7 @@ jobs:
       # - name: Set environment
       #   uses: ./.github/actions/templates/avm-setEnvironment
       #   with:
-      #     removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
+      #     RunDeploymentRemoval: "${{ fromJson(inputs.calculatedJobControls ).RunDeploymentRemoval }}"
       # - name: "Run deployment validation with test file [${{ matrix.testCases.path }}]"
       #   uses: ./.github/actions/templates/avm-validateModuleDeployment
       #   with:
@@ -115,7 +118,7 @@ jobs:
       #     deploymentMetadataLocation: "WestEurope"
       #     subscriptionId: "${{ secrets.ARM_SUBSCRIPTION_ID }}"
       #     managementGroupId: "${{ secrets.ARM_MGMTGROUP_ID }}"
-      #     removeDeployment: "${{ fromJson(inputs.calculatedActions).removeDeployment }}"
+      #     RunDeploymentRemoval: "${{ fromJson(inputs.calculatedJobControls ).RunDeploymentRemoval }}"
       #   env:
       #     AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Deployment test task
@@ -126,8 +129,9 @@ jobs:
             Write-Host 'Running Deployment test for [${{ matrix.testCases.path }}]'
 
             Write-Host 'GH event: ${{ github.event_name }}'
-            Write-Host 'Calculated: ${{ fromJson(inputs.calculatedActions).RunAction }}'
-            Write-Host 'Remove: ${{ fromJson(inputs.calculatedActions).RemoveDeployment }}'
+            Write-Host 'Calculated static validation: ${{ fromJson(inputs.calculatedJobControls).RunStaticValidation }}'
+            Write-Host 'Calculated deployment validation: ${{ fromJson(inputs.calculatedJobControls).RunDeploymentValidation }}'
+            Write-Host 'Remove: ${{ fromJson(inputs.calculatedJobControls).RunDeploymentRemoval }}'
 
   ##################
   #   Publishing   #

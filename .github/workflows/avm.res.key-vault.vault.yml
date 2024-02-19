@@ -61,9 +61,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: "Get (calculated) workflow controls"
-        id: get-workflow-controls
-        uses: ./.github/actions/templates/avm-getWorkflowControls
+      - name: "Get calculated job controls"
+        id: get-calculated-job-controls
+        uses: ./.github/actions/templates/avm-getCalculatedJobControls
         with:
           workflowPath: "${{ env.workflowPath}}"
           modulePath: "${{ env.modulePath }}"
@@ -74,7 +74,7 @@ jobs:
           modulePath: "${{ env.modulePath }}"
     outputs:
       moduleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.moduleTestFilePaths }}
-      calculatedActions: ${{ steps.get-workflow-controls.outputs.calculatedActions }}
+      calculatedJobControls : ${{ steps.get-calculated-job-controls.outputs.calculatedJobControls  }}
       psRuleModuleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.psRuleModuleTestFilePaths }}
       modulePath: "${{ env.modulePath }}"
 
@@ -93,5 +93,5 @@ jobs:
       moduleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.moduleTestFilePaths }}"
       psRuleModuleTestFilePaths: "${{ needs.job_initialize_pipeline.outputs.psRuleModuleTestFilePaths }}"
       modulePath: "${{ needs.job_initialize_pipeline.outputs.modulePath}}"
-      calculatedActions: "${{ needs.job_initialize_pipeline.outputs.calculatedActions }}"
+      calculatedJobControls : "${{ needs.job_initialize_pipeline.outputs.calculatedJobControls }}"
     secrets: inherit
