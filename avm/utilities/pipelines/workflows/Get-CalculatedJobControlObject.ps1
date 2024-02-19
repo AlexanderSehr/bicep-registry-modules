@@ -117,12 +117,6 @@ function Get-CalculatedJobControlObject {
         }
     }
 
-    Write-Verbose "Will execute static validation [$RunStaticValidation]"
-    Write-Verbose "Will execute deployment validation [$RunDeploymentValidation]"
-    Write-Verbose "Will remove deployed resources [$RunDeploymentRemoval]"
-    Write-Verbose "Will execute publishing [$RunPublishing]"
-
-
     return @{
         RunStaticValidation     = $RunStaticValidation
         RunDeploymentValidation = $RunDeploymentValidation
