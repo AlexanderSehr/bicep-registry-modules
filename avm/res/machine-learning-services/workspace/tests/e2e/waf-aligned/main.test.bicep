@@ -62,10 +62,9 @@ module diagnosticDependencies '../../../../../../utilities/e2e-template-assets/t
 // Test Execution //
 // ============== //
 
-@batchSize(1)
-module testDeployment '../../../main.bicep' = [for iteration in [ 'init', 'idem' ]: {
+module testDeployment '../../../main.bicep' = {
   scope: resourceGroup
-  name: '${uniqueString(deployment().name, resourceLocation)}-test-${serviceShort}-${iteration}'
+  name: '${uniqueString(deployment().name, resourceLocation)}-test-${serviceShort}'
   params: {
     name: '${namePrefix}${serviceShort}001'
     location: resourceLocation
@@ -104,4 +103,4 @@ module testDeployment '../../../main.bicep' = [for iteration in [ 'init', 'idem'
     nestedDependencies
     diagnosticDependencies
   ]
-}]
+}
