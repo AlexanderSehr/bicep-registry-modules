@@ -1,0 +1,67 @@
+name: .Platform - Trigger module workflows on a schedule
+
+on:
+  schedule:
+    - cron: "0 12 1 * *" # Bi-Weekly Test (on 1st of every month)
+  workflow_dispatch:
+    inputs:
+      includePattern:
+        type: string
+        description: "RegEx which workflows are included"
+        required: false
+        default: "avm\\.(?:res|ptn)"
+
+jobs:
+  ###########################
+  #   Initialize pipeline   #
+  ###########################
+  job_initialize_pipeline:
+    runs-on: ubuntu-latest
+    name: "Initialize pipeline"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "Set input parameters to output variables"
+        id: get-workflow-param
+        uses: ./.github/actions/templates/avm-getWorkflowInput
+        with:
+          workflowPath: "${{ env.workflowPath}}"
+    outputs:
+      workflowInput: ${{ steps.get-workflow-param.outputs.workflowInput }}
+  InvokeWorkflowsForBranch:
+    name: Invoke-WorkflowsForBranch
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    needs:
+      - job_initialize_pipeline
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: tibdex/github-app-token@v2
+        id: generate-token
+        with:
+          app_id: ${{ secrets.TEAM_LINTER_APP_ID }}
+          private_key: ${{ secrets.TEAM_LINTER_PRIVATE_KEY }}
+      - name: "Run scripts"
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          # Load used functions
+          . (Join-Path $env:GITHUB_WORKSPACE 'avm' 'utilities' 'pipelines' 'platform' 'Invoke-WorkflowsForBranch.ps1')
+
+          $functionInput = @{
+            RepositoryOwner = $env:GITHUB_WORKSPACE
+            RepositoryName  = '${{ github.event.repository.name }}'
+            PipelineFilter  = "${{ needs.job_initialize_pipeline.outputs.includePattern }}"
+          }
+
+          Write-Verbose "Invoke task with" -Verbose
+          Write-Verbose ($functionInput | ConvertTo-Json | Out-String) -Verbose
+
+          Invoke-WorkflowsForBranch @functionInput -Verbose
