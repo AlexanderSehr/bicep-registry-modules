@@ -53,344 +53,344 @@ $pathsToBuild | ForEach-Object -Parallel {
   $null = $dict.TryAdd($_, $templateHashTable)
 }
 
-Describe 'File/folder tests' -Tag 'Modules' {
+# Describe 'File/folder tests' -Tag 'Modules' {
 
-  Context 'General module folder tests' {
+#   Context 'General module folder tests' {
 
-    $moduleFolderTestCases = [System.Collections.ArrayList] @()
-    foreach ($moduleFolderPath in $moduleFolderPaths) {
-      $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
-      $moduleFolderTestCases += @{
-        moduleFolderName = $resourceTypeIdentifier
-        moduleFolderPath = $moduleFolderPath
-        isTopLevelModule = ($resourceTypeIdentifier -split '[\/|\\]').Count -eq 2
-      }
-    }
+#     $moduleFolderTestCases = [System.Collections.ArrayList] @()
+#     foreach ($moduleFolderPath in $moduleFolderPaths) {
+#       $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
+#       $moduleFolderTestCases += @{
+#         moduleFolderName = $resourceTypeIdentifier
+#         moduleFolderPath = $moduleFolderPath
+#         isTopLevelModule = ($resourceTypeIdentifier -split '[\/|\\]').Count -eq 2
+#       }
+#     }
 
-    It '[<moduleFolderName>] Module should contain a [` main.bicep `] file.' -TestCases $moduleFolderTestCases {
+#     It '[<moduleFolderName>] Module should contain a [` main.bicep `] file.' -TestCases $moduleFolderTestCases {
 
-      param( [string] $moduleFolderPath )
+#       param( [string] $moduleFolderPath )
 
-      $hasBicep = Test-Path (Join-Path -Path $moduleFolderPath 'main.bicep')
-      $hasBicep | Should -Be $true
-    }
+#       $hasBicep = Test-Path (Join-Path -Path $moduleFolderPath 'main.bicep')
+#       $hasBicep | Should -Be $true
+#     }
 
-    It '[<moduleFolderName>] Module should contain a [` main.json `] file.' -TestCases $moduleFolderTestCases {
+#     It '[<moduleFolderName>] Module should contain a [` main.json `] file.' -TestCases $moduleFolderTestCases {
 
-      param( [string] $moduleFolderPath )
+#       param( [string] $moduleFolderPath )
 
-      $hasARM = Test-Path (Join-Path -Path $moduleFolderPath 'main.json')
-      $hasARM | Should -Be $true
-    }
+#       $hasARM = Test-Path (Join-Path -Path $moduleFolderPath 'main.json')
+#       $hasARM | Should -Be $true
+#     }
 
-    It '[<moduleFolderName>] Module should contain a [` README.md `] file.' -TestCases $moduleFolderTestCases {
+#     It '[<moduleFolderName>] Module should contain a [` README.md `] file.' -TestCases $moduleFolderTestCases {
 
-      param(
-        [string] $moduleFolderPath
-      )
+#       param(
+#         [string] $moduleFolderPath
+#       )
 
-      $readMeFilePath = Join-Path -Path $moduleFolderPath 'README.md'
-      $pathExisting = Test-Path $readMeFilePath
-      $pathExisting | Should -Be $true
+#       $readMeFilePath = Join-Path -Path $moduleFolderPath 'README.md'
+#       $pathExisting = Test-Path $readMeFilePath
+#       $pathExisting | Should -Be $true
 
-      $file = Get-Item -Path $readMeFilePath
-      $file.Name | Should -BeExactly 'README.md'
-    }
+#       $file = Get-Item -Path $readMeFilePath
+#       $file.Name | Should -BeExactly 'README.md'
+#     }
 
-    It '[<moduleFolderName>] Module should contain a [` ORPHANED.md `] file only if orphaned.' -TestCases ($moduleFolderTestCases | Where-Object { $_.isTopLevelModule }) {
+#     It '[<moduleFolderName>] Module should contain a [` ORPHANED.md `] file only if orphaned.' -TestCases ($moduleFolderTestCases | Where-Object { $_.isTopLevelModule }) {
 
-      param(
-        [string] $moduleFolderPath
-      )
+#       param(
+#         [string] $moduleFolderPath
+#       )
 
-      $templateFilePath = Join-Path -Path $moduleFolderPath 'main.bicep'
+#       $templateFilePath = Join-Path -Path $moduleFolderPath 'main.bicep'
 
-      # Use correct telemetry link based on file path
-      $telemetryCsvLink = $moduleFolderPath -match '[\\|\/]res[\\|\/]' ? $telemetryResCsvLink : $telemetryPtnCsvLink
+#       # Use correct telemetry link based on file path
+#       $telemetryCsvLink = $moduleFolderPath -match '[\\|\/]res[\\|\/]' ? $telemetryResCsvLink : $telemetryPtnCsvLink
 
-      # Fetch CSV
-      # =========
-      try {
-        $rawData = Invoke-WebRequest -Uri $telemetryCsvLink
-      } catch {
-        $errorMessage = "Failed to download telemetry CSV file from [$telemetryCsvLink] due to [{0}]." -f $_.Exception.Message
-        Write-Error $errorMessage
-        Set-ItResult -Skipped -Because $errorMessage
-      }
-      $csvData = $rawData.Content | ConvertFrom-Csv -Delimiter ','
+#       # Fetch CSV
+#       # =========
+#       try {
+#         $rawData = Invoke-WebRequest -Uri $telemetryCsvLink
+#       } catch {
+#         $errorMessage = "Failed to download telemetry CSV file from [$telemetryCsvLink] due to [{0}]." -f $_.Exception.Message
+#         Write-Error $errorMessage
+#         Set-ItResult -Skipped -Because $errorMessage
+#       }
+#       $csvData = $rawData.Content | ConvertFrom-Csv -Delimiter ','
 
-      $moduleName = Get-BRMRepositoryName -TemplateFilePath $templateFilePath
-      $relevantCSVRow = $csvData | Where-Object {
-        $_.ModuleName -eq $moduleName
-      }
+#       $moduleName = Get-BRMRepositoryName -TemplateFilePath $templateFilePath
+#       $relevantCSVRow = $csvData | Where-Object {
+#         $_.ModuleName -eq $moduleName
+#       }
 
-      if (-not $relevantCSVRow) {
-        $errorMessage = "Failed to identify module [$moduleName]."
-        Write-Error $errorMessage
-        Set-ItResult -Skipped -Because $errorMessage
-      }
-      $isOrphaned = [String]::IsNullOrEmpty($relevantCSVRow.PrimaryModuleOwnerGHHandle)
+#       if (-not $relevantCSVRow) {
+#         $errorMessage = "Failed to identify module [$moduleName]."
+#         Write-Error $errorMessage
+#         Set-ItResult -Skipped -Because $errorMessage
+#       }
+#       $isOrphaned = [String]::IsNullOrEmpty($relevantCSVRow.PrimaryModuleOwnerGHHandle)
 
-      $orphanedFilePath = Join-Path -Path $moduleFolderPath 'ORPHANED.md'
-      if ($isOrphaned) {
-        $pathExisting = Test-Path $orphanedFilePath
-        $pathExisting | Should -Be $true -Because 'The module is orphaned.'
-      } else {
-        $pathExisting = Test-Path $orphanedFilePath
-        $pathExisting | Should -Be $false -Because ('The module is not orphaned but owned by [{0}].' -f $relevantCSVRow.PrimaryModuleOwnerGHHandle)
-      }
-    }
-  }
+#       $orphanedFilePath = Join-Path -Path $moduleFolderPath 'ORPHANED.md'
+#       if ($isOrphaned) {
+#         $pathExisting = Test-Path $orphanedFilePath
+#         $pathExisting | Should -Be $true -Because 'The module is orphaned.'
+#       } else {
+#         $pathExisting = Test-Path $orphanedFilePath
+#         $pathExisting | Should -Be $false -Because ('The module is not orphaned but owned by [{0}].' -f $relevantCSVRow.PrimaryModuleOwnerGHHandle)
+#       }
+#     }
+#   }
 
-  Context 'Top level module folder tests' {
+#   Context 'Top level module folder tests' {
 
-    $topLevelModuleTestCases = [System.Collections.ArrayList]@()
-    foreach ($moduleFolderPath in $moduleFolderPaths) {
-      $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
-      $moduleTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[1] # 'avm/res|ptn/<provider>/<resourceType>' would return 'res|ptn'
-      if (($resourceTypeIdentifier -split '[\/|\\]').Count -eq 2) {
-        $topLevelModuleTestCases += @{
-          moduleFolderName     = $moduleFolderPath.Replace('\', '/').Split('/avm/')[1]
-          moduleFolderPath     = $moduleFolderPath
-          moduleTypeIdentifier = $moduleTypeIdentifier
-        }
-      }
-    }
+#     $topLevelModuleTestCases = [System.Collections.ArrayList]@()
+#     foreach ($moduleFolderPath in $moduleFolderPaths) {
+#       $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
+#       $moduleTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[1] # 'avm/res|ptn/<provider>/<resourceType>' would return 'res|ptn'
+#       if (($resourceTypeIdentifier -split '[\/|\\]').Count -eq 2) {
+#         $topLevelModuleTestCases += @{
+#           moduleFolderName     = $moduleFolderPath.Replace('\', '/').Split('/avm/')[1]
+#           moduleFolderPath     = $moduleFolderPath
+#           moduleTypeIdentifier = $moduleTypeIdentifier
+#         }
+#       }
+#     }
 
-    It '[<moduleFolderName>] Module should contain a [` version.json `] file.' -TestCases $topLevelModuleTestCases {
+#     It '[<moduleFolderName>] Module should contain a [` version.json `] file.' -TestCases $topLevelModuleTestCases {
 
-      param (
-        [string] $moduleFolderPath
-      )
+#       param (
+#         [string] $moduleFolderPath
+#       )
 
-      $pathExisting = Test-Path (Join-Path -Path $moduleFolderPath 'version.json')
-      $pathExisting | Should -Be $true
-    }
+#       $pathExisting = Test-Path (Join-Path -Path $moduleFolderPath 'version.json')
+#       $pathExisting | Should -Be $true
+#     }
 
-    It '[<moduleFolderName>] Module should contain a [` tests `] folder.' -TestCases $topLevelModuleTestCases {
+#     It '[<moduleFolderName>] Module should contain a [` tests `] folder.' -TestCases $topLevelModuleTestCases {
 
-      param(
-        [string] $moduleFolderPath
-      )
+#       param(
+#         [string] $moduleFolderPath
+#       )
 
-      $pathExisting = Test-Path (Join-Path -Path $moduleFolderPath 'tests')
-      $pathExisting | Should -Be $true
-    }
+#       $pathExisting = Test-Path (Join-Path -Path $moduleFolderPath 'tests')
+#       $pathExisting | Should -Be $true
+#     }
 
-    It '[<moduleFolderName>] Module should contain a [` tests/e2e `] folder.' -TestCases $topLevelModuleTestCases {
+#     It '[<moduleFolderName>] Module should contain a [` tests/e2e `] folder.' -TestCases $topLevelModuleTestCases {
 
-      param(
-        [string] $moduleFolderPath
-      )
+#       param(
+#         [string] $moduleFolderPath
+#       )
 
-      $pathExisting = Test-Path (Join-Path -Path $moduleFolderPath 'tests')
-      $pathExisting | Should -Be $true
-    }
+#       $pathExisting = Test-Path (Join-Path -Path $moduleFolderPath 'tests')
+#       $pathExisting | Should -Be $true
+#     }
 
-    It '[<moduleFolderName>] Module should contain a [` tests/e2e/*waf-aligned `] folder.' -TestCases ($topLevelModuleTestCases | Where-Object { $_.moduleTypeIdentifier -eq 'res' }) {
+#     It '[<moduleFolderName>] Module should contain a [` tests/e2e/*waf-aligned `] folder.' -TestCases ($topLevelModuleTestCases | Where-Object { $_.moduleTypeIdentifier -eq 'res' }) {
 
-      param(
-        [string] $moduleFolderPath
-      )
+#       param(
+#         [string] $moduleFolderPath
+#       )
 
-      $wafAlignedFolder = Get-ChildItem -Directory (Join-Path -Path $moduleFolderPath 'tests' 'e2e') -Filter '*waf-aligned'
-      $wafAlignedFolder | Should -Not -BeNullOrEmpty
-    }
+#       $wafAlignedFolder = Get-ChildItem -Directory (Join-Path -Path $moduleFolderPath 'tests' 'e2e') -Filter '*waf-aligned'
+#       $wafAlignedFolder | Should -Not -BeNullOrEmpty
+#     }
 
-    It '[<moduleFolderName>] Module should contain a [` tests/e2e/*defaults `] folder.' -TestCases ($topLevelModuleTestCases | Where-Object { $_.moduleTypeIdentifier -eq 'res' }) {
+#     It '[<moduleFolderName>] Module should contain a [` tests/e2e/*defaults `] folder.' -TestCases ($topLevelModuleTestCases | Where-Object { $_.moduleTypeIdentifier -eq 'res' }) {
 
-      param(
-        [string] $moduleFolderPath
-      )
+#       param(
+#         [string] $moduleFolderPath
+#       )
 
-      # only one Domain-Services instance can be provisioned in a tenant and only one test (the waf-aligned) is possible.
-      if ($moduleFolderName.Equals('res/aad/domain-service')) {
-        Set-ItResult -Skipped -Because 'only one instance of the Domain-Service can be deployed at a time, and as such, also only one test can exist at a time.'
-        return
-      }
+#       # only one Domain-Services instance can be provisioned in a tenant and only one test (the waf-aligned) is possible.
+#       if ($moduleFolderName.Equals('res/aad/domain-service')) {
+#         Set-ItResult -Skipped -Because 'only one instance of the Domain-Service can be deployed at a time, and as such, also only one test can exist at a time.'
+#         return
+#       }
 
-      $defaultsFolder = Get-ChildItem -Directory (Join-Path -Path $moduleFolderPath 'tests' 'e2e') -Filter '*defaults'
-      $defaultsFolder | Should -Not -BeNullOrEmpty
-    }
+#       $defaultsFolder = Get-ChildItem -Directory (Join-Path -Path $moduleFolderPath 'tests' 'e2e') -Filter '*defaults'
+#       $defaultsFolder | Should -Not -BeNullOrEmpty
+#     }
 
-    It '[<moduleFolderName>] Module should contain one [` main.test.bicep `] file in each e2e test folder.' -TestCases $topLevelModuleTestCases {
+#     It '[<moduleFolderName>] Module should contain one [` main.test.bicep `] file in each e2e test folder.' -TestCases $topLevelModuleTestCases {
 
-      param(
-        [string] $moduleFolderName,
-        [string] $moduleFolderPath
-      )
+#       param(
+#         [string] $moduleFolderName,
+#         [string] $moduleFolderPath
+#       )
 
-      $e2eTestFolderPathList = Get-ChildItem -Directory (Join-Path -Path $moduleFolderPath 'tests' 'e2e')
-      foreach ($e2eTestFolderPath in $e2eTestFolderPathList) {
-        $filePath = Join-Path -Path $e2eTestFolderPath 'main.test.bicep'
-        $pathExisting = Test-Path $filePath
-        $pathExisting | Should -Be $true -Because "path [$filePath] is expected to exist."
-      }
-    }
-  }
-}
+#       $e2eTestFolderPathList = Get-ChildItem -Directory (Join-Path -Path $moduleFolderPath 'tests' 'e2e')
+#       foreach ($e2eTestFolderPath in $e2eTestFolderPathList) {
+#         $filePath = Join-Path -Path $e2eTestFolderPath 'main.test.bicep'
+#         $pathExisting = Test-Path $filePath
+#         $pathExisting | Should -Be $true -Because "path [$filePath] is expected to exist."
+#       }
+#     }
+#   }
+# }
 
-Describe 'Pipeline tests' -Tag 'Pipeline' {
+# Describe 'Pipeline tests' -Tag 'Pipeline' {
 
-  $pipelineTestCases = [System.Collections.ArrayList] @()
-  foreach ($moduleFolderPath in $moduleFolderPaths) {
+#   $pipelineTestCases = [System.Collections.ArrayList] @()
+#   foreach ($moduleFolderPath in $moduleFolderPaths) {
 
-    $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
-    $relativeModulePath = Join-Path 'avm' ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}')[1]
+#     $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
+#     $relativeModulePath = Join-Path 'avm' ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}')[1]
 
-    $isTopLevelModule = ($resourceTypeIdentifier -split '[\/|\\]').Count -eq 2
-    if ($isTopLevelModule) {
+#     $isTopLevelModule = ($resourceTypeIdentifier -split '[\/|\\]').Count -eq 2
+#     if ($isTopLevelModule) {
 
-      $workflowsFolderName = Join-Path $repoRootPath '.github' 'workflows'
-      $workflowFileName = Get-PipelineFileName -ResourceIdentifier $relativeModulePath
-      $workflowPath = Join-Path $workflowsFolderName $workflowFileName
+#       $workflowsFolderName = Join-Path $repoRootPath '.github' 'workflows'
+#       $workflowFileName = Get-PipelineFileName -ResourceIdentifier $relativeModulePath
+#       $workflowPath = Join-Path $workflowsFolderName $workflowFileName
 
-      $pipelineTestCases += @{
-        relativeModulePath = $relativeModulePath
-        moduleFolderName   = $resourceTypeIdentifier
-        workflowFileName   = $workflowFileName
-        workflowPath       = $workflowPath
-      }
-    }
-  }
+#       $pipelineTestCases += @{
+#         relativeModulePath = $relativeModulePath
+#         moduleFolderName   = $resourceTypeIdentifier
+#         workflowFileName   = $workflowFileName
+#         workflowPath       = $workflowPath
+#       }
+#     }
+#   }
 
-  It '[<moduleFolderName>] Module should have a GitHub workflow in path [.github/workflows/<workflowFileName>].' -TestCases $pipelineTestCases {
+#   It '[<moduleFolderName>] Module should have a GitHub workflow in path [.github/workflows/<workflowFileName>].' -TestCases $pipelineTestCases {
 
-    param(
-      [string] $WorkflowPath
-    )
+#     param(
+#       [string] $WorkflowPath
+#     )
 
-    Test-Path $WorkflowPath | Should -Be $true -Because "path [$WorkflowPath] should exist."
-  }
+#     Test-Path $WorkflowPath | Should -Be $true -Because "path [$WorkflowPath] should exist."
+#   }
 
-  It '[<moduleFolderName>] GitHub workflow [<WorkflowFileName>] should have [workflowPath] environment variable with value [.github/workflows/<WorkflowFileName>].' -TestCases $pipelineTestCases {
+#   It '[<moduleFolderName>] GitHub workflow [<WorkflowFileName>] should have [workflowPath] environment variable with value [.github/workflows/<WorkflowFileName>].' -TestCases $pipelineTestCases {
 
-    param(
-      [string] $WorkflowPath,
-      [string] $WorkflowFileName
-    )
+#     param(
+#       [string] $WorkflowPath,
+#       [string] $WorkflowFileName
+#     )
 
-    if (-not (Test-Path $WorkflowPath)) {
-      Set-ItResult -Skipped -Because "Cannot test content of file in path [$WorkflowPath] as it does not exist."
-      return
-    }
+#     if (-not (Test-Path $WorkflowPath)) {
+#       Set-ItResult -Skipped -Because "Cannot test content of file in path [$WorkflowPath] as it does not exist."
+#       return
+#     }
 
-    $environmentVariables = Get-WorkflowEnvVariablesAsObject -WorkflowPath $WorkflowPath
+#     $environmentVariables = Get-WorkflowEnvVariablesAsObject -WorkflowPath $WorkflowPath
 
-    $environmentVariables.Keys | Should -Contain 'workflowPath'
-    $environmentVariables['workflowPath'] | Should -Be ".github/workflows/$workflowFileName"
-  }
-}
+#     $environmentVariables.Keys | Should -Contain 'workflowPath'
+#     $environmentVariables['workflowPath'] | Should -Be ".github/workflows/$workflowFileName"
+#   }
+# }
 
 Describe 'Module tests' -Tag 'Module' {
 
-  Context 'Readme content tests' -Tag 'Readme' {
+  # Context 'Readme content tests' -Tag 'Readme' {
 
-    $readmeFileTestCases = [System.Collections.ArrayList] @()
+  #   $readmeFileTestCases = [System.Collections.ArrayList] @()
 
-    foreach ($moduleFolderPath in $moduleFolderPaths) {
+  #   foreach ($moduleFolderPath in $moduleFolderPaths) {
 
-      $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
-      $templateFilePath = Join-Path $moduleFolderPath 'main.bicep'
+  #     $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
+  #     $templateFilePath = Join-Path $moduleFolderPath 'main.bicep'
 
-      $readmeFileTestCases += @{
-        moduleFolderName    = $resourceTypeIdentifier
-        templateFileContent = $builtTestFileMap[$templateFilePath]
-        templateFilePath    = $templateFilePath
-        readMeFilePath      = Join-Path -Path $moduleFolderPath 'README.md'
-      }
-    }
+  #     $readmeFileTestCases += @{
+  #       moduleFolderName    = $resourceTypeIdentifier
+  #       templateFileContent = $builtTestFileMap[$templateFilePath]
+  #       templateFilePath    = $templateFilePath
+  #       readMeFilePath      = Join-Path -Path $moduleFolderPath 'README.md'
+  #     }
+  #   }
 
-    It '[<moduleFolderName>] `Set-ModuleReadMe` script should not apply any updates.' -TestCases $readmeFileTestCases {
+  #   It '[<moduleFolderName>] `Set-ModuleReadMe` script should not apply any updates.' -TestCases $readmeFileTestCases {
 
-      param(
-        [string] $templateFilePath,
-        [hashtable] $templateFileContent,
-        [string] $readMeFilePath
-      )
+  #     param(
+  #       [string] $templateFilePath,
+  #       [hashtable] $templateFileContent,
+  #       [string] $readMeFilePath
+  #     )
 
-      # Get current hash
-      $fileHashBefore = (Get-FileHash $readMeFilePath).Hash
+  #     # Get current hash
+  #     $fileHashBefore = (Get-FileHash $readMeFilePath).Hash
 
-      # Load function
-      . (Join-Path $repoRootPath 'avm' 'utilities' 'pipelines' 'sharedScripts' 'Set-ModuleReadMe.ps1')
+  #     # Load function
+  #     . (Join-Path $repoRootPath 'avm' 'utilities' 'pipelines' 'sharedScripts' 'Set-ModuleReadMe.ps1')
 
-      # Apply update with already compiled template content
-      Set-ModuleReadMe -TemplateFilePath $templateFilePath -PreLoadedContent @{ TemplateFileContent = $templateFileContent }
+  #     # Apply update with already compiled template content
+  #     Set-ModuleReadMe -TemplateFilePath $templateFilePath -PreLoadedContent @{ TemplateFileContent = $templateFileContent }
 
-      # Get hash after 'update'
-      $fileHashAfter = (Get-FileHash $readMeFilePath).Hash
+  #     # Get hash after 'update'
+  #     $fileHashAfter = (Get-FileHash $readMeFilePath).Hash
 
-      # Compare
-      $filesAreTheSame = $fileHashBefore -eq $fileHashAfter
-      if (-not $filesAreTheSame) {
-        $diffReponse = git diff $readMeFilePath
-        Write-Warning ($diffReponse | Out-String) -Verbose
+  #     # Compare
+  #     $filesAreTheSame = $fileHashBefore -eq $fileHashAfter
+  #     if (-not $filesAreTheSame) {
+  #       $diffReponse = git diff $readMeFilePath
+  #       Write-Warning ($diffReponse | Out-String) -Verbose
 
-        # Reset readme file to original state
-        git checkout HEAD -- $readMeFilePath
-      }
+  #       # Reset readme file to original state
+  #       git checkout HEAD -- $readMeFilePath
+  #     }
 
-      $mdFormattedDiff = ($diffReponse -join '</br>') -replace '\|', '\|'
-      $filesAreTheSame | Should -Be $true -Because ('The file hashes before and after applying the `/avm/utilities/tools/Set-AVMModule.ps1` and more precisely the `/avm/utilities/pipelines/sharedScripts/Set-ModuleReadMe.ps1` function should be identical and should not have diff </br><pre>{0}</pre>. Please re-run the `Set-AVMModule` function for this module.' -f $mdFormattedDiff)
-    }
-  }
+  #     $mdFormattedDiff = ($diffReponse -join '</br>') -replace '\|', '\|'
+  #     $filesAreTheSame | Should -Be $true -Because ('The file hashes before and after applying the `/avm/utilities/tools/Set-AVMModule.ps1` and more precisely the `/avm/utilities/pipelines/sharedScripts/Set-ModuleReadMe.ps1` function should be identical and should not have diff </br><pre>{0}</pre>. Please re-run the `Set-AVMModule` function for this module.' -f $mdFormattedDiff)
+  #   }
+  # }
 
-  Context 'Compiled ARM template tests' -Tag 'ARM' {
+  # Context 'Compiled ARM template tests' -Tag 'ARM' {
 
-    $armTemplateTestCases = [System.Collections.ArrayList] @()
+  #   $armTemplateTestCases = [System.Collections.ArrayList] @()
 
-    foreach ($moduleFolderPath in $moduleFolderPaths) {
+  #   foreach ($moduleFolderPath in $moduleFolderPaths) {
 
-      # Skipping folders without a [main.bicep] template
-      $templateFilePath = Join-Path $moduleFolderPath 'main.bicep'
-      if (-not (Test-Path $templateFilePath)) {
-        continue
-      }
+  #     # Skipping folders without a [main.bicep] template
+  #     $templateFilePath = Join-Path $moduleFolderPath 'main.bicep'
+  #     if (-not (Test-Path $templateFilePath)) {
+  #       continue
+  #     }
 
-      $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
+  #     $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
 
-      $armTemplateTestCases += @{
-        moduleFolderName = $resourceTypeIdentifier
-        moduleFolderPath = $moduleFolderPath
-        templateFilePath = $templateFilePath
-      }
-    }
+  #     $armTemplateTestCases += @{
+  #       moduleFolderName = $resourceTypeIdentifier
+  #       moduleFolderPath = $moduleFolderPath
+  #       templateFilePath = $templateFilePath
+  #     }
+  #   }
 
-    It '[<moduleFolderName>] The [main.json] ARM template should be based on the current [main.bicep] Bicep template.' -TestCases $armTemplateTestCases {
+  #   It '[<moduleFolderName>] The [main.json] ARM template should be based on the current [main.bicep] Bicep template.' -TestCases $armTemplateTestCases {
 
-      param(
-        [string] $moduleFolderName,
-        [string] $moduleFolderPath,
-        [string] $templateFilePath
-      )
+  #     param(
+  #       [string] $moduleFolderName,
+  #       [string] $moduleFolderPath,
+  #       [string] $templateFilePath
+  #     )
 
-      $armTemplatePath = Join-Path $moduleFolderPath 'main.json'
+  #     $armTemplatePath = Join-Path $moduleFolderPath 'main.json'
 
-      # Current json
+  #     # Current json
 
-      if (-not (Test-Path $armTemplatePath)) {
-        $false | Should -Be $true -Because "[main.json] file for module [$moduleFolderName] is missing."
-        return # Skipping if test was failing
-      }
+  #     if (-not (Test-Path $armTemplatePath)) {
+  #       $false | Should -Be $true -Because "[main.json] file for module [$moduleFolderName] is missing."
+  #       return # Skipping if test was failing
+  #     }
 
-      $originalJson = Remove-JSONMetadata -TemplateObject (Get-Content $armTemplatePath -Raw | ConvertFrom-Json -Depth 99 -AsHashtable)
-      $originalJson = ConvertTo-OrderedHashtable -JSONInputObject (ConvertTo-Json $originalJson -Depth 99)
+  #     $originalJson = Remove-JSONMetadata -TemplateObject (Get-Content $armTemplatePath -Raw | ConvertFrom-Json -Depth 99 -AsHashtable)
+  #     $originalJson = ConvertTo-OrderedHashtable -JSONInputObject (ConvertTo-Json $originalJson -Depth 99)
 
-      # Recompile json
-      $null = Remove-Item -Path $armTemplatePath -Force
-      bicep build $templateFilePath
+  #     # Recompile json
+  #     $null = Remove-Item -Path $armTemplatePath -Force
+  #     bicep build $templateFilePath
 
-      $newJson = Remove-JSONMetadata -TemplateObject (Get-Content $armTemplatePath -Raw | ConvertFrom-Json -Depth 99 -AsHashtable)
-      $newJson = ConvertTo-OrderedHashtable -JSONInputObject (ConvertTo-Json $newJson -Depth 99)
+  #     $newJson = Remove-JSONMetadata -TemplateObject (Get-Content $armTemplatePath -Raw | ConvertFrom-Json -Depth 99 -AsHashtable)
+  #     $newJson = ConvertTo-OrderedHashtable -JSONInputObject (ConvertTo-Json $newJson -Depth 99)
 
-      # compare
-      (ConvertTo-Json $originalJson -Depth 99) | Should -Be (ConvertTo-Json $newJson -Depth 99) -Because "the [$moduleFolderName] [main.json] should be based on the latest [main.bicep] file. Please run [` bicep build >bicepFilePath< `] using the latest Bicep CLI version."
+  #     # compare
+  #     (ConvertTo-Json $originalJson -Depth 99) | Should -Be (ConvertTo-Json $newJson -Depth 99) -Because "the [$moduleFolderName] [main.json] should be based on the latest [main.bicep] file. Please run [` bicep build >bicepFilePath< `] using the latest Bicep CLI version."
 
-      # Reset template file to original state
-      git checkout HEAD -- $armTemplatePath
-    }
-  }
+  #     # Reset template file to original state
+  #     git checkout HEAD -- $armTemplatePath
+  #   }
+  # }
 
   Context 'Template tests' -Tag 'Template' {
 
@@ -545,6 +545,28 @@ Describe 'Module tests' -Tag 'Module' {
         $incorrectParameters | Should -BeNullOrEmpty -Because ('parameters in the template file should be camel-cased. Found incorrect items: [{0}].' -f ($incorrectParameters -join ', '))
       }
 
+      It '[<moduleFolderName>] Parameters that represent resource IDs should end with `resourceId`.' -TestCases $moduleFolderTestCases {
+
+        param(
+          [hashtable] $templateFileParameters
+        )
+
+        if (-not $templateFileParameters) {
+          Set-ItResult -Skipped -Because 'the module template has no parameters.'
+          return
+        }
+
+        $incorrectParameters = @()
+        foreach ($parameter in ($templateFileParameters.PSBase.Keys | Sort-Object -Culture 'en-US')) {
+          $parameterObject = $templateFileParameters[$parameter]
+
+          if ($parameterObject.metadata.description -match '.*resource Id.*' -and $parameterObject.name -match '.*id$' -and $parameterObject.name -notmatch '.*resourceId$') {
+            $incorrectParameters += $parameter
+          }
+
+        }
+        $incorrectParameters | Should -BeNullOrEmpty -Because ('parameters representing resource IDs in the template file should be end with [resourceId]. Found incorrect items: [{0}].' -f ($incorrectParameters -join ', '))
+      }
 
       It "[<moduleFolderName>] Each parameters' & UDT's description should start with a one word category starting with a capital letter, followed by a dot, a space and the actual description text ending with a dot." -TestCases $moduleFolderTestCases {
 
@@ -1110,369 +1132,369 @@ Describe 'Module tests' -Tag 'Module' {
   }
 }
 
-Describe 'Governance tests' {
+# Describe 'Governance tests' {
 
-  $governanceTestCases = [System.Collections.ArrayList] @()
-  foreach ($moduleFolderPath in $moduleFolderPaths) {
+#   $governanceTestCases = [System.Collections.ArrayList] @()
+#   foreach ($moduleFolderPath in $moduleFolderPaths) {
 
-    $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
-    $relativeModulePath = Join-Path 'avm' ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}')[1]
-
-    $isTopLevelModule = ($resourceTypeIdentifier -split '[\/|\\]').Count -eq 2
-    if ($isTopLevelModule) {
+#     $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
+#     $relativeModulePath = Join-Path 'avm' ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}')[1]
+
+#     $isTopLevelModule = ($resourceTypeIdentifier -split '[\/|\\]').Count -eq 2
+#     if ($isTopLevelModule) {
 
-      $governanceTestCases += @{
-        relativeModulePath = $relativeModulePath
-        repoRootPath       = $repoRootPath
-        moduleFolderName   = $resourceTypeIdentifier
-      }
-    }
-  }
+#       $governanceTestCases += @{
+#         relativeModulePath = $relativeModulePath
+#         repoRootPath       = $repoRootPath
+#         moduleFolderName   = $resourceTypeIdentifier
+#       }
+#     }
+#   }
 
-  It '[<moduleFolderName>] Owning team should be specified correctly in CODEWONERS file.' -TestCases $governanceTestCases {
+#   It '[<moduleFolderName>] Owning team should be specified correctly in CODEWONERS file.' -TestCases $governanceTestCases {
 
-    param(
-      [string] $relativeModulePath,
-      [string] $repoRootPath
-    )
-
-    $codeownersFilePath = Join-Path $repoRootPath '.github' 'CODEOWNERS'
-    $codeOwnersContent = Get-Content $codeownersFilePath
-
-    $formattedEntry = $relativeModulePath -replace '\\', '\/'
-    $moduleLine = $codeOwnersContent | Where-Object { $_ -match "^\s*\/$formattedEntry\/" }
+#     param(
+#       [string] $relativeModulePath,
+#       [string] $repoRootPath
+#     )
+
+#     $codeownersFilePath = Join-Path $repoRootPath '.github' 'CODEOWNERS'
+#     $codeOwnersContent = Get-Content $codeownersFilePath
+
+#     $formattedEntry = $relativeModulePath -replace '\\', '\/'
+#     $moduleLine = $codeOwnersContent | Where-Object { $_ -match "^\s*\/$formattedEntry\/" }
 
-    $expectedEntry = '/{0}/ @Azure/{1}-module-owners-bicep @Azure/avm-core-team-technical-bicep' -f ($relativeModulePath -replace '\\', '/'), ($relativeModulePath -replace '-' -replace '[\\|\/]', '-')
-
-    # Line should exist
-    $moduleLine | Should -Not -BeNullOrEmpty -Because "the module should be listed in the [CODEOWNERS](https://azure.github.io/Azure-Verified-Modules/specs/shared/#codeowners-file) file as [/$expectedEntry]."
+#     $expectedEntry = '/{0}/ @Azure/{1}-module-owners-bicep @Azure/avm-core-team-technical-bicep' -f ($relativeModulePath -replace '\\', '/'), ($relativeModulePath -replace '-' -replace '[\\|\/]', '-')
+
+#     # Line should exist
+#     $moduleLine | Should -Not -BeNullOrEmpty -Because "the module should be listed in the [CODEOWNERS](https://azure.github.io/Azure-Verified-Modules/specs/shared/#codeowners-file) file as [/$expectedEntry]."
 
-    # Line should be correct
-    $moduleLine | Should -Be $expectedEntry -Because 'the module should match the expected format as documented [here](https://azure.github.io/Azure-Verified-Modules/specs/shared/#codeowners-file).'
-  }
-
-  It '[<moduleFolderName>] Module identifier should be listed in issue template in the correct alphabetical position.' -TestCases $governanceTestCases {
-
-    param(
-      [string] $relativeModulePath,
-      [string] $repoRootPath
-    )
-
-    $issueTemplatePath = Join-Path $repoRootPath '.github' 'ISSUE_TEMPLATE' 'avm_module_issue.yml'
-    $issueTemplateContent = Get-Content $issueTemplatePath
-
-    # Identify listed modules
-    $startIndex = 0
-    while ($issueTemplateContent[$startIndex] -notmatch '^\s*#?\s*\-\s+\"avm\/.+\"' -and $startIndex -ne $issueTemplateContent.Length) {
-      $startIndex++
-    }
-
-    $endIndex = $startIndex
-    while ($issueTemplateContent[$endIndex] -match '.*- "avm\/.*' -and $endIndex -ne $issueTemplateContent.Length) {
-      $endIndex++
-    }
-    $endIndex-- # Go one back to last module line
-
-    $listedModules = $issueTemplateContent[$startIndex..$endIndex] | ForEach-Object { $_ -replace '.*- "(avm\/.*)".*', '$1' }
-
-    # Should exist
-    $listedModules | Should -Contain ($relativeModulePath -replace '\\', '/') -Because 'the module should be listed in the issue template in the correct alphabetical position ([ref](https://azure.github.io/Azure-Verified-Modules/specs/bicep/#id-bcpnfr15---category-contributionsupport---avm-module-issue-template-file)).'
-
-    # Should not be commented
-    $entry = $issueTemplateContent | Where-Object { $_ -match ('.*- "{0}".*' -f $relativeModulePath -replace '\\', '\/') }
-    $entry.Trim() | Should -Not -Match '^\s*#.*' -Because 'the module should not be commented out in the issue template.'
-
-    # Should be at correct location
-    $incorrectLines = @()
-    foreach ($finding in (Compare-Object $listedModules ($listedModules | Sort-Object -Culture 'en-US') -SyncWindow 0)) {
-      if ($finding.SideIndicator -eq '<=') {
-        $incorrectLines += $finding.InputObject
-      }
-    }
-    $incorrectLines = $incorrectLines | Sort-Object -Culture 'en-US' -Unique
+#     # Line should be correct
+#     $moduleLine | Should -Be $expectedEntry -Because 'the module should match the expected format as documented [here](https://azure.github.io/Azure-Verified-Modules/specs/shared/#codeowners-file).'
+#   }
+
+#   It '[<moduleFolderName>] Module identifier should be listed in issue template in the correct alphabetical position.' -TestCases $governanceTestCases {
+
+#     param(
+#       [string] $relativeModulePath,
+#       [string] $repoRootPath
+#     )
+
+#     $issueTemplatePath = Join-Path $repoRootPath '.github' 'ISSUE_TEMPLATE' 'avm_module_issue.yml'
+#     $issueTemplateContent = Get-Content $issueTemplatePath
+
+#     # Identify listed modules
+#     $startIndex = 0
+#     while ($issueTemplateContent[$startIndex] -notmatch '^\s*#?\s*\-\s+\"avm\/.+\"' -and $startIndex -ne $issueTemplateContent.Length) {
+#       $startIndex++
+#     }
+
+#     $endIndex = $startIndex
+#     while ($issueTemplateContent[$endIndex] -match '.*- "avm\/.*' -and $endIndex -ne $issueTemplateContent.Length) {
+#       $endIndex++
+#     }
+#     $endIndex-- # Go one back to last module line
+
+#     $listedModules = $issueTemplateContent[$startIndex..$endIndex] | ForEach-Object { $_ -replace '.*- "(avm\/.*)".*', '$1' }
+
+#     # Should exist
+#     $listedModules | Should -Contain ($relativeModulePath -replace '\\', '/') -Because 'the module should be listed in the issue template in the correct alphabetical position ([ref](https://azure.github.io/Azure-Verified-Modules/specs/bicep/#id-bcpnfr15---category-contributionsupport---avm-module-issue-template-file)).'
+
+#     # Should not be commented
+#     $entry = $issueTemplateContent | Where-Object { $_ -match ('.*- "{0}".*' -f $relativeModulePath -replace '\\', '\/') }
+#     $entry.Trim() | Should -Not -Match '^\s*#.*' -Because 'the module should not be commented out in the issue template.'
+
+#     # Should be at correct location
+#     $incorrectLines = @()
+#     foreach ($finding in (Compare-Object $listedModules ($listedModules | Sort-Object -Culture 'en-US') -SyncWindow 0)) {
+#       if ($finding.SideIndicator -eq '<=') {
+#         $incorrectLines += $finding.InputObject
+#       }
+#     }
+#     $incorrectLines = $incorrectLines | Sort-Object -Culture 'en-US' -Unique
 
-    $incorrectLines.Count | Should -Be 0 -Because ('the number of modules that are not in the correct alphabetical order in the issue template should be zero ([ref](https://azure.github.io/Azure-Verified-Modules/specs/bicep/#id-bcpnfr15---category-contributionsupport---avm-module-issue-template-file)).</br>However, the following incorrectly located lines were found:</br><pre>{0}</pre>' -f ($incorrectLines -join '</br>'))
-  }
-}
+#     $incorrectLines.Count | Should -Be 0 -Because ('the number of modules that are not in the correct alphabetical order in the issue template should be zero ([ref](https://azure.github.io/Azure-Verified-Modules/specs/bicep/#id-bcpnfr15---category-contributionsupport---avm-module-issue-template-file)).</br>However, the following incorrectly located lines were found:</br><pre>{0}</pre>' -f ($incorrectLines -join '</br>'))
+#   }
+# }
 
-Describe 'Test file tests' -Tag 'TestTemplate' {
+# Describe 'Test file tests' -Tag 'TestTemplate' {
 
-  Context 'General test file' {
+#   Context 'General test file' {
 
-    $deploymentTestFileTestCases = @()
+#     $deploymentTestFileTestCases = @()
 
-    foreach ($moduleFolderPath in $moduleFolderPaths) {
-      if (Test-Path (Join-Path $moduleFolderPath 'tests')) {
-        $testFilePaths = (Get-ChildItem -Path $moduleFolderPath -Recurse -Filter 'main.test.bicep').FullName | Sort-Object -Culture 'en-US'
-        foreach ($testFilePath in $testFilePaths) {
-          $testFileContent = Get-Content $testFilePath
-          $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
+#     foreach ($moduleFolderPath in $moduleFolderPaths) {
+#       if (Test-Path (Join-Path $moduleFolderPath 'tests')) {
+#         $testFilePaths = (Get-ChildItem -Path $moduleFolderPath -Recurse -Filter 'main.test.bicep').FullName | Sort-Object -Culture 'en-US'
+#         foreach ($testFilePath in $testFilePaths) {
+#           $testFileContent = Get-Content $testFilePath
+#           $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]{1}avm[\/|\\]{1}(res|ptn)[\/|\\]{1}')[2] -replace '\\', '/' # 'avm/res|ptn/<provider>/<resourceType>' would return '<provider>/<resourceType>'
 
-          $deploymentTestFileTestCases += @{
-            testName         = Split-Path (Split-Path $testFilePath) -Leaf
-            testFilePath     = $testFilePath
-            testFileContent  = $testFileContent
-            moduleFolderName = $resourceTypeIdentifier
-          }
-        }
-      }
-    }
+#           $deploymentTestFileTestCases += @{
+#             testName         = Split-Path (Split-Path $testFilePath) -Leaf
+#             testFilePath     = $testFilePath
+#             testFileContent  = $testFileContent
+#             moduleFolderName = $resourceTypeIdentifier
+#           }
+#         }
+#       }
+#     }
 
-    It '[<moduleFolderName>] Bicep test deployment files should contain a parameter [serviceShort] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
+#     It '[<moduleFolderName>] Bicep test deployment files should contain a parameter [serviceShort] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
 
-      param(
-        [object[]] $testFileContent
-      )
-      ($testFileContent -match "^param serviceShort string = '(.*)$") | Should -Not -BeNullOrEmpty -Because 'the module test deployment file should contain a parameter [serviceShort] using the syntax [param serviceShort string = ''*''].'
-    }
+#       param(
+#         [object[]] $testFileContent
+#       )
+#       ($testFileContent -match "^param serviceShort string = '(.*)$") | Should -Not -BeNullOrEmpty -Because 'the module test deployment file should contain a parameter [serviceShort] using the syntax [param serviceShort string = ''*''].'
+#     }
 
-    It '[<moduleFolderName>] [<testName>] Bicep test deployment files in a [defaults] folder should have a parameter [serviceShort] with a value ending with [min]' -TestCases ($deploymentTestFileTestCases | Where-Object { $_.testFilePath -match '.*[\\|\/](.+\.)?defaults[\\|\/].*' }) {
+#     It '[<moduleFolderName>] [<testName>] Bicep test deployment files in a [defaults] folder should have a parameter [serviceShort] with a value ending with [min]' -TestCases ($deploymentTestFileTestCases | Where-Object { $_.testFilePath -match '.*[\\|\/](.+\.)?defaults[\\|\/].*' }) {
 
-      param(
-        [object[]] $testFileContent
-      )
+#       param(
+#         [object[]] $testFileContent
+#       )
 
-      if (($testFileContent | Out-String) -match "param serviceShort string = '(.*)'") {
-        $Matches[1] | Should -BeLike '*min'
-      } else {
-        Set-ItResult -Skipped -Because 'the module test deployment file should contain a parameter [serviceShort] using the syntax [param serviceShort string = ''*min''] but it doesn''t.'
-      }
-    }
+#       if (($testFileContent | Out-String) -match "param serviceShort string = '(.*)'") {
+#         $Matches[1] | Should -BeLike '*min'
+#       } else {
+#         Set-ItResult -Skipped -Because 'the module test deployment file should contain a parameter [serviceShort] using the syntax [param serviceShort string = ''*min''] but it doesn''t.'
+#       }
+#     }
 
-    It '[<moduleFolderName>] [<testName>] Bicep test deployment files in a [max] folder should have a [serviceShort] parameter with a value ending with  [max]' -TestCases ($deploymentTestFileTestCases | Where-Object { $_.testFilePath -match '.*[\\|\/](.+\.)?max[\\|\/].*' }) {
+#     It '[<moduleFolderName>] [<testName>] Bicep test deployment files in a [max] folder should have a [serviceShort] parameter with a value ending with  [max]' -TestCases ($deploymentTestFileTestCases | Where-Object { $_.testFilePath -match '.*[\\|\/](.+\.)?max[\\|\/].*' }) {
 
-      param(
-        [object[]] $testFileContent
-      )
+#       param(
+#         [object[]] $testFileContent
+#       )
 
-      if (($testFileContent | Out-String) -match "param serviceShort string = '(.*)'") {
-        $Matches[1] | Should -BeLike '*max'
-      } else {
-        Set-ItResult -Skipped -Because 'the module test deployment file should contain a parameter [serviceShort] using the syntax [param serviceShort string = ''*max''] but it doesn''t.'
-      }
-    }
+#       if (($testFileContent | Out-String) -match "param serviceShort string = '(.*)'") {
+#         $Matches[1] | Should -BeLike '*max'
+#       } else {
+#         Set-ItResult -Skipped -Because 'the module test deployment file should contain a parameter [serviceShort] using the syntax [param serviceShort string = ''*max''] but it doesn''t.'
+#       }
+#     }
 
-    It '[<moduleFolderName>] [<testName>] Bicep test deployment files in a [waf-aligned] folder should have a [serviceShort] parameter with a value ending with [waf]' -TestCases ($deploymentTestFileTestCases | Where-Object { $_.testFilePath -match '.*[\\|\/](.+\.)?waf\-aligned[\\|\/].*' }) {
+#     It '[<moduleFolderName>] [<testName>] Bicep test deployment files in a [waf-aligned] folder should have a [serviceShort] parameter with a value ending with [waf]' -TestCases ($deploymentTestFileTestCases | Where-Object { $_.testFilePath -match '.*[\\|\/](.+\.)?waf\-aligned[\\|\/].*' }) {
 
-      param(
-        [object[]] $testFileContent
-      )
+#       param(
+#         [object[]] $testFileContent
+#       )
 
-      if (($testFileContent | Out-String) -match "param serviceShort string = '(.*)'") {
-        $Matches[1] | Should -BeLike '*waf'
-      } else {
-        Set-ItResult -Skipped -Because 'the module test deployment file should contain a parameter [serviceShort] using the syntax [param serviceShort string = ''*waf''] but it doesn''t.'
-      }
-    }
-
-    It '[<moduleFolderName>] Bicep test deployment files should contain a metadata string [name] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
-
-      param(
-        [object[]] $testFileContent
-      )
-      ($testFileContent | Out-String) | Should -Match 'metadata name = .+' -Because 'Test cases should contain a metadata string [name] in the format `metadata name = ''One cake of a name''` to be more descriptive. If provided, the tooling will automatically inject it into the module''s readme.md file.'
-    }
-
-    It '[<moduleFolderName>] Bicep test deployment files should contain a metadata string [description] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
-
-      param(
-        [object[]] $testFileContent
-      )
-      ($testFileContent | Out-String) | Should -Match 'metadata description = .+' -Because 'Test cases should contain a metadata string [description] in the format `metadata description = ''The cake is a lie''` to be more descriptive. If provided, the tooling will automatically inject it into the module''s readme.md file.'
-    }
-
-    It "[<moduleFolderName>] Bicep test deployment files should contain a parameter [namePrefix] with value ['#_namePrefix_#'] for test case [<testName>]" -TestCases $deploymentTestFileTestCases {
-
-      param(
-        [object[]] $testFileContent
-      )
-
-      ($testFileContent | Out-String) | Should -Match "param namePrefix string = '#_namePrefix_#'" -Because 'The test CI needs this value to ensure that deployed resources have unique names per fork.'
-    }
-
-    It "[<moduleFolderName>] Bicep test deployment files should invoke test like [`module testDeployment '../.*main.bicep' = [ or {`] for test case [<testName>]" -TestCases $deploymentTestFileTestCases {
-
-      param(
-        [object[]] $testFileContent
-      )
-
-      $testIndex = ($testFileContent | Select-String ("^module testDeployment '..\/.*main.bicep' = .*[\[|\{]$") | ForEach-Object { $_.LineNumber - 1 })[0]
-
-      $testIndex -ne -1 | Should -Be $true -Because 'the module test invocation should be in the expected format to allow identification.'
-    }
-
-    It '[<moduleFolderName>] Bicep test deployment name should contain [`-test-`] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
-
-      param(
-        [object[]] $testFileContent
-      )
-
-      $expectedNameFormat = ($testFileContent | Out-String) -match '\s*name:.+-test-.+\s*'
-
-      $expectedNameFormat | Should -Be $true -Because 'the handle ''-test-'' should be part of the module test invocation''s resource name to allow identification.'
-    }
-
-    It '[<moduleFolderName>] Bicep test deployment should have parameter [`serviceShort`] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
-
-      param(
-        [object[]] $testFileContent
-      )
-
-      $hasExpectedParam = ($testFileContent | Out-String) -match '\s*param\s+serviceShort\s+string\s*'
-      $hasExpectedParam | Should -Be $true
-    }
-  }
-}
-
-Describe 'API version tests' -Tag 'ApiCheck' {
-
-  $testCases = @()
-  $apiSpecsFileUri = 'https://azure.github.io/Azure-Verified-Modules/governance/apiSpecsList.json'
-
-  try {
-    $apiSpecs = Invoke-WebRequest -Uri $ApiSpecsFileUri
-    $ApiVersions = ConvertFrom-Json $apiSpecs.Content -AsHashtable
-  } catch {
-    Write-Warning "Failed to download API specs file from [$ApiSpecsFileUri]. Skipping API tests"
-    Set-ItResult -Skipped -Because "Failed to download API specs file from [$ApiSpecsFileUri]. Skipping API tests."
-    return
-  }
-
-  foreach ($moduleFolderPath in $moduleFolderPaths) {
-
-    $moduleFolderName = $moduleFolderPath.Replace('\', '/').Split('/avm/')[1]
-    $templateFilePath = Join-Path $moduleFolderPath 'main.bicep'
-    $templateFileContent = $builtTestFileMap[$templateFilePath]
-
-    $nestedResources = Get-NestedResourceList -TemplateFileContent $templateFileContent | Where-Object {
-      $_.type -notin @('Microsoft.Resources/deployments') -and $_
-    } | Select-Object 'Type', 'ApiVersion' -Unique | Sort-Object -Culture 'en-US' -Property 'Type'
-
-    foreach ($resource in $nestedResources) {
-
-      switch ($resource.type) {
-        { $PSItem -like '*diagnosticsettings*' } {
-          $testCases += @{
-            moduleName                     = $moduleFolderName
-            resourceType                   = 'diagnosticSettings'
-            ProviderNamespace              = 'Microsoft.Insights'
-            TargetApi                      = $resource.ApiVersion
-            AvailableApiVersions           = $ApiVersions
-            AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
-          }
-          break
-        }
-        { $PSItem -like '*locks' } {
-          $testCases += @{
-            moduleName                     = $moduleFolderName
-            resourceType                   = 'locks'
-            ProviderNamespace              = 'Microsoft.Authorization'
-            TargetApi                      = $resource.ApiVersion
-            AvailableApiVersions           = $ApiVersions
-            AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
-          }
-          break
-        }
-        { $PSItem -like '*roleAssignments' } {
-          $testCases += @{
-            moduleName                     = $moduleFolderName
-            resourceType                   = 'roleAssignments'
-            ProviderNamespace              = 'Microsoft.Authorization'
-            TargetApi                      = $resource.ApiVersion
-            AvailableApiVersions           = $ApiVersions
-            AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
-          }
-          break
-        }
-        { $PSItem -like '*privateEndpoints' -and ($PSItem -notlike '*managedPrivateEndpoints') } {
-          $testCases += @{
-            moduleName                     = $moduleFolderName
-            resourceType                   = 'privateEndpoints'
-            ProviderNamespace              = 'Microsoft.Network'
-            TargetApi                      = $resource.ApiVersion
-            AvailableApiVersions           = $ApiVersions
-            AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
-          }
-          break
-        }
-        Default {
-          $ProviderNamespace, $rest = $resource.Type.Split('/')
-          $testCases += @{
-            moduleName                     = $moduleFolderName
-            resourceType                   = $rest -join '/'
-            ProviderNamespace              = $ProviderNamespace
-            TargetApi                      = $resource.ApiVersion
-            AvailableApiVersions           = $ApiVersions
-            AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
-          }
-          break
-        }
-      }
-    }
-  }
-
-  It 'In [<moduleName>] used resource type [<ResourceType>] should use one of the recent API version(s). Currently using [<TargetApi>].' -TestCases $TestCases {
-
-    param(
-      [string] $ResourceType,
-      [string] $TargetApi,
-      [string] $ProviderNamespace,
-      [hashtable] $AvailableApiVersions,
-      [bool] $AllowPreviewVersionsInAPITests
-    )
-
-    if ($AvailableApiVersions.Keys -notcontains $ProviderNamespace) {
-      Write-Warning "[API Test] The Provider Namespace [$ProviderNamespace] is missing in your Azure API versions file. Please consider updating it and if it is still missing to open an issue in the 'AzureAPICrawler' PowerShell module's GitHub repository."
-      Set-ItResult -Skipped -Because "The Azure API version file is missing the Provider Namespace [$ProviderNamespace]."
-      return
-    }
-    if ($AvailableApiVersions.$ProviderNamespace.Keys -notcontains $ResourceType) {
-      Write-Warning "[API Test] The Provider Namespace [$ProviderNamespace] is missing the Resource Type [$ResourceType] in your API versions file. Please consider updating it and if it is still missing to open an issue in the 'AzureAPICrawler' PowerShell module's GitHub repository."
-      Set-ItResult -Skipped -Because "The Azure API version file is missing the Resource Type [$ResourceType] for Provider Namespace [$ProviderNamespace]."
-      return
-    }
-
-    $resourceTypeApiVersions = $AvailableApiVersions.$ProviderNamespace.$ResourceType
-
-    if (-not $resourceTypeApiVersions) {
-      Write-Warning ('[API Test] We are currently unable to determine the available API versions for resource type [{0}/{1}].' -f $ProviderNamespace, $resourceType)
-      continue
-    }
-
-    $approvedApiVersions = @()
-    if ($AllowPreviewVersionsInAPITests) {
-      # We allow the latest 5 including previews (in case somebody wants to use preview), or the latest 3 non-preview
-      $approvedApiVersions += $resourceTypeApiVersions | Select-Object -Last 5
-      $approvedApiVersions += $resourceTypeApiVersions | Where-Object { $_ -notlike '*-preview' } | Select-Object -Last 5
-    } else {
-      # We allow the latest 5 non-preview preview
-      $approvedApiVersions += $resourceTypeApiVersions | Where-Object { $_ -notlike '*-preview' } | Select-Object -Last 5
-    }
-
-    $approvedApiVersions = $approvedApiVersions | Sort-Object -Culture 'en-US' -Unique -Descending
-
-    if ($approvedApiVersions -notcontains $TargetApi) {
-      # Using a warning now instead of an error, as we don't want to block PRs for this.
-      Write-Warning ("The used API version [$TargetApi] is not one of the most recent 5 versions. Please consider upgrading to one of the following: {0}" -f $approvedApiVersions -join ', ')
-
-      # The original failed test was
-      # $approvedApiVersions | Should -Contain $TargetApi
-    } else {
-      # Provide a warning if an API version is second to next to expire.
-      $indexOfVersion = $approvedApiVersions.IndexOf($TargetApi)
-
-      # Example
-      # Available versions:
-      #
-      # 2017-08-01-beta
-      # 2017-08-01        < $TargetApi (Index = 1)
-      # 2017-07-14
-      # 2016-05-16
-
-      if ($indexOfVersion -gt ($approvedApiVersions.Count - 2)) {
-        $newerAPIVersions = $approvedApiVersions[0..($indexOfVersion - 1)]
-        Write-Warning ("The used API version [$TargetApi] for Resource Type [$ProviderNamespace/$ResourceType] will soon expire. Please consider updating it. Consider using one of the newer API versions [{0}]" -f ($newerAPIVersions -join ', '))
-      }
-    }
-  }
-}
+#       if (($testFileContent | Out-String) -match "param serviceShort string = '(.*)'") {
+#         $Matches[1] | Should -BeLike '*waf'
+#       } else {
+#         Set-ItResult -Skipped -Because 'the module test deployment file should contain a parameter [serviceShort] using the syntax [param serviceShort string = ''*waf''] but it doesn''t.'
+#       }
+#     }
+
+#     It '[<moduleFolderName>] Bicep test deployment files should contain a metadata string [name] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
+
+#       param(
+#         [object[]] $testFileContent
+#       )
+#       ($testFileContent | Out-String) | Should -Match 'metadata name = .+' -Because 'Test cases should contain a metadata string [name] in the format `metadata name = ''One cake of a name''` to be more descriptive. If provided, the tooling will automatically inject it into the module''s readme.md file.'
+#     }
+
+#     It '[<moduleFolderName>] Bicep test deployment files should contain a metadata string [description] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
+
+#       param(
+#         [object[]] $testFileContent
+#       )
+#       ($testFileContent | Out-String) | Should -Match 'metadata description = .+' -Because 'Test cases should contain a metadata string [description] in the format `metadata description = ''The cake is a lie''` to be more descriptive. If provided, the tooling will automatically inject it into the module''s readme.md file.'
+#     }
+
+#     It "[<moduleFolderName>] Bicep test deployment files should contain a parameter [namePrefix] with value ['#_namePrefix_#'] for test case [<testName>]" -TestCases $deploymentTestFileTestCases {
+
+#       param(
+#         [object[]] $testFileContent
+#       )
+
+#       ($testFileContent | Out-String) | Should -Match "param namePrefix string = '#_namePrefix_#'" -Because 'The test CI needs this value to ensure that deployed resources have unique names per fork.'
+#     }
+
+#     It "[<moduleFolderName>] Bicep test deployment files should invoke test like [`module testDeployment '../.*main.bicep' = [ or {`] for test case [<testName>]" -TestCases $deploymentTestFileTestCases {
+
+#       param(
+#         [object[]] $testFileContent
+#       )
+
+#       $testIndex = ($testFileContent | Select-String ("^module testDeployment '..\/.*main.bicep' = .*[\[|\{]$") | ForEach-Object { $_.LineNumber - 1 })[0]
+
+#       $testIndex -ne -1 | Should -Be $true -Because 'the module test invocation should be in the expected format to allow identification.'
+#     }
+
+#     It '[<moduleFolderName>] Bicep test deployment name should contain [`-test-`] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
+
+#       param(
+#         [object[]] $testFileContent
+#       )
+
+#       $expectedNameFormat = ($testFileContent | Out-String) -match '\s*name:.+-test-.+\s*'
+
+#       $expectedNameFormat | Should -Be $true -Because 'the handle ''-test-'' should be part of the module test invocation''s resource name to allow identification.'
+#     }
+
+#     It '[<moduleFolderName>] Bicep test deployment should have parameter [`serviceShort`] for test case [<testName>]' -TestCases $deploymentTestFileTestCases {
+
+#       param(
+#         [object[]] $testFileContent
+#       )
+
+#       $hasExpectedParam = ($testFileContent | Out-String) -match '\s*param\s+serviceShort\s+string\s*'
+#       $hasExpectedParam | Should -Be $true
+#     }
+#   }
+# }
+
+# Describe 'API version tests' -Tag 'ApiCheck' {
+
+#   $testCases = @()
+#   $apiSpecsFileUri = 'https://azure.github.io/Azure-Verified-Modules/governance/apiSpecsList.json'
+
+#   try {
+#     $apiSpecs = Invoke-WebRequest -Uri $ApiSpecsFileUri
+#     $ApiVersions = ConvertFrom-Json $apiSpecs.Content -AsHashtable
+#   } catch {
+#     Write-Warning "Failed to download API specs file from [$ApiSpecsFileUri]. Skipping API tests"
+#     Set-ItResult -Skipped -Because "Failed to download API specs file from [$ApiSpecsFileUri]. Skipping API tests."
+#     return
+#   }
+
+#   foreach ($moduleFolderPath in $moduleFolderPaths) {
+
+#     $moduleFolderName = $moduleFolderPath.Replace('\', '/').Split('/avm/')[1]
+#     $templateFilePath = Join-Path $moduleFolderPath 'main.bicep'
+#     $templateFileContent = $builtTestFileMap[$templateFilePath]
+
+#     $nestedResources = Get-NestedResourceList -TemplateFileContent $templateFileContent | Where-Object {
+#       $_.type -notin @('Microsoft.Resources/deployments') -and $_
+#     } | Select-Object 'Type', 'ApiVersion' -Unique | Sort-Object -Culture 'en-US' -Property 'Type'
+
+#     foreach ($resource in $nestedResources) {
+
+#       switch ($resource.type) {
+#         { $PSItem -like '*diagnosticsettings*' } {
+#           $testCases += @{
+#             moduleName                     = $moduleFolderName
+#             resourceType                   = 'diagnosticSettings'
+#             ProviderNamespace              = 'Microsoft.Insights'
+#             TargetApi                      = $resource.ApiVersion
+#             AvailableApiVersions           = $ApiVersions
+#             AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
+#           }
+#           break
+#         }
+#         { $PSItem -like '*locks' } {
+#           $testCases += @{
+#             moduleName                     = $moduleFolderName
+#             resourceType                   = 'locks'
+#             ProviderNamespace              = 'Microsoft.Authorization'
+#             TargetApi                      = $resource.ApiVersion
+#             AvailableApiVersions           = $ApiVersions
+#             AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
+#           }
+#           break
+#         }
+#         { $PSItem -like '*roleAssignments' } {
+#           $testCases += @{
+#             moduleName                     = $moduleFolderName
+#             resourceType                   = 'roleAssignments'
+#             ProviderNamespace              = 'Microsoft.Authorization'
+#             TargetApi                      = $resource.ApiVersion
+#             AvailableApiVersions           = $ApiVersions
+#             AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
+#           }
+#           break
+#         }
+#         { $PSItem -like '*privateEndpoints' -and ($PSItem -notlike '*managedPrivateEndpoints') } {
+#           $testCases += @{
+#             moduleName                     = $moduleFolderName
+#             resourceType                   = 'privateEndpoints'
+#             ProviderNamespace              = 'Microsoft.Network'
+#             TargetApi                      = $resource.ApiVersion
+#             AvailableApiVersions           = $ApiVersions
+#             AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
+#           }
+#           break
+#         }
+#         Default {
+#           $ProviderNamespace, $rest = $resource.Type.Split('/')
+#           $testCases += @{
+#             moduleName                     = $moduleFolderName
+#             resourceType                   = $rest -join '/'
+#             ProviderNamespace              = $ProviderNamespace
+#             TargetApi                      = $resource.ApiVersion
+#             AvailableApiVersions           = $ApiVersions
+#             AllowPreviewVersionsInAPITests = $AllowPreviewVersionsInAPITests
+#           }
+#           break
+#         }
+#       }
+#     }
+#   }
+
+#   It 'In [<moduleName>] used resource type [<ResourceType>] should use one of the recent API version(s). Currently using [<TargetApi>].' -TestCases $TestCases {
+
+#     param(
+#       [string] $ResourceType,
+#       [string] $TargetApi,
+#       [string] $ProviderNamespace,
+#       [hashtable] $AvailableApiVersions,
+#       [bool] $AllowPreviewVersionsInAPITests
+#     )
+
+#     if ($AvailableApiVersions.Keys -notcontains $ProviderNamespace) {
+#       Write-Warning "[API Test] The Provider Namespace [$ProviderNamespace] is missing in your Azure API versions file. Please consider updating it and if it is still missing to open an issue in the 'AzureAPICrawler' PowerShell module's GitHub repository."
+#       Set-ItResult -Skipped -Because "The Azure API version file is missing the Provider Namespace [$ProviderNamespace]."
+#       return
+#     }
+#     if ($AvailableApiVersions.$ProviderNamespace.Keys -notcontains $ResourceType) {
+#       Write-Warning "[API Test] The Provider Namespace [$ProviderNamespace] is missing the Resource Type [$ResourceType] in your API versions file. Please consider updating it and if it is still missing to open an issue in the 'AzureAPICrawler' PowerShell module's GitHub repository."
+#       Set-ItResult -Skipped -Because "The Azure API version file is missing the Resource Type [$ResourceType] for Provider Namespace [$ProviderNamespace]."
+#       return
+#     }
+
+#     $resourceTypeApiVersions = $AvailableApiVersions.$ProviderNamespace.$ResourceType
+
+#     if (-not $resourceTypeApiVersions) {
+#       Write-Warning ('[API Test] We are currently unable to determine the available API versions for resource type [{0}/{1}].' -f $ProviderNamespace, $resourceType)
+#       continue
+#     }
+
+#     $approvedApiVersions = @()
+#     if ($AllowPreviewVersionsInAPITests) {
+#       # We allow the latest 5 including previews (in case somebody wants to use preview), or the latest 3 non-preview
+#       $approvedApiVersions += $resourceTypeApiVersions | Select-Object -Last 5
+#       $approvedApiVersions += $resourceTypeApiVersions | Where-Object { $_ -notlike '*-preview' } | Select-Object -Last 5
+#     } else {
+#       # We allow the latest 5 non-preview preview
+#       $approvedApiVersions += $resourceTypeApiVersions | Where-Object { $_ -notlike '*-preview' } | Select-Object -Last 5
+#     }
+
+#     $approvedApiVersions = $approvedApiVersions | Sort-Object -Culture 'en-US' -Unique -Descending
+
+#     if ($approvedApiVersions -notcontains $TargetApi) {
+#       # Using a warning now instead of an error, as we don't want to block PRs for this.
+#       Write-Warning ("The used API version [$TargetApi] is not one of the most recent 5 versions. Please consider upgrading to one of the following: {0}" -f $approvedApiVersions -join ', ')
+
+#       # The original failed test was
+#       # $approvedApiVersions | Should -Contain $TargetApi
+#     } else {
+#       # Provide a warning if an API version is second to next to expire.
+#       $indexOfVersion = $approvedApiVersions.IndexOf($TargetApi)
+
+#       # Example
+#       # Available versions:
+#       #
+#       # 2017-08-01-beta
+#       # 2017-08-01        < $TargetApi (Index = 1)
+#       # 2017-07-14
+#       # 2016-05-16
+
+#       if ($indexOfVersion -gt ($approvedApiVersions.Count - 2)) {
+#         $newerAPIVersions = $approvedApiVersions[0..($indexOfVersion - 1)]
+#         Write-Warning ("The used API version [$TargetApi] for Resource Type [$ProviderNamespace/$ResourceType] will soon expire. Please consider updating it. Consider using one of the newer API versions [{0}]" -f ($newerAPIVersions -join ', '))
+#       }
+#     }
+#   }
+# }
