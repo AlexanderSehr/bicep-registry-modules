@@ -9,13 +9,15 @@ param name string
 param virtualNetworkName string
 
 @description('Required. The address prefix for the subnet.')
-param addressPrefix string
+param subnetAddressPrefix string
 
 @description('Optional. The resource ID of the network security group to assign to the subnet.')
 param networkSecurityGroupResourceId string = ''
 
 @description('Optional. The resource ID of the route table to assign to the subnet.')
-param routeTableResourceId string = ''
+param routeTableId string = ''
+
+param subnetTestParam string
 
 @description('Optional. The service endpoints to enable on the subnet.')
 param serviceEndpoints array = []
@@ -83,15 +85,16 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2023-04-01' = {
   name: name
   parent: virtualNetwork
   properties: {
-    addressPrefix: addressPrefix
+    addressPrefix: subnetAddressPrefix
+    subnetTestParam: subnetTestParam
     networkSecurityGroup: !empty(networkSecurityGroupResourceId)
       ? {
           id: networkSecurityGroupResourceId
         }
       : null
-    routeTable: !empty(routeTableResourceId)
+    routeTable: !empty(routeTableId)
       ? {
-          id: routeTableResourceId
+          id: routeTableId
         }
       : null
     natGateway: !empty(natGatewayResourceId)

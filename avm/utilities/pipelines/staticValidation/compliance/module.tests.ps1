@@ -568,6 +568,51 @@ Describe 'Module tests' -Tag 'Module' {
         $incorrectParameters | Should -BeNullOrEmpty -Because ('parameters representing resource IDs in the template file should be end with [resourceId]. Found incorrect items: [{0}].' -f ($incorrectParameters -join ', '))
       }
 
+      It '[<moduleFolderName>] No template parameters could contain the resource type in their name unless it''s API-spec-aligned.' -TestCases $moduleFolderTestCases {
+
+        param(
+          [hashtable] $templateFileParameters,
+          [string] $moduleFolderName,
+          [hashtable] $templateFileContent
+        )
+
+        if (-not $templateFileParameters) {
+          Set-ItResult -Skipped -Because 'the module template has no parameters.'
+          return
+        }
+
+        # Extract potentially accepted parameters (via properties of actual resource deployments)
+        $potentiallyValidProperties = @()
+        ($templateFileContent.resources.Values | Where-Object {
+          $_.type -ne 'Microsoft.Resources/deployments'
+        } | ConvertTo-Json -Depth 99) -split '\n' | ForEach-Object {
+          if ($_ -match ('^\s*"([a-zA-Z]+?)":.+$')) {
+            $potentiallyValidProperties += $Matches[1]
+          }
+        }
+        $potentiallyValidProperties = $potentiallyValidProperties | Sort-Object -Unique
+
+        # Now check for each parameter
+        $incorrectParameters = @()
+        foreach ($parameter in ($templateFileParameters.PSBase.Keys | Sort-Object -Culture 'en-US')) {
+          $parameterObject = $templateFileParameters[$parameter]
+          $resourceType = Split-Path $moduleFolderName -Leaf
+
+
+          # If there are any that contain the resource type
+          if ($parameterObject.name -match "^$resourceType.*") {
+            foreach ($propertyName in $potentiallyValidProperties) {
+
+              # AND are NOT part of the properties (which is important as a property specs-wise may contain the resource type afterall)
+              if ($propertyName -notmatch "^$resourceType.*") {
+                $incorrectParameters += $parameter
+              }
+            }
+          }
+        }
+        $incorrectParameters | Should -BeNullOrEmpty -Because ('not template parameters should contain the module''s resource type in their name unless API-spec-aligned. Found incorrect items: [{0}].' -f ($incorrectParameters -join ', '))
+      }
+
       It "[<moduleFolderName>] Each parameters' & UDT's description should start with a one word category starting with a capital letter, followed by a dot, a space and the actual description text ending with a dot." -TestCases $moduleFolderTestCases {
 
         param(
