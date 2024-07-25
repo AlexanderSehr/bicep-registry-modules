@@ -5,14 +5,51 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.28.1.47646",
-      "templateHash": "1522380733959447255"
+      "version": "0.29.47.4906",
+      "templateHash": "2665684818443680692"
     },
     "name": "DBforMySQL Flexible Servers",
     "description": "This module deploys a DBforMySQL Flexible Server.",
     "owner": "Azure/module-maintainers"
   },
   "definitions": {
+    "maintenanceWindowType": {
+      "type": "object",
+      "properties": {
+        "customWindow": {
+          "type": "string",
+          "allowedValues": [
+            "Disabled",
+            "Enabled"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Indicates whether custom window is enabled or disabled. Defaults to 'Enabled'."
+          }
+        },
+        "dayOfWeek": {
+          "type": "int",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Day of week for maintenance window. Defaults to '0'."
+          }
+        },
+        "startHour": {
+          "type": "int",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Start hour for maintenance window. Defaults to '0'."
+          }
+        },
+        "startMinute": {
+          "type": "int",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Start minute for maintenance window. Defaults to '0'."
+          }
+        }
+      }
+    },
     "managedIdentitiesType": {
       "type": "object",
       "properties": {
@@ -413,10 +450,15 @@
       }
     },
     "maintenanceWindow": {
-      "type": "object",
-      "defaultValue": {},
+      "$ref": "#/definitions/maintenanceWindowType",
+      "defaultValue": {
+        "customWindow": "Enabled",
+        "dayOfWeek": 0,
+        "startHour": 1,
+        "startMinute": 0
+      },
       "metadata": {
-        "description": "Optional. Properties for the maintenence window. If provided, \"customWindow\" property must exist and set to \"Enabled\"."
+        "description": "Optional. Properties for the maintenence window."
       }
     },
     "delegatedSubnetResourceId": {
@@ -673,7 +715,7 @@
           "mode": "[parameters('highAvailability')]",
           "standbyAvailabilityZone": "[if(equals(parameters('highAvailability'), 'SameZone'), parameters('availabilityZone'), null())]"
         },
-        "maintenanceWindow": "[if(not(empty(parameters('maintenanceWindow'))), createObject('customWindow', parameters('maintenanceWindow').customWindow, 'dayOfWeek', if(equals(parameters('maintenanceWindow').customWindow, 'Enabled'), parameters('maintenanceWindow').dayOfWeek, 0), 'startHour', if(equals(parameters('maintenanceWindow').customWindow, 'Enabled'), parameters('maintenanceWindow').startHour, 0), 'startMinute', if(equals(parameters('maintenanceWindow').customWindow, 'Enabled'), parameters('maintenanceWindow').startMinute, 0)), null())]",
+        "maintenanceWindow": "[if(not(equals(null(), parameters('maintenanceWindow'))), createObject('customWindow', coalesce(tryGet(parameters('maintenanceWindow'), 'customWindow'), 'Enabled'), 'dayOfWeek', coalesce(tryGet(parameters('maintenanceWindow'), 'dayOfWeek'), 0), 'startHour', coalesce(tryGet(parameters('maintenanceWindow'), 'startHour'), 0), 'startMinute', coalesce(tryGet(parameters('maintenanceWindow'), 'startMinute'), 0)), null())]",
         "network": "[if(and(not(empty(parameters('delegatedSubnetResourceId'))), empty(parameters('firewallRules'))), createObject('delegatedSubnetResourceId', parameters('delegatedSubnetResourceId'), 'privateDnsZoneResourceId', parameters('privateDnsZoneResourceId')), null())]",
         "replicationRole": "[parameters('replicationRole')]",
         "restorePointInTime": "[parameters('restorePointInTime')]",
@@ -799,8 +841,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "16124321045090132550"
+              "version": "0.29.47.4906",
+              "templateHash": "3899016958678961956"
             },
             "name": "DBforMySQL Flexible Server Databases",
             "description": "This module deploys a DBforMySQL Flexible Server Database.",
@@ -907,8 +949,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "5174688085450924115"
+              "version": "0.29.47.4906",
+              "templateHash": "3603204616530956637"
             },
             "name": "DBforMySQL Flexible Server Firewall Rules",
             "description": "This module deploys a DBforMySQL Flexible Server Firewall Rule.",
@@ -1014,8 +1056,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "1872309055548332882"
+              "version": "0.29.47.4906",
+              "templateHash": "10716181569874218665"
             },
             "name": "DBforMySQL Flexible Server Administrators",
             "description": "This module deploys a DBforMySQL Flexible Server Administrator.",

@@ -545,6 +545,11 @@ module flexibleServer 'br/public:avm/res/db-for-my-sql/flexible-server:<version>
       kind: 'CanNotDelete'
       name: 'myCustomLockName'
     }
+    maintenanceWindow: {
+      dayOfWeek: 1
+      startHour: 2
+      startMinute: 3
+    }
     tags: {
       Environment: 'Non-Prod'
       'hidden-title': 'This is visible in the resource name'
@@ -590,6 +595,13 @@ module flexibleServer 'br/public:avm/res/db-for-my-sql/flexible-server:<version>
       "value": {
         "kind": "CanNotDelete",
         "name": "myCustomLockName"
+      }
+    },
+    "maintenanceWindow": {
+      "value": {
+        "dayOfWeek": 1,
+        "startHour": 2,
+        "startMinute": 3
       }
     },
     "tags": {
@@ -648,7 +660,7 @@ module flexibleServer 'br/public:avm/res/db-for-my-sql/flexible-server:<version>
 | [`highAvailability`](#parameter-highavailability) | string | The mode for High Availability (HA). It is not supported for the Burstable pricing tier and Zone redundant HA can only be set during server provisioning. |
 | [`location`](#parameter-location) | string | Location for all resources. |
 | [`lock`](#parameter-lock) | object | The lock settings of the service. |
-| [`maintenanceWindow`](#parameter-maintenancewindow) | object | Properties for the maintenence window. If provided, "customWindow" property must exist and set to "Enabled". |
+| [`maintenanceWindow`](#parameter-maintenancewindow) | object | Properties for the maintenence window. |
 | [`replicationRole`](#parameter-replicationrole) | string | The replication role. |
 | [`roleAssignments`](#parameter-roleassignments) | array | Array of role assignments to create. |
 | [`storageAutoIoScaling`](#parameter-storageautoioscaling) | string | Enable IO Auto Scaling or not. The server scales IOPs up or down automatically depending on your workload needs. |
@@ -1164,11 +1176,63 @@ Specify the name of lock.
 
 ### Parameter: `maintenanceWindow`
 
-Properties for the maintenence window. If provided, "customWindow" property must exist and set to "Enabled".
+Properties for the maintenence window.
 
 - Required: No
 - Type: object
-- Default: `{}`
+- Default:
+  ```Bicep
+  {
+      customWindow: 'Enabled'
+      dayOfWeek: 0
+      startHour: 1
+      startMinute: 0
+  }
+  ```
+
+**Optional parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`customWindow`](#parameter-maintenancewindowcustomwindow) | string | Indicates whether custom window is enabled or disabled. Defaults to 'Enabled'. |
+| [`dayOfWeek`](#parameter-maintenancewindowdayofweek) | int | Day of week for maintenance window. Defaults to '0'. |
+| [`startHour`](#parameter-maintenancewindowstarthour) | int | Start hour for maintenance window. Defaults to '0'. |
+| [`startMinute`](#parameter-maintenancewindowstartminute) | int | Start minute for maintenance window. Defaults to '0'. |
+
+### Parameter: `maintenanceWindow.customWindow`
+
+Indicates whether custom window is enabled or disabled. Defaults to 'Enabled'.
+
+- Required: No
+- Type: string
+- Allowed:
+  ```Bicep
+  [
+    'Disabled'
+    'Enabled'
+  ]
+  ```
+
+### Parameter: `maintenanceWindow.dayOfWeek`
+
+Day of week for maintenance window. Defaults to '0'.
+
+- Required: No
+- Type: int
+
+### Parameter: `maintenanceWindow.startHour`
+
+Start hour for maintenance window. Defaults to '0'.
+
+- Required: No
+- Type: int
+
+### Parameter: `maintenanceWindow.startMinute`
+
+Start minute for maintenance window. Defaults to '0'.
+
+- Required: No
+- Type: int
 
 ### Parameter: `replicationRole`
 

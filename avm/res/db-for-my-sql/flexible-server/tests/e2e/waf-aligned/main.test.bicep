@@ -62,6 +62,11 @@ module testDeployment '../../../main.bicep' = [
         Environment: 'Non-Prod'
         Role: 'DeploymentValidation'
       }
+      maintenanceWindow: {
+        dayOfWeek: 1
+        startHour: 2
+        startMinute: 3
+      }
     }
   }
 ]

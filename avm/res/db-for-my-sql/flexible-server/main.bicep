@@ -82,8 +82,27 @@ param customerManagedKeyGeo customerManagedKeyType
 @description('Optional. The mode for High Availability (HA). It is not supported for the Burstable pricing tier and Zone redundant HA can only be set during server provisioning.')
 param highAvailability string = 'Disabled'
 
-@description('Optional. Properties for the maintenence window. If provided, "customWindow" property must exist and set to "Enabled".')
-param maintenanceWindow object = {}
+@description('Optional. Properties for the maintenence window.')
+param maintenanceWindow maintenanceWindowType = {
+  customWindow: 'Enabled'
+  dayOfWeek: 0
+  startHour: 1
+  startMinute: 0
+}
+
+type maintenanceWindowType = {
+  @description('Optional. Indicates whether custom window is enabled or disabled. Defaults to \'Enabled\'.')
+  customWindow: ('Enabled' | 'Disabled')?
+
+  @description('Optional. Day of week for maintenance window. Defaults to \'0\'.')
+  dayOfWeek: int?
+
+  @description('Optional. Start hour for maintenance window. Defaults to \'0\'.')
+  startHour: int?
+
+  @description('Optional. Start minute for maintenance window. Defaults to \'0\'.')
+  startMinute: int?
+}
 
 @description('Optional. Delegated subnet arm resource ID. Used when the desired connectivity mode is "Private Access" - virtual network integration. Delegation must be enabled on the subnet for MySQL Flexible Servers and subnet CIDR size is /29.')
 param delegatedSubnetResourceId string = ''
@@ -289,12 +308,12 @@ resource flexibleServer 'Microsoft.DBforMySQL/flexibleServers@2022-09-30-preview
       mode: highAvailability
       standbyAvailabilityZone: highAvailability == 'SameZone' ? availabilityZone : null
     }
-    maintenanceWindow: !empty(maintenanceWindow)
+    maintenanceWindow: null != maintenanceWindow
       ? {
-          customWindow: maintenanceWindow.customWindow
-          dayOfWeek: maintenanceWindow.customWindow == 'Enabled' ? maintenanceWindow.dayOfWeek : 0
-          startHour: maintenanceWindow.customWindow == 'Enabled' ? maintenanceWindow.startHour : 0
-          startMinute: maintenanceWindow.customWindow == 'Enabled' ? maintenanceWindow.startMinute : 0
+          customWindow: maintenanceWindow.?customWindow ?? 'Enabled'
+          dayOfWeek: maintenanceWindow.?dayOfWeek ?? 0
+          startHour: maintenanceWindow.?startHour ?? 0
+          startMinute: maintenanceWindow.?startMinute ?? 0
         }
       : null
     network: !empty(delegatedSubnetResourceId) && empty(firewallRules)
