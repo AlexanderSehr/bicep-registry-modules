@@ -63,9 +63,15 @@ module testDeployment '../../../main.bicep' = [
         kind: 'CanNotDelete'
         name: 'myCustomLockName'
       }
-      privateDnsZoneResourceIds: [
-        nestedDependencies.outputs.privateDNSZoneResourceId
-      ]
+      privateDnsZoneGroup: {
+        name: 'default'
+        privateDnsZoneGroupConfigs: [
+          {
+            name: 'config'
+            privateDnsZoneResourceId: nestedDependencies.outputs.privateDNSZoneResourceId
+          }
+        ]
+      }
       roleAssignments: [
         {
           roleDefinitionIdOrName: 'Owner'
@@ -113,7 +119,6 @@ module testDeployment '../../../main.bicep' = [
         Environment: 'Non-Prod'
         Role: 'DeploymentValidation'
       }
-      privateDnsZoneGroupName: 'default'
       privateLinkServiceConnections: [
         {
           name: '${namePrefix}${serviceShort}001'
