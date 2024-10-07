@@ -177,27 +177,24 @@ resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
   tags: tags
   identity: identity
   properties: {
-    repoConfiguration: bool(gitConfigureLater)
-      ? null
-      : union(
-          {
-            type: gitRepoType
-            hostName: gitHostName
-            accountName: gitAccountName
-            repositoryName: gitRepositoryName
-            collaborationBranch: gitCollaborationBranch
-            rootFolder: gitRootFolder
-            disablePublish: gitDisablePublish
-            lastCommitId: gitLastCommitId
-            tenantId: gitTenantId
-          },
-          (gitRepoType == 'FactoryVSTSConfiguration'
+    repoConfiguration: !gitConfigureLater
+      ? {
+          type: gitRepoType
+          hostName: gitHostName
+          accountName: gitAccountName
+          repositoryName: gitRepositoryName
+          collaborationBranch: gitCollaborationBranch
+          rootFolder: gitRootFolder
+          disablePublish: gitDisablePublish
+          lastCommitId: gitLastCommitId
+          tenantId: gitTenantId
+          ...(gitRepoType == 'FactoryVSTSConfiguration'
             ? {
                 projectName: gitProjectName
               }
-            : {}),
-          {}
-        )
+            : {})
+        }
+      : {}
     globalParameters: !empty(globalParameters) ? globalParameters : null
     publicNetworkAccess: !empty(publicNetworkAccess)
       ? any(publicNetworkAccess)

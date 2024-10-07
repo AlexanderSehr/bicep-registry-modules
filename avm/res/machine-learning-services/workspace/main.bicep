@@ -237,51 +237,49 @@ resource workspace 'Microsoft.MachineLearningServices/workspaces@2024-04-01-prev
     tier: sku
   }
   identity: identity
-  properties: union(
+  properties: {
     // Always added parameters
-    {
-      friendlyName: name
-      storageAccount: associatedStorageAccountResourceId
-      keyVault: associatedKeyVaultResourceId
-      applicationInsights: associatedApplicationInsightsResourceId
-      containerRegistry: associatedContainerRegistryResourceId
-      hbiWorkspace: hbiWorkspace
-      description: description
-      discoveryUrl: discoveryUrl
-      encryption: !empty(customerManagedKey)
-        ? {
-            status: 'Enabled'
-            identity: !empty(customerManagedKey.?userAssignedIdentityResourceId)
-              ? {
-                  userAssignedIdentity: cMKUserAssignedIdentity.id
-                }
-              : null
-            keyVaultProperties: {
-              keyVaultArmId: cMKKeyVault.id
-              keyIdentifier: !empty(customerManagedKey.?keyVersion ?? '')
-                ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-                : cMKKeyVault::cMKKey.properties.keyUriWithVersion
-            }
+    friendlyName: name
+    storageAccount: associatedStorageAccountResourceId
+    keyVault: associatedKeyVaultResourceId
+    applicationInsights: associatedApplicationInsightsResourceId
+    containerRegistry: associatedContainerRegistryResourceId
+    hbiWorkspace: hbiWorkspace
+    description: description
+    discoveryUrl: discoveryUrl
+    encryption: !empty(customerManagedKey)
+      ? {
+          status: 'Enabled'
+          identity: !empty(customerManagedKey.?userAssignedIdentityResourceId)
+            ? {
+                userAssignedIdentity: cMKUserAssignedIdentity.id
+              }
+            : null
+          keyVaultProperties: {
+            keyVaultArmId: cMKKeyVault.id
+            keyIdentifier: !empty(customerManagedKey.?keyVersion ?? '')
+              ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
+              : cMKKeyVault::cMKKey.properties.keyUriWithVersion
           }
-        : null
-      imageBuildCompute: imageBuildCompute
-      primaryUserAssignedIdentity: primaryUserAssignedIdentity
-      systemDatastoresAuthMode: systemDatastoresAuthMode
-      publicNetworkAccess: publicNetworkAccess
-      serviceManagedResourcesSettings: serviceManagedResourcesSettings
-      featureStoreSettings: featureStoreSettings
-      hubResourceId: hubResourceId
-      managedNetwork: managedNetworkSettings
-      serverlessComputeSettings: serverlessComputeSettings
-      workspaceHubConfig: workspaceHubConfig
-    },
-    // Parameters only added if not empty
-    !empty(sharedPrivateLinkResources)
+        }
+      : null
+    imageBuildCompute: imageBuildCompute
+    primaryUserAssignedIdentity: primaryUserAssignedIdentity
+    systemDatastoresAuthMode: systemDatastoresAuthMode
+    publicNetworkAccess: publicNetworkAccess
+    serviceManagedResourcesSettings: serviceManagedResourcesSettings
+    featureStoreSettings: featureStoreSettings
+    hubResourceId: hubResourceId
+    managedNetwork: managedNetworkSettings
+    serverlessComputeSettings: serverlessComputeSettings
+    workspaceHubConfig: workspaceHubConfig
+    // Parameters only added if condition applies
+    ...(!empty(sharedPrivateLinkResources)
       ? {
           sharedPrivateLinkResources: sharedPrivateLinkResources
         }
-      : {}
-  )
+      : {})
+  }
   kind: kind
 }
 

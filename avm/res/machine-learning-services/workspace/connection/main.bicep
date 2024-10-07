@@ -51,18 +51,16 @@ resource machineLearningWorkspace 'Microsoft.MachineLearningServices/workspaces@
 resource connection 'Microsoft.MachineLearningServices/workspaces/connections@2024-04-01' = {
   name: name
   parent: machineLearningWorkspace
-  properties: union(
-    {
-      category: category
-      expiryTime: expiryTime
-      isSharedToAll: isSharedToAll
-      metadata: metadata
-      sharedUserList: sharedUserList
-      target: target
-      value: value
-    },
-    connectionProperties
-  )
+  properties: {
+    category: category
+    expiryTime: expiryTime
+    isSharedToAll: isSharedToAll
+    metadata: metadata
+    sharedUserList: sharedUserList
+    target: target
+    value: value
+    ...connectionProperties
+  }
 }
 
 // ============ //
