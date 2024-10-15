@@ -123,25 +123,23 @@ resource namespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' existing
 resource topic 'Microsoft.ServiceBus/namespaces/topics@2022-10-01-preview' = {
   name: name
   parent: namespace
-  properties: union(
-    {
-      autoDeleteOnIdle: autoDeleteOnIdle
-      defaultMessageTimeToLive: defaultMessageTimeToLive
-      duplicateDetectionHistoryTimeWindow: duplicateDetectionHistoryTimeWindow
-      enableBatchedOperations: enableBatchedOperations
-      enablePartitioning: enablePartitioning
-      requiresDuplicateDetection: requiresDuplicateDetection
-      status: status
-      supportOrdering: supportOrdering
-      maxSizeInMegabytes: maxSizeInMegabytes
-    },
-    (namespace.sku.name == 'Premium')
+  properties: {
+    autoDeleteOnIdle: autoDeleteOnIdle
+    defaultMessageTimeToLive: defaultMessageTimeToLive
+    duplicateDetectionHistoryTimeWindow: duplicateDetectionHistoryTimeWindow
+    enableBatchedOperations: enableBatchedOperations
+    enablePartitioning: enablePartitioning
+    requiresDuplicateDetection: requiresDuplicateDetection
+    status: status
+    supportOrdering: supportOrdering
+    maxSizeInMegabytes: maxSizeInMegabytes
+    ...(namespace.sku.name == 'Premium')
       ? {
           enableExpress: enableExpress
           maxMessageSizeInKilobytes: maxMessageSizeInKilobytes
         }
       : {}
-  )
+  }
 }
 
 module topic_authorizationRules 'authorization-rule/main.bicep' = [

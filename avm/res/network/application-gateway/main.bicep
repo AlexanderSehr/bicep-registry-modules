@@ -270,75 +270,74 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-04-01' =
   location: location
   tags: tags
   identity: identity
-  properties: union(
-    {
-      authenticationCertificates: authenticationCertificates
-      autoscaleConfiguration: autoscaleMaxCapacity > 0 && autoscaleMinCapacity >= 0
-        ? {
-            maxCapacity: autoscaleMaxCapacity
-            minCapacity: autoscaleMinCapacity
-          }
-        : null
-      backendAddressPools: backendAddressPools
-      backendHttpSettingsCollection: backendHttpSettingsCollection
-      backendSettingsCollection: backendSettingsCollection
-      customErrorConfigurations: customErrorConfigurations
-      enableHttp2: enableHttp2
-      firewallPolicy: !empty(firewallPolicyResourceId)
-        ? {
-            id: firewallPolicyResourceId
-          }
-        : null
-      forceFirewallPolicyAssociation: !empty(firewallPolicyResourceId)
-      frontendIPConfigurations: frontendIPConfigurations
-      frontendPorts: frontendPorts
-      gatewayIPConfigurations: gatewayIPConfigurations
-      globalConfiguration: endsWith(sku, 'v2')
-        ? {
-            enableRequestBuffering: enableRequestBuffering
-            enableResponseBuffering: enableResponseBuffering
-          }
-        : null
-      httpListeners: httpListeners
-      loadDistributionPolicies: loadDistributionPolicies
-      listeners: listeners
-      privateLinkConfigurations: privateLinkConfigurations
-      probes: probes
-      redirectConfigurations: redirectConfigurations
-      requestRoutingRules: requestRoutingRules
-      routingRules: routingRules
-      rewriteRuleSets: rewriteRuleSets
-      sku: {
-        name: sku
-        tier: endsWith(sku, 'v2') ? sku : substring(sku, 0, indexOf(sku, '_'))
-        capacity: autoscaleMaxCapacity > 0 && autoscaleMinCapacity >= 0 ? null : capacity
-      }
-      sslCertificates: sslCertificates
-      sslPolicy: sslPolicyType != 'Predefined'
-        ? {
-            cipherSuites: sslPolicyCipherSuites
-            minProtocolVersion: sslPolicyMinProtocolVersion
-            policyName: empty(sslPolicyName) ? null : sslPolicyName
-            policyType: sslPolicyType
-          }
-        : {
-            policyName: empty(sslPolicyName) ? null : sslPolicyName
-            policyType: sslPolicyType
-          }
-      sslProfiles: sslProfiles
-      trustedClientCertificates: trustedClientCertificates
-      trustedRootCertificates: trustedRootCertificates
-      urlPathMaps: urlPathMaps
-    },
-    (enableFips
+  properties: {
+    authenticationCertificates: authenticationCertificates
+    autoscaleConfiguration: autoscaleMaxCapacity > 0 && autoscaleMinCapacity >= 0
+      ? {
+          maxCapacity: autoscaleMaxCapacity
+          minCapacity: autoscaleMinCapacity
+        }
+      : null
+    backendAddressPools: backendAddressPools
+    backendHttpSettingsCollection: backendHttpSettingsCollection
+    backendSettingsCollection: backendSettingsCollection
+    customErrorConfigurations: customErrorConfigurations
+    enableHttp2: enableHttp2
+    firewallPolicy: !empty(firewallPolicyResourceId)
+      ? {
+          id: firewallPolicyResourceId
+        }
+      : null
+    forceFirewallPolicyAssociation: !empty(firewallPolicyResourceId)
+    frontendIPConfigurations: frontendIPConfigurations
+    frontendPorts: frontendPorts
+    gatewayIPConfigurations: gatewayIPConfigurations
+    globalConfiguration: endsWith(sku, 'v2')
+      ? {
+          enableRequestBuffering: enableRequestBuffering
+          enableResponseBuffering: enableResponseBuffering
+        }
+      : null
+    httpListeners: httpListeners
+    loadDistributionPolicies: loadDistributionPolicies
+    listeners: listeners
+    privateLinkConfigurations: privateLinkConfigurations
+    probes: probes
+    redirectConfigurations: redirectConfigurations
+    requestRoutingRules: requestRoutingRules
+    routingRules: routingRules
+    rewriteRuleSets: rewriteRuleSets
+    sku: {
+      name: sku
+      tier: endsWith(sku, 'v2') ? sku : substring(sku, 0, indexOf(sku, '_'))
+      capacity: autoscaleMaxCapacity > 0 && autoscaleMinCapacity >= 0 ? null : capacity
+    }
+    sslCertificates: sslCertificates
+    sslPolicy: sslPolicyType != 'Predefined'
+      ? {
+          cipherSuites: sslPolicyCipherSuites
+          minProtocolVersion: sslPolicyMinProtocolVersion
+          policyName: empty(sslPolicyName) ? null : sslPolicyName
+          policyType: sslPolicyType
+        }
+      : {
+          policyName: empty(sslPolicyName) ? null : sslPolicyName
+          policyType: sslPolicyType
+        }
+    sslProfiles: sslProfiles
+    trustedClientCertificates: trustedClientCertificates
+    trustedRootCertificates: trustedRootCertificates
+    urlPathMaps: urlPathMaps
+    // Parameters only added if condition applies
+    ...(enableFips
       ? {
           enableFips: enableFips
         }
-      : {}),
-    (!empty(webApplicationFirewallConfiguration)
+      : {})
+    ...(!empty(webApplicationFirewallConfiguration)
       ? { webApplicationFirewallConfiguration: webApplicationFirewallConfiguration }
       : {})
-  )
+  }
   zones: zones
 }
 
