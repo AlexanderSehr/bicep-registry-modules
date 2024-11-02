@@ -152,7 +152,7 @@ resource cMKKeyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = if (!empt
     split(customerManagedKey.?keyVaultResourceId ?? '', '/')[4]
   )
 
-  resource cMKKey 'keys@2023-02-01' existing = {
+  resource cMKKey 'keys@2023-02-01' existing = if (!empty(customerManagedKey.?keyName)) {
     name: customerManagedKey.?keyName ?? ''
   }
 }
