@@ -171,7 +171,23 @@ param publicNetworkAccess string = ''
 @description('Optional. Allows HTTPS traffic only to storage service if sets to true.')
 param supportsHttpsTrafficOnly bool = true
 
-import { customerManagedKeyType } from 'br/public:avm/utl/types/avm-common-types:0.2.1'
+// import { customerManagedKeyType } from 'br/public:avm/utl/types/avm-common-types:0.2.1'
+type customerManagedKeyType = {
+  @description('Required. The resource ID of a key vault to reference a customer managed key for encryption from.')
+  keyVaultResourceId: string
+
+  @description('Required. The name of the customer managed key to use for encryption.')
+  keyName: string
+
+  @description('Optional. The version of the customer managed key to reference for encryption.')
+  keyVersion: string?
+
+  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
+  fetchLatestToday: bool?
+
+  @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
+  userAssignedIdentityResourceId: string?
+}
 @description('Optional. The customer managed key definition.')
 param customerManagedKey customerManagedKeyType?
 
@@ -395,7 +411,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
               keyvaulturi: cMKKeyVault.properties.vaultUri
               keyversion: !empty(customerManagedKey.?keyVersion ?? '')
                 ? customerManagedKey!.keyVersion
-                : last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
+                : (customerManagedKey.?fetchLatestToday ?? false)
+                    ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
+                    : null
             }
           : null
         identity: {
