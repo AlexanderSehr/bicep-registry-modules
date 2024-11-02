@@ -97,7 +97,23 @@ param queues queueType[]?
 @description('Optional. The topics to create in the service bus namespace.')
 param topics topicType[]?
 
-import { customerManagedKeyType } from 'br/public:avm/utl/types/avm-common-types:0.2.1'
+// import { customerManagedKeyType } from 'br/public:avm/utl/types/avm-common-types:0.2.1'
+type customerManagedKeyType = {
+  @description('Required. The resource ID of a key vault to reference a customer managed key for encryption from.')
+  keyVaultResourceId: string
+
+  @description('Required. The name of the customer managed key to use for encryption.')
+  keyName: string
+
+  @description('Optional. The version of the customer managed key to reference for encryption.')
+  keyVersion: string?
+
+  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
+  fetchLatestToday: bool?
+
+  @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
+  userAssignedIdentityResourceId: string?
+}
 @description('Optional. The customer managed key definition.')
 param customerManagedKey customerManagedKeyType?
 
@@ -227,7 +243,9 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview
               keyVaultUri: cMKKeyVault.properties.vaultUri
               keyVersion: !empty(customerManagedKey.?keyVersion ?? '')
                 ? customerManagedKey!.keyVersion
-                : last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
+                : (customerManagedKey.?fetchLatestToday ?? false)
+                    ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
+                    : null
             }
           ]
           requireInfrastructureEncryption: requireInfrastructureEncryption

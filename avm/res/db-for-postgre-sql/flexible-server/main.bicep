@@ -102,7 +102,23 @@ import { managedIdentityOnlyUserAssignedType } from 'br/public:avm/utl/types/avm
 @description('Conditional. The managed identity definition for this resource. Required if \'cMKKeyName\' is not empty.')
 param managedIdentities managedIdentityOnlyUserAssignedType?
 
-import { customerManagedKeyType } from 'br/public:avm/utl/types/avm-common-types:0.1.0'
+// import { customerManagedKeyType } from 'br/public:avm/utl/types/avm-common-types:0.2.1'
+type customerManagedKeyType = {
+  @description('Required. The resource ID of a key vault to reference a customer managed key for encryption from.')
+  keyVaultResourceId: string
+
+  @description('Required. The name of the customer managed key to use for encryption.')
+  keyName: string
+
+  @description('Optional. The version of the customer managed key to reference for encryption.')
+  keyVersion: string?
+
+  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
+  fetchLatestToday: bool?
+
+  @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
+  userAssignedIdentityResourceId: string?
+}
 @description('Optional. The customer managed key definition.')
 param customerManagedKey customerManagedKeyType?
 
@@ -261,7 +277,9 @@ resource flexibleServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
       ? {
           primaryKeyURI: !empty(customerManagedKey.?keyVersion ?? '')
             ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-            : cMKKeyVault::cMKKey.properties.keyUriWithVersion
+            : (customerManagedKey.?fetchLatestToday ?? false)
+                ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
+                : cMKKeyVault::cMKKey.properties.keyUri
           primaryUserAssignedIdentityId: cMKUserAssignedIdentity.id
           type: 'AzureKeyVault'
         }

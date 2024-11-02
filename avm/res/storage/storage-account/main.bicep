@@ -409,7 +409,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
           ? {
               keyname: customerManagedKey!.keyName
               keyvaulturi: cMKKeyVault.properties.vaultUri
-              keyversion: !empty(customerManagedKey.?keyVersion ?? '')
+              keyversion: !empty(customerManagedKey.?keyVersion)
                 ? customerManagedKey!.keyVersion
                 : (customerManagedKey.?fetchLatestToday ?? false)
                     ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))

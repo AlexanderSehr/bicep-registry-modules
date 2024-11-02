@@ -323,7 +323,9 @@ resource workspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
                     keyName: customerManagedKey!.keyName
                     keyVersion: !empty(customerManagedKey.?keyVersion ?? '')
                       ? customerManagedKey!.keyVersion!
-                      : last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
+                      : (customerManagedKey.?fetchLatestToday ?? false)
+                          ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
+                          : null
                   }
                 }
               : null
@@ -337,7 +339,7 @@ resource workspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
                       ? customerManagedKeyManagedDisk!.keyVersion!
                       : last(split(cMKManagedDiskKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
                   }
-                  rotationToLatestKeyVersionEnabled: customerManagedKeyManagedDisk.?rotationToLatestKeyVersionEnabled ?? true
+                  rotationToLatestKeyVersionEnabled: (customerManagedKeyManagedDisk.?fetchLatestToday ?? false == false) ?? true
                 }
               : null
           }
@@ -706,6 +708,9 @@ type customerManagedKeyType = {
   @description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
   keyVersion: string?
 
+  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
+  fetchLatestToday: bool?
+
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?
 }?
@@ -720,11 +725,11 @@ type customerManagedKeyManagedDiskType = {
   @description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
   keyVersion: string?
 
+  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
+  fetchLatestToday: bool?
+
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?
-
-  @description('Optional. Indicate whether the latest key version should be automatically used for Managed Disk Encryption. Enabled by default.')
-  rotationToLatestKeyVersionEnabled: bool?
 }?
 
 type roleAssignmentType = {

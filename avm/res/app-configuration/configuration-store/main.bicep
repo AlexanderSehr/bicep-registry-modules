@@ -180,10 +180,12 @@ resource configurationStore 'Microsoft.AppConfiguration/configurationStores@2023
     encryption: !empty(customerManagedKey)
       ? {
           keyVaultProperties: {
-            keyIdentifier: !empty(customerManagedKey.?keyVersion ?? '')
+            keyIdentifier: !empty(customerManagedKey.?keyVersion)
               ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-              : cMKKeyVault::cMKKey.properties.keyUriWithVersion
-            identityClientId: !empty(customerManagedKey.?userAssignedIdentityResourceId ?? '')
+              : (customerManagedKey.?fetchLatestToday ?? false)
+                  ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
+                  : cMKKeyVault::cMKKey.properties.keyUri
+            identityClientId: !empty(customerManagedKey.?userAssignedIdentityResourceId)
               ? cMKUserAssignedIdentity.properties.clientId
               : null
           }
@@ -541,6 +543,9 @@ type customerManagedKeyType = {
 
   @description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
   keyVersion: string?
+
+  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
+  fetchLatestToday: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?

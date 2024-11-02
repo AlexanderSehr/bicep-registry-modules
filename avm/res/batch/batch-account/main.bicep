@@ -186,9 +186,11 @@ resource batchAccount 'Microsoft.Batch/batchAccounts@2022-06-01' = {
       ? {
           keySource: 'Microsoft.KeyVault'
           keyVaultProperties: {
-            keyIdentifier: !empty(customerManagedKey.?keyVersion ?? '')
+            keyIdentifier: !empty(customerManagedKey.?keyVersion)
               ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-              : cMKKeyVault::cMKKey.properties.keyUriWithVersion
+              : (customerManagedKey.?fetchLatestToday ?? false)
+                  ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
+                  : cMKKeyVault::cMKKey.properties.keyUri
           }
         }
       : null
@@ -530,6 +532,9 @@ type customerManagedKeyType = {
 
   @description('Required. The name of the customer managed key to use for encryption.')
   keyName: string
+
+  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
+  fetchLatestToday: bool?
 
   @description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
   keyVersion: string?

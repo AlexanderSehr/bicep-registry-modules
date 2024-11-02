@@ -298,12 +298,16 @@ resource flexibleServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
           geoBackupKeyURI: geoRedundantBackup == 'Enabled'
             ? (!empty(customerManagedKeyGeo.?keyVersion ?? '')
                 ? '${cMKGeoKeyVault::cMKKey.properties.keyUri}/${customerManagedKeyGeo!.keyVersion}'
-                : cMKGeoKeyVault::cMKKey.properties.keyUriWithVersion)
+                : (customerManagedKeyGeo.?fetchLatestToday ?? false)
+                    ? cMKGeoKeyVault::cMKKey.properties.keyUriWithVersion
+                    : cMKGeoKeyVault::cMKKey.properties.keyUri)
             : null
           geoBackupUserAssignedIdentityId: geoRedundantBackup == 'Enabled' ? cMKGeoUserAssignedIdentity.id : null
           primaryKeyURI: !empty(customerManagedKey.?keyVersion ?? '')
             ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-            : cMKKeyVault::cMKKey.properties.keyUriWithVersion
+            : (customerManagedKey.?fetchLatestToday ?? false)
+                ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
+                : cMKKeyVault::cMKKey.properties.keyUri
           primaryUserAssignedIdentityId: cMKUserAssignedIdentity.id
         }
       : null
@@ -542,6 +546,9 @@ type customerManagedKeyType = {
 
   @description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
   keyVersion: string?
+
+  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
+  fetchLatestToday: bool?
 
   @description('Required. User assigned identity to use when fetching the customer managed key.')
   userAssignedIdentityResourceId: string
