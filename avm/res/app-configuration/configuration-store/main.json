@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "11592620611499466961"
+      "templateHash": "16314839819454996994"
     },
     "name": "App Configuration Stores",
     "description": "This module deploys an App Configuration Store.",
@@ -658,7 +658,7 @@
       "apiVersion": "2023-02-01",
       "subscriptionId": "[split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')[2]]",
       "resourceGroup": "[split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')[4]]",
-      "name": "[format('{0}/{1}', last(split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')), coalesce(tryGet(parameters('customerManagedKey'), 'keyName'), 'dummyKey'))]",
+      "name": "[format('{0}/{1}', last(split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')), tryGet(parameters('customerManagedKey'), 'keyName'))]",
       "dependsOn": [
         "cMKKeyVault"
       ]
@@ -699,7 +699,7 @@
       "apiVersion": "2023-01-31",
       "subscriptionId": "[split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')[2]]",
       "resourceGroup": "[split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')[4]]",
-      "name": "[last(split(coalesce(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), 'dummyMsi'), '/'))]"
+      "name": "[last(split(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), '/'))]"
     },
     "configurationStore": {
       "type": "Microsoft.AppConfiguration/configurationStores",
@@ -715,7 +715,7 @@
         "createMode": "[parameters('createMode')]",
         "disableLocalAuth": "[parameters('disableLocalAuth')]",
         "enablePurgeProtection": "[if(equals(parameters('sku'), 'Free'), false(), parameters('enablePurgeProtection'))]",
-        "encryption": "[if(not(empty(parameters('customerManagedKey'))), createObject('keyVaultProperties', createObject('keyIdentifier', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'keyVersion'), ''))), format('{0}/{1}', reference('cMKKeyVault::cMKKey').keyUri, parameters('customerManagedKey').keyVersion), reference('cMKKeyVault::cMKKey').keyUriWithVersion), 'identityClientId', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), ''))), reference('cMKUserAssignedIdentity').clientId, null()))), null())]",
+        "encryption": "[if(and(not(empty(parameters('customerManagedKey'))), not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId')))), createObject('keyVaultProperties', createObject('keyIdentifier', if(not(empty(tryGet(parameters('customerManagedKey'), 'keyVersion'))), format('{0}/{1}', reference('cMKKeyVault::cMKKey').keyUri, parameters('customerManagedKey').keyVersion), reference('cMKKeyVault::cMKKey').keyUriWithVersion), 'identityClientId', if(not(empty(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'))), reference('cMKUserAssignedIdentity').clientId, null()))), null())]",
         "publicNetworkAccess": "[if(not(empty(parameters('publicNetworkAccess'))), parameters('publicNetworkAccess'), if(not(empty(parameters('privateEndpoints'))), 'Disabled', 'Enabled'))]",
         "softDeleteRetentionInDays": "[if(equals(parameters('sku'), 'Free'), 0, parameters('softDeleteRetentionInDays'))]"
       },

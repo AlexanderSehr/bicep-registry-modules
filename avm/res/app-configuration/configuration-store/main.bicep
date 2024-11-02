@@ -153,12 +153,12 @@ resource cMKKeyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = if (!empt
   )
 
   resource cMKKey 'keys@2023-02-01' existing = if (!empty(customerManagedKey.?keyVaultResourceId) && !empty(customerManagedKey.?keyName)) {
-    name: customerManagedKey.?keyName ?? 'dummyKey'
+    name: customerManagedKey.?keyName!
   }
 }
 
 resource cMKUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (!empty(customerManagedKey.?userAssignedIdentityResourceId)) {
-  name: last(split(customerManagedKey.?userAssignedIdentityResourceId ?? 'dummyMsi', '/'))
+  name: last(split(customerManagedKey.?userAssignedIdentityResourceId!, '/'))
   scope: resourceGroup(
     split(customerManagedKey.?keyVaultResourceId!, '/')[2],
     split(customerManagedKey.?keyVaultResourceId!, '/')[4]
@@ -177,13 +177,13 @@ resource configurationStore 'Microsoft.AppConfiguration/configurationStores@2023
     createMode: createMode
     disableLocalAuth: disableLocalAuth
     enablePurgeProtection: sku == 'Free' ? false : enablePurgeProtection
-    encryption: !empty(customerManagedKey)
+    encryption: !empty(customerManagedKey) && !empty(customerManagedKey.?keyVaultResourceId)
       ? {
           keyVaultProperties: {
-            keyIdentifier: !empty(customerManagedKey.?keyVersion ?? '')
+            keyIdentifier: !empty(customerManagedKey.?keyVersion)
               ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
               : cMKKeyVault::cMKKey.properties.keyUriWithVersion
-            identityClientId: !empty(customerManagedKey.?userAssignedIdentityResourceId ?? '')
+            identityClientId: !empty(customerManagedKey.?userAssignedIdentityResourceId)
               ? cMKUserAssignedIdentity.properties.clientId
               : null
           }
