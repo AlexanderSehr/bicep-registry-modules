@@ -260,9 +260,7 @@ resource workspace 'Microsoft.MachineLearningServices/workspaces@2024-04-01-prev
               keyVaultArmId: cMKKeyVault.id
               keyIdentifier: !empty(customerManagedKey.?keyVersion ?? '')
                 ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-                : (customerManagedKey.?fetchLatestToday ?? false)
-                    ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
-                    : cMKKeyVault::cMKKey.properties.keyUri
+                : cMKKeyVault::cMKKey.properties.keyUriWithVersion
             }
           }
         : null
@@ -735,11 +733,8 @@ type customerManagedKeyType = {
   @sys.description('Required. The name of the customer managed key to use for encryption.')
   keyName: string
 
-  @sys.description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
+  @sys.description('Optional. The version of the customer managed key to reference for encryption. If not provided, the deployment will use the latest version available at deployment time.')
   keyVersion: string?
-
-  @sys.description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestToday: bool?
 
   @sys.description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?
