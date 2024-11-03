@@ -110,11 +110,8 @@ type customerManagedKeyType = {
   @description('Required. The name of the customer managed key to use for encryption.')
   keyName: string
 
-  @description('Optional. The version of the customer managed key to reference for encryption.')
+  @description('Optional. The version of the customer managed key to reference for encryption. If not provided, the deployment will use the latest version available at deployment time.')
   keyVersion: string?
-
-  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestToday: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?
@@ -277,9 +274,7 @@ resource flexibleServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' =
       ? {
           primaryKeyURI: !empty(customerManagedKey.?keyVersion ?? '')
             ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-            : (customerManagedKey.?fetchLatestToday ?? false)
-                ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
-                : cMKKeyVault::cMKKey.properties.keyUri
+            : cMKKeyVault::cMKKey.properties.keyUriWithVersion
           primaryUserAssignedIdentityId: cMKUserAssignedIdentity.id
           type: 'AzureKeyVault'
         }

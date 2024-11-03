@@ -714,7 +714,7 @@ type customerManagedKeyType = {
   @description('Required. The name of the customer managed key to use for encryption.')
   keyName: string
 
-  @sys.description('Optional. The version of the customer managed key to reference for encryption. If not provided, the deployment will use the latest version available at deployment time.')
+  @description('Optional. The version of the customer managed key to reference for encryption. If not provided, the deployment will use the latest version available at deployment time.')
   keyVersion: string?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
