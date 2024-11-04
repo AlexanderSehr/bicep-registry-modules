@@ -23,11 +23,8 @@ type customerManagedKeyType = {
   @description('Required. The name of the customer managed key to use for encryption.')
   keyName: string
 
-  @description('Optional. The version of the customer managed key to reference for encryption.')
+  @description('Optional. The version of the customer managed key to reference for encryption. If not provided, the deployment will use the latest version available at deployment time.')
   keyVersion: string?
-
-  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestToday: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?
@@ -216,9 +213,7 @@ resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' 
             keyvaultUri: cMKKeyVault.properties.vaultUri
             keyVersion: !empty(customerManagedKey.?keyVersion ?? '')
               ? customerManagedKey!.keyVersion
-              : (customerManagedKey.?fetchLatestToday ?? false)
-                  ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
-                  : null
+              : last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
           }
         }
       : null
