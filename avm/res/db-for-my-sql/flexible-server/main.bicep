@@ -304,7 +304,6 @@ resource flexibleServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
           primaryKeyURI: !empty(customerManagedKey.?keyVersion ?? '')
             ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
             : cMKKeyVault::cMKKey.properties.keyUriWithVersion
-
           primaryUserAssignedIdentityId: cMKUserAssignedIdentity.id
         }
       : null
