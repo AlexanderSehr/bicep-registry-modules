@@ -298,16 +298,13 @@ resource flexibleServer 'Microsoft.DBforMySQL/flexibleServers@2023-12-30' = {
           geoBackupKeyURI: geoRedundantBackup == 'Enabled'
             ? (!empty(customerManagedKeyGeo.?keyVersion ?? '')
                 ? '${cMKGeoKeyVault::cMKKey.properties.keyUri}/${customerManagedKeyGeo!.keyVersion}'
-                : (customerManagedKeyGeo.?fetchLatestNow ?? false)
-                    ? cMKGeoKeyVault::cMKKey.properties.keyUriWithVersion
-                    : cMKGeoKeyVault::cMKKey.properties.keyUri)
+                : cMKGeoKeyVault::cMKKey.properties.keyUriWithVersion)
             : null
           geoBackupUserAssignedIdentityId: geoRedundantBackup == 'Enabled' ? cMKGeoUserAssignedIdentity.id : null
           primaryKeyURI: !empty(customerManagedKey.?keyVersion ?? '')
             ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-            : (customerManagedKey.?fetchLatestNow ?? false)
-                ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
-                : cMKKeyVault::cMKKey.properties.keyUri
+            : cMKKeyVault::cMKKey.properties.keyUriWithVersion
+
           primaryUserAssignedIdentityId: cMKUserAssignedIdentity.id
         }
       : null
@@ -544,11 +541,8 @@ type customerManagedKeyType = {
   @description('Required. The name of the customer managed key to use for encryption.')
   keyName: string
 
-  @description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
+  @description('Optional. The version of the customer managed key to reference for encryption. If not provided, the deployment will use the latest version available at deployment time.')
   keyVersion: string?
-
-  @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestNow: bool?
 
   @description('Required. User assigned identity to use when fetching the customer managed key.')
   userAssignedIdentityResourceId: string
