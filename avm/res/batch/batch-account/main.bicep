@@ -188,7 +188,7 @@ resource batchAccount 'Microsoft.Batch/batchAccounts@2022-06-01' = {
           keyVaultProperties: {
             keyIdentifier: !empty(customerManagedKey.?keyVersion)
               ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-              : (customerManagedKey.?fetchLatestNow ?? false)
+              : (customerManagedKey.?autoRotationDisabled ?? false)
                   ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
                   : cMKKeyVault::cMKKey.properties.keyUri
           }
@@ -534,7 +534,7 @@ type customerManagedKeyType = {
   keyName: string
 
   @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestNow: bool?
+  autoRotationDisabled: bool?
 
   @description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
   keyVersion: string?

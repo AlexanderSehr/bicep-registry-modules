@@ -337,7 +337,7 @@ resource workspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
                       ? customerManagedKeyManagedDisk!.keyVersion!
                       : last(split(cMKManagedDiskKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
                   }
-                  rotationToLatestKeyVersionEnabled: (customerManagedKeyManagedDisk.?fetchLatestNow ?? false == false) ?? true
+                  rotationToLatestKeyVersionEnabled: (customerManagedKeyManagedDisk.?autoRotationDisabled ?? false == false) ?? true
                 }
               : null
           }
@@ -721,7 +721,7 @@ type customerManagedKeyManagedDiskType = {
   keyVersion: string?
 
   @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestNow: bool?
+  autoRotationDisabled: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?

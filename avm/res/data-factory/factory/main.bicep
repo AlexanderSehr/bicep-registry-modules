@@ -212,7 +212,7 @@ resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
           keyName: customerManagedKey!.keyName
           keyVersion: !empty(customerManagedKey.?keyVersion ?? '')
             ? customerManagedKey!.keyVersion
-            : (customerManagedKey.?fetchLatestNow ?? false)
+            : (customerManagedKey.?autoRotationDisabled ?? false)
                 ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
                 : null
           vaultBaseUrl: cMKKeyVault.properties.vaultUri
@@ -587,7 +587,7 @@ type customerManagedKeyType = {
   keyVersion: string?
 
   @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestNow: bool?
+  autoRotationDisabled: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?
