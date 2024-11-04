@@ -259,7 +259,7 @@ resource registry 'Microsoft.ContainerRegistry/registries@2023-06-01-preview' = 
               : null
             keyIdentifier: !empty(customerManagedKey.?keyVersion)
               ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-              : (customerManagedKey.?fetchLatestToday ?? false)
+              : (customerManagedKey.?fetchLatestNow ?? false)
                   ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
                   : cMKKeyVault::cMKKey.properties.keyUri
           }
@@ -724,7 +724,7 @@ type customerManagedKeyType = {
   keyVersion: string?
 
   @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestToday: bool?
+  fetchLatestNow: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?

@@ -183,7 +183,7 @@ type customerManagedKeyType = {
   keyVersion: string?
 
   @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestToday: bool?
+  fetchLatestNow: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?
@@ -411,7 +411,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
               keyvaulturi: cMKKeyVault.properties.vaultUri
               keyversion: !empty(customerManagedKey.?keyVersion)
                 ? customerManagedKey!.keyVersion
-                : (customerManagedKey.?fetchLatestToday ?? false)
+                : (customerManagedKey.?fetchLatestNow ?? false)
                     ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
                     : null
             }

@@ -182,7 +182,7 @@ resource configurationStore 'Microsoft.AppConfiguration/configurationStores@2023
           keyVaultProperties: {
             keyIdentifier: !empty(customerManagedKey.?keyVersion)
               ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-              : (customerManagedKey.?fetchLatestToday ?? false)
+              : (customerManagedKey.?fetchLatestNow ?? false)
                   ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
                   : cMKKeyVault::cMKKey.properties.keyUri
             identityClientId: !empty(customerManagedKey.?userAssignedIdentityResourceId)

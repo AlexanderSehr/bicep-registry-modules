@@ -146,7 +146,7 @@ resource loadTest 'Microsoft.LoadTestService/loadTests@2022-12-01' = {
           }
           keyUrl: !empty(customerManagedKey.?keyVersion)
             ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-            : (customerManagedKey.?fetchLatestToday ?? false)
+            : (customerManagedKey.?fetchLatestNow ?? false)
                 ? cMKKeyVault::cMKKey.properties.keyUriWithVersion
                 : cMKKeyVault::cMKKey.properties.keyUri
         }
@@ -238,7 +238,7 @@ type customerManagedKeyType = {
   keyName: string?
 
   @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestToday: bool?
+  fetchLatestNow: bool?
 
   @description('Optional. The version of the customer managed key to reference for encryption. If not provided, using \'latest\'.')
   keyVersion: string?

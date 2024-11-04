@@ -155,7 +155,7 @@ resource containergroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
             keyName: customerManagedKey!.keyName
             keyVersion: !empty(customerManagedKey.?keyVersion ?? '')
               ? customerManagedKey!.keyVersion
-              : (customerManagedKey.?fetchLatestToday ?? false)
+              : (customerManagedKey.?fetchLatestNow ?? false)
                   ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
                   : null
             vaultBaseUrl: cMKKeyVault.properties.vaultUri
@@ -252,7 +252,7 @@ type customerManagedKeyType = {
   keyVersion: string?
 
   @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestToday: bool?
+  fetchLatestNow: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?

@@ -109,7 +109,7 @@ type customerManagedKeyType = {
   keyVersion: string?
 
   @description('Optional. If specified, instead of using \'latest\', the latest key version at the time of the deployment is used.')
-  fetchLatestToday: bool?
+  fetchLatestNow: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?
@@ -243,7 +243,7 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview
               keyVaultUri: cMKKeyVault.properties.vaultUri
               keyVersion: !empty(customerManagedKey.?keyVersion ?? '')
                 ? customerManagedKey!.keyVersion
-                : (customerManagedKey.?fetchLatestToday ?? false)
+                : (customerManagedKey.?fetchLatestNow ?? false)
                     ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
                     : null
             }
