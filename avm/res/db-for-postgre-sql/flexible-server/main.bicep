@@ -98,24 +98,11 @@ param highAvailability string = 'ZoneRedundant'
 @description('Optional. The mode to create a new PostgreSQL server.')
 param createMode string = 'Default'
 
-import { managedIdentityOnlyUserAssignedType } from 'br/public:avm/utl/types/avm-common-types:0.1.0'
+import { managedIdentityOnlyUserAssignedType } from 'br/public:avm/utl/types/avm-common-types:0.3.0'
 @description('Conditional. The managed identity definition for this resource. Required if \'cMKKeyName\' is not empty.')
 param managedIdentities managedIdentityOnlyUserAssignedType?
 
-// import { customerManagedKeyType } from 'br/public:avm/utl/types/avm-common-types:0.2.1'
-type customerManagedKeyType = {
-  @description('Required. The resource ID of a key vault to reference a customer managed key for encryption from.')
-  keyVaultResourceId: string
-
-  @description('Required. The name of the customer managed key to use for encryption.')
-  keyName: string
-
-  @description('Optional. The version of the customer managed key to reference for encryption. If not provided, the deployment will use the latest version available at deployment time.')
-  keyVersion: string?
-
-  @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
-  userAssignedIdentityResourceId: string?
-}
+import { customerManagedKeyType } from 'br/public:avm/utl/types/avm-common-types:0.3.0'
 @description('Optional. The customer managed key definition.')
 param customerManagedKey customerManagedKeyType?
 
@@ -148,11 +135,11 @@ param databases array = []
 @description('Optional. The configurations to create in the server.')
 param configurations array = []
 
-import { lockType } from 'br/public:avm/utl/types/avm-common-types:0.1.0'
+import { lockType } from 'br/public:avm/utl/types/avm-common-types:0.3.0'
 @description('Optional. The lock settings of the service.')
 param lock lockType?
 
-import { roleAssignmentType } from 'br/public:avm/utl/types/avm-common-types:0.1.0'
+import { roleAssignmentType } from 'br/public:avm/utl/types/avm-common-types:0.3.0'
 @description('Optional. Array of role assignments to create.')
 param roleAssignments roleAssignmentType[]?
 
@@ -162,11 +149,11 @@ param tags object?
 @description('Optional. Enable/Disable usage telemetry for module.')
 param enableTelemetry bool = true
 
-import { diagnosticSettingFullType } from 'br/public:avm/utl/types/avm-common-types:0.1.0'
+import { diagnosticSettingFullType } from 'br/public:avm/utl/types/avm-common-types:0.3.0'
 @description('Optional. The diagnostic settings of the service.')
 param diagnosticSettings diagnosticSettingFullType[]?
 
-import { privateEndpointSingleServiceType } from 'br/public:avm/utl/types/avm-common-types:0.1.0'
+import { privateEndpointSingleServiceType } from 'br/public:avm/utl/types/avm-common-types:0.3.0'
 @description('Optional. Configuration details for private endpoints. Used when the desired connectivy mode is \'Public Access\' and \'delegatedSubnetResourceId\' is NOT used.')
 param privateEndpoints privateEndpointSingleServiceType[]?
 
