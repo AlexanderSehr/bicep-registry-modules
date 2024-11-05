@@ -323,9 +323,7 @@ resource workspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
                     keyName: customerManagedKey!.keyName
                     keyVersion: !empty(customerManagedKey.?keyVersion ?? '')
                       ? customerManagedKey!.keyVersion!
-                      : (customerManagedKey.?autoRotationDisabled ?? false)
-                          ? last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
-                          : ''
+                      : last(split(cMKKeyVault::cMKKey.properties.keyUriWithVersion, '/'))
                   }
                 }
               : null
@@ -707,9 +705,6 @@ type customerManagedKeyType = {
 
   @description('Optional. The version of the customer managed key to reference for encryption. If not provided, the deployment will use the latest version available at deployment time.')
   keyVersion: string?
-
-  @description('Optional. If configured, instead of auto-rotating to the latest key version, the latest key version at the time of the deployment is used.')
-  autoRotationDisabled: bool?
 
   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
   userAssignedIdentityResourceId: string?
