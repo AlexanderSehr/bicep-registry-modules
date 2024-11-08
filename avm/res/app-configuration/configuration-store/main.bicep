@@ -158,10 +158,10 @@ resource cMKKeyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = if (!empt
 }
 
 resource cMKUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (!empty(customerManagedKey.?userAssignedIdentityResourceId)) {
-  name: last(split(customerManagedKey.?userAssignedIdentityResourceId ?? '', '/'))
+  name: last(split(customerManagedKey.?userAssignedIdentityResourceId ?? 'dummy', '/'))
   scope: resourceGroup(
-    split(customerManagedKey.?userAssignedIdentityResourceId ?? '', '/')[2],
-    split(customerManagedKey.?userAssignedIdentityResourceId ?? '', '/')[4]
+    split(customerManagedKey.?userAssignedIdentityResourceId ?? '//', '/')[2],
+    split(customerManagedKey.?userAssignedIdentityResourceId ?? '////', '/')[4]
   )
 }
 
