@@ -173,18 +173,27 @@ function Set-EnvironmentOnAgent {
     # Adding a step to explicitly install the latest Bicep CLI because there is
     # always a delay in updating Bicep CLI in the job runner environments.
 
-    Write-Verbose 'Preinstalled Bicep CLI version:' -Verbose
-    bicep --version
+    # Write-Verbose 'Preinstalled Bicep CLI version:' -Verbose
+    # bicep --version
 
-    Write-Verbose ('Install latest Bicep CLI') -Verbose
-    # Fetch the latest Bicep CLI binary
-    curl -Lo bicep 'https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64'
-    # Mark it as executable
-    chmod +x ./bicep
-    # Add Bicep to your PATH (requires admin)
-    sudo mv ./bicep /usr/local/bin/bicep
+    # Write-Verbose ('Install latest Bicep CLI') -Verbose
+    # # Fetch the latest Bicep CLI binary
+    # curl -Lo bicep 'https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64'
+    # # Mark it as executable
+    # chmod +x ./bicep
+    # # Add Bicep to your PATH (requires admin)
+    # sudo mv ./bicep /usr/local/bin/bicep
 
-    Write-Verbose 'Bicep CLI version after install:' -Verbose
+    # Write-Verbose 'Bicep CLI version after install:' -Verbose
+    # bicep --version
+
+    Write-Verbose 'Execute [az bicep install -v "0.30.23"]' -Verbose
+    az bicep install -v '0.30.23'
+
+    Write-Verbose 'Execute [az bicep version]' -Verbose
+    az bicep version
+
+    Write-Verbose 'Execute [bicep --version]' -Verbose
     bicep --version
 
     ###############################
