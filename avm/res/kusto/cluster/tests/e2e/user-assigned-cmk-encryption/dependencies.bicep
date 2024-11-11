@@ -1,8 +1,8 @@
-@description('Required. The name of the managed identity to create.')
-param managedIdentityName string
-
 @description('Required. The name of the Key Vault to create.')
 param keyVaultName string
+
+@description('Required. The name of the Managed Identity to create.')
+param managedIdentityName string
 
 @description('Optional. The location to deploy resources to.')
 param location string = resourceGroup().location
@@ -51,11 +51,11 @@ resource keyPermissions 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
-@description('The principal ID of the created managed identity.')
-output managedIdentityPrincipalId string = managedIdentity.properties.principalId
-
 @description('The resource ID of the created Managed Identity.')
 output managedIdentityResourceId string = managedIdentity.id
+
+@description('The client ID of the created Managed Identity.')
+output managedIdentityClientId string = managedIdentity.properties.clientId
 
 @description('The resource ID of the created Key Vault.')
 output keyVaultResourceId string = keyVault.id

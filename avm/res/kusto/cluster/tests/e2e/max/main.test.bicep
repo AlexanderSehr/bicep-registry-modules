@@ -37,7 +37,7 @@ module nestedDependencies 'dependencies.bicep' = {
   params: {
     location: resourceLocation
     managedIdentityName: 'dep-${namePrefix}-msi-${serviceShort}'
-    entraIdGroupName: 'dep-${namePrefix}-group-${serviceShort}'
+    // entraIdGroupName: 'dep-${namePrefix}-group-${serviceShort}'
   }
 }
 
@@ -64,8 +64,10 @@ module testDeployment '../../../main.bicep' = [
       enableAutoScale: true
       principalAssignments: [
         {
-          principalId: nestedDependencies.outputs.entraIdGroupDisplayName
-          principalType: 'Group'
+          principalId: nestedDependencies.outputs.managedIdentityClientId
+          // principalId: nestedDependencies.outputs.entraIdGroupDisplayName
+          principalType: 'App'
+          // principalType: 'Group'
           role: 'AllDatabasesViewer'
         }
       ]

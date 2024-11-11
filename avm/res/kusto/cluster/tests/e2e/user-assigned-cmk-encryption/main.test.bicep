@@ -1,7 +1,7 @@
 targetScope = 'subscription'
 
-metadata name = 'Using only defaults'
-metadata description = 'This instance deploys the module with the minimum set of required parameters.'
+metadata name = 'Using Customer-Managed-Keys with User-Assigned identity'
+metadata description = 'This instance deploys the module using Customer-Managed-Keys using a User-Assigned Identity to access the Customer-Managed-Key secret.'
 
 // ========== //
 // Parameters //
@@ -15,7 +15,7 @@ param resourceGroupName string = 'dep-${namePrefix}-kusto.clusters-${serviceShor
 param resourceLocation string = deployment().location
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
-param serviceShort string = 'kcencr'
+param serviceShort string = 'kcuencr'
 
 @description('Optional. A token to inject into the name of each resource.')
 param namePrefix string = '#_namePrefix_#'
@@ -55,12 +55,18 @@ module testDeployment '../../../main.bicep' = [
     scope: resourceGroup
     name: '${uniqueString(deployment().name, resourceLocation)}-test-${serviceShort}-${iteration}'
     params: {
-      name: '${namePrefix}${serviceShort}0001'
+      #disable-next-line BCP334
+      name: '${namePrefix}${serviceShort}001'
       sku: 'Standard_E2ads_v5'
       customerManagedKey: {
         keyName: nestedDependencies.outputs.keyName
         keyVaultResourceId: nestedDependencies.outputs.keyVaultResourceId
         userAssignedIdentityResourceId: nestedDependencies.outputs.managedIdentityResourceId
+      }
+      managedIdentities: {
+        userAssignedResourceIds: [
+          nestedDependencies.outputs.managedIdentityResourceId
+        ]
       }
     }
   }
