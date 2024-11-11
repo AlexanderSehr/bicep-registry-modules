@@ -65,9 +65,7 @@ module testDeployment '../../../main.bicep' = [
       principalAssignments: [
         {
           principalId: nestedDependencies.outputs.managedIdentityClientId
-          // principalId: nestedDependencies.outputs.entraIdGroupDisplayName
           principalType: 'App'
-          // principalType: 'Group'
           role: 'AllDatabasesViewer'
         }
       ]
