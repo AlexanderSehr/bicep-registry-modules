@@ -12,7 +12,7 @@ resource kustoCluster 'Microsoft.Kusto/clusters@2023-08-15' = {
   location: location
   sku: {
     name: 'Standard_E2ads_v5'
-    tier: 'Basic'
+    tier: 'Standard'
   }
   identity: {
     type: 'SystemAssigned'
