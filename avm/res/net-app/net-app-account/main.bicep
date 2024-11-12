@@ -228,12 +228,12 @@ module netAppAccount_capacityPools 'capacity-pool/main.bicep' = [
       name: capacityPool.name
       location: location
       size: capacityPool.size
-      serviceLevel: capacityPool.?serviceLevel ?? 'Standard'
-      qosType: capacityPool.?qosType ?? 'Auto'
-      volumes: capacityPool.?volumes ?? []
-      coolAccess: capacityPool.?coolAccess ?? false
-      roleAssignments: capacityPool.?roleAssignments ?? []
-      encryptionType: capacityPool.?encryptionType ?? 'Single'
+      serviceLevel: capacityPool.?serviceLevel
+      qosType: capacityPool.?qosType
+      volumes: capacityPool.?volumes
+      coolAccess: capacityPool.?coolAccess
+      roleAssignments: capacityPool.?roleAssignments
+      encryptionType: capacityPool.?encryptionType
       tags: capacityPool.?tags ?? tags
     }
   }
