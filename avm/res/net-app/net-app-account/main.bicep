@@ -13,7 +13,7 @@ param aesEncryption bool = false
 
 import { customerManagedKeyType } from 'br/public:avm/utl/types/avm-common-types:0.3.0'
 @description('Optional. The customer managed key definition.')
-param customerManagedKey customerManagedKeyType
+param customerManagedKey customerManagedKeyType?
 
 @description('Optional. Fully Qualified Active Directory DNS Domain Name (e.g. \'contoso.com\').')
 param domainName string = ''
