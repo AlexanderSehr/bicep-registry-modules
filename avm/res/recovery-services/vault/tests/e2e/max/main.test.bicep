@@ -77,6 +77,9 @@ module testDeployment '../../../main.bicep' = [
       protectionContainers: [
         {
           name: 'iaasvmcontainer;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
+          containerType: 'Microsoft.Compute/virtualMachines'
+          backupManagementType: 'AzureIaasVM'
+          sourceResourceId: nestedDependencies.outputs.virtualMachineResourceId
           protectedItems: [
             {
               name: 'vm;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
