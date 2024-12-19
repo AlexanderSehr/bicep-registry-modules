@@ -48,7 +48,7 @@ param protectedItems protectedItem[]?
 ])
 param containerType string?
 
-resource protectionContainer 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers@2023-01-01' = {
+resource protectionContainer 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers@2024-10-01' = {
   name: '${recoveryVaultName}/Azure/${name}'
   properties: {
     sourceResourceId: sourceResourceId
