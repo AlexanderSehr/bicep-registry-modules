@@ -225,7 +225,7 @@ resource rsv 'Microsoft.RecoveryServices/vaults@2024-04-01' = {
           keyVaultProperties: {
             keyUri: !empty(customerManagedKey.?keyVersion)
               ? '${cMKKeyVault::cMKKey.properties.keyUri}/${customerManagedKey!.keyVersion}'
-              : (customerManagedKey!.autoRotationEnabled ?? true)
+              : (customerManagedKey.?autoRotationEnabled ?? true)
                   ? cMKKeyVault::cMKKey.properties.keyUri
                   : cMKKeyVault::cMKKey.properties.keyUriWithVersion
           }
