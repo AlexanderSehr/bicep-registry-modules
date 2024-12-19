@@ -303,6 +303,9 @@ module protectionContainer_protectedItems 'protected-item/main.bicep' = [
       protectedItemType: protectedItem.protectedItemType
       sourceResourceId: protectedItem.sourceResourceId
     }
+    dependsOn: [
+      rsv_backupPolicies
+    ]
   }
 ]
 
