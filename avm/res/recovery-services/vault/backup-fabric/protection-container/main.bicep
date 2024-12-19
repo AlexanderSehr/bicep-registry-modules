@@ -32,7 +32,7 @@ param sourceResourceId string?
 param friendlyName string?
 
 @description('Optional. Protected items to register in the container.')
-param protectedItems protectedItem[]?
+param protectedItems protectedItemType[]?
 
 @description('Optional. Type of the container.')
 @allowed([
@@ -84,7 +84,7 @@ output name string = protectionContainer.name
 
 @export()
 @description('The type for a protected item')
-type protectedItem = {
+type protectedItemType = {
   @description('Required. Name of the resource.')
   name: string
 
