@@ -38,6 +38,9 @@ module nestedDependencies 'dependencies.bicep' = {
     location: resourceLocation
     virtualNetworkName: 'dep-${namePrefix}-vnet-${serviceShort}'
     managedIdentityName: 'dep-${namePrefix}-msi-${serviceShort}'
+    sshDeploymentScriptName: 'dep-${namePrefix}-ds-${serviceShort}'
+    sshKeyName: 'dep-${namePrefix}-ssh-${serviceShort}'
+    virtualMachineName: 'dep-${namePrefix}-vm-${serviceShort}'
   }
 }
 
@@ -71,6 +74,23 @@ module testDeployment '../../../main.bicep' = [
         enhancedSecurityState: 'Disabled'
         softDeleteFeatureState: 'Disabled'
       }
+      protectionContainers: [
+        {
+          name: 'iaasvmcontainer;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
+          protectedItems: [
+            {
+              name: 'vm;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
+              policyResourceId: az.resourceId(
+                'Microsoft.RecoveryServices/vaults/backupPolicies',
+                '${namePrefix}${serviceShort}001',
+                'VMpolicy'
+              )
+              protectedItemType: 'Microsoft.Compute/virtualMachines'
+              sourceResourceId: nestedDependencies.outputs.virtualMachineResourceId
+            }
+          ]
+        }
+      ]
       backupPolicies: [
         {
           name: 'VMpolicy'
