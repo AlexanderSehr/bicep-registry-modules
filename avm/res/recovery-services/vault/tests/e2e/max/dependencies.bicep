@@ -85,55 +85,49 @@ resource sshKey 'Microsoft.Compute/sshPublicKeys@2022-03-01' = {
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
-  name: virtualMachineName
-  location: location
-  properties: {
-    networkProfile: {
-      networkInterfaces: [
-        {
-          properties: {
-            primary: true
-            deleteOption: 'Delete'
-          }
-          id: virtualNetwork.properties.subnets[0].id
-        }
-      ]
+module vm 'br/public:avm/res/compute/virtual-machine:0.10.1' = {
+  name: '${uniqueString(deployment().name, location)}-virtualMachine'
+  params: {
+    location: location
+    name: virtualMachineName
+    adminUsername: 'localAdminUser'
+    imageReference: {
+      publisher: 'Canonical'
+      offer: '0001-com-ubuntu-server-jammy'
+      sku: '22_04-lts-gen2'
+      version: 'latest'
     }
-    storageProfile: {
-      imageReference: {
-        publisher: 'Canonical'
-        offer: '0001-com-ubuntu-server-jammy'
-        sku: '22_04-lts-gen2'
-        version: 'latest'
-      }
-      osDisk: {
-        diskSizeGB: 128
-        createOption: 'FromImage'
-        caching: 'ReadWrite'
-        managedDisk: {
-          storageAccountType: 'Premium_LRS'
-        }
-      }
-    }
-    hardwareProfile: {
-      vmSize: 'Standard_D2s_v3'
-    }
-    osProfile: {
-      #disable-next-line adminusername-should-not-be-literal
-      adminUsername: 'localAdminUser'
-      linuxConfiguration: {
-        disablePasswordAuthentication: true
-        ssh: {
-          publicKeys: [
-            {
-              keyData: sshKey.properties.publicKey
-              path: '/home/localAdminUser/.ssh/authorized_keys'
+    zone: 0
+    nicConfigurations: [
+      {
+        ipConfigurations: [
+          {
+            name: 'ipconfig01'
+            subnetResourceId: virtualNetwork.properties.subnets[0].id
+            pipConfiguration: {
+              name: 'pip-01'
             }
-          ]
-        }
+          }
+        ]
+        nicSuffix: '-nic-01'
+      }
+    ]
+    osDisk: {
+      diskSizeGB: 128
+      caching: 'ReadWrite'
+      managedDisk: {
+        storageAccountType: 'Premium_LRS'
       }
     }
+    osType: 'Linux'
+    vmSize: 'Standard_D2s_v3'
+    disablePasswordAuthentication: true
+    publicKeys: [
+      {
+        keyData: sshKey.properties.publicKey
+        path: '/home/localAdminUser/.ssh/authorized_keys'
+      }
+    ]
   }
 }
 
@@ -166,4 +160,4 @@ output managedIdentityResourceId string = managedIdentity.id
 output privateDNSZoneResourceId string = privateDNSZone.id
 
 @description('The resource ID of the created Virtual Machine.')
-output virtualMachineResourceId string = vm.id
+output virtualMachineResourceId string = vm.outputs.resourceId
