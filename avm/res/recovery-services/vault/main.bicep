@@ -20,11 +20,11 @@ param backupPolicies backupPolicyType[]?
 @description('Optional. The backup configuration.')
 param backupConfig backupConfigType?
 
-@description('Optional. List of all protection containers.')
-param protectionContainers protectionContainerType[]?
-
 // @description('Optional. List of all protection containers.')
-// param protectedItems protectedItemType[]?
+// param protectionContainers protectionContainerType[]?
+
+@description('Optional. List of all protection containers.')
+param protectedItems object[]?
 
 @description('Optional. List of all replication fabrics.')
 param replicationFabrics replicationFabricType[]?
@@ -275,39 +275,39 @@ module rsv_backupStorageConfiguration 'backup-storage-config/main.bicep' = if (!
   }
 }
 
-module rsv_backupFabric_protectionContainers 'backup-fabric/protection-container/main.bicep' = [
-  for (protectionContainer, index) in (protectionContainers ?? []): {
-    name: '${uniqueString(deployment().name, location)}-RSV-ProtectionContainers-${index}'
-    params: {
-      recoveryVaultName: rsv.name
-      name: protectionContainer.name
-      sourceResourceId: protectionContainer.?sourceResourceId
-      friendlyName: protectionContainer.?friendlyName
-      backupManagementType: protectionContainer.?backupManagementType
-      containerType: protectionContainer.?containerType
-      protectedItems: protectionContainer.?protectedItems
-      location: location
-    }
-  }
-]
-
-// module protectionContainer_protectedItems 'protected-item/main.bicep' = [
-//   for (protectedItem, index) in (protectedItems ?? []): {
-//     name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
+// module rsv_backupFabric_protectionContainers 'backup-fabric/protection-container/main.bicep' = [
+//   for (protectionContainer, index) in (protectionContainers ?? []): {
+//     name: '${uniqueString(deployment().name, location)}-RSV-ProtectionContainers-${index}'
 //     params: {
-//       name: protectedItem.name
-//       location: location
-//       policyResourceId: protectedItem.policyResourceId
-//       protectedItemType: protectedItem.protectedItemType
-//       protectionContainerName: protectedItem.protectionContainerName
 //       recoveryVaultName: rsv.name
-//       sourceResourceId: protectedItem.sourceResourceId
+//       name: protectionContainer.name
+//       sourceResourceId: protectionContainer.?sourceResourceId
+//       friendlyName: protectionContainer.?friendlyName
+//       backupManagementType: protectionContainer.?backupManagementType
+//       containerType: protectionContainer.?containerType
+//       protectedItems: protectionContainer.?protectedItems
+//       location: location
 //     }
-//     dependsOn: [
-//       rsv_backupPolicies
-//     ]
 //   }
 // ]
+
+module protectionContainer_protectedItems 'protected-item/main.bicep' = [
+  for (protectedItem, index) in (protectedItems ?? []): {
+    name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
+    params: {
+      recoveryVaultName: rsv.name
+      name: protectedItem.name
+      location: location
+      policyResourceId: protectedItem.policyResourceId
+      protectedItemType: protectedItem.protectedItemType
+      protectionContainerName: protectedItem.protectionContainerName
+      sourceResourceId: protectedItem.sourceResourceId
+    }
+    dependsOn: [
+      rsv_backupPolicies
+    ]
+  }
+]
 
 module rsv_backupPolicies 'backup-policy/main.bicep' = [
   for (backupPolicy, index) in (backupPolicies ?? []): {
@@ -483,19 +483,6 @@ output privateEndpoints array = [
 // =============== //
 //   Definitions   //
 // =============== //
-
-// @export()
-// @description('The customer managed key type.')
-// type customerManagedKeyType = {
-//   @description('Required. The resource ID of a key vault to reference a customer managed key for encryption from.')
-//   keyVaultResourceId: string
-
-//   @description('Required. The name of the customer managed key to use for encryption.')
-//   keyName: string
-
-//   @description('Optional. User assigned identity to use when fetching the customer managed key. Required if no system assigned identity is available for use.')
-//   userAssignedIdentityResourceId: string?
-// }
 
 @export()
 @description('The type for redundancy settings.')
