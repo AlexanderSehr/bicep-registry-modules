@@ -47,6 +47,7 @@ param sourceResourceId string
 // }
 
 resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
+  // name: 'alsgrsvmax001/Azure/iaasvmcontainer;IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
   name: 'alsgrsvmax001/Azure/IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
   location: location
   properties: {
