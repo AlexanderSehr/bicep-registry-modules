@@ -29,8 +29,8 @@ param location string = resourceGroup().location
 @description('Required. The backup item type.')
 param protectedItemType string
 
-@description('Required. Resource ID of the backup policy with which this item is backed up.')
-param policyResourceId string
+@description('Required. The backup policy with which this item is backed up.')
+param policyName string
 
 @description('Required. Resource ID of the resource to back up.')
 param sourceResourceId string
@@ -47,18 +47,37 @@ param sourceResourceId string
 //   }
 // }
 
+resource rsv 'Microsoft.RecoveryServices/vaults@2023-01-01' existing = {
+  name: recoveryVaultName
+
+  resource backupPolicy 'backupPolicies@2024-10-01' existing = {
+    name: policyName
+  }
+}
+
 // Iterative validation
 resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
-  // name: 'alsgrsvmax001/Azure/iaasvmcontainer;IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
   name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
   location: location
   properties: {
     protectedItemType: any(protectedItemType)
-    policyId: resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', 'alsgrsvmax001', 'VMpolicy')
+    policyId: rsv::backupPolicy.id
     sourceResourceId: sourceResourceId
     extendedProperties: {}
   }
 }
+
+// Works
+// resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
+//   name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
+//   location: location
+//   properties: {
+//     protectedItemType: any(protectedItemType)
+//     policyId: resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', 'alsgrsvmax001', 'VMpolicy')
+//     sourceResourceId: sourceResourceId
+//     extendedProperties: {}
+//   }
+// }
 
 // Works
 // resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {

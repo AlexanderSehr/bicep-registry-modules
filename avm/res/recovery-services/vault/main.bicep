@@ -298,7 +298,7 @@ module protectionContainer_protectedItems 'protected-item/main.bicep' = [
       recoveryVaultName: rsv.name
       name: protectedItem.name
       location: location
-      policyResourceId: protectedItem.policyResourceId
+      policyName: protectedItem.policyName
       protectedItemType: protectedItem.protectedItemType
       protectionContainerName: protectedItem.protectionContainerName
       sourceResourceId: protectedItem.sourceResourceId
