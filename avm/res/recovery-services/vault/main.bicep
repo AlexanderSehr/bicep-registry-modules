@@ -291,23 +291,23 @@ module rsv_backupStorageConfiguration 'backup-storage-config/main.bicep' = if (!
 //   }
 // ]
 
-module protectionContainer_protectedItems 'protected-item/main.bicep' = [
-  for (protectedItem, index) in (protectedItems ?? []): {
-    name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
-    params: {
-      name: protectedItem.name
-      location: location
-      policyResourceId: protectedItem.policyResourceId
-      protectedItemType: protectedItem.protectedItemType
-      protectionContainerName: protectedItem.protectionContainerName
-      recoveryVaultName: rsv.name
-      sourceResourceId: protectedItem.sourceResourceId
-    }
-    dependsOn: [
-      rsv_backupPolicies
-    ]
-  }
-]
+// module protectionContainer_protectedItems 'protected-item/main.bicep' = [
+//   for (protectedItem, index) in (protectedItems ?? []): {
+//     name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
+//     params: {
+//       name: protectedItem.name
+//       location: location
+//       policyResourceId: protectedItem.policyResourceId
+//       protectedItemType: protectedItem.protectedItemType
+//       protectionContainerName: protectedItem.protectionContainerName
+//       recoveryVaultName: rsv.name
+//       sourceResourceId: protectedItem.sourceResourceId
+//     }
+//     dependsOn: [
+//       rsv_backupPolicies
+//     ]
+//   }
+// ]
 
 module rsv_backupPolicies 'backup-policy/main.bicep' = [
   for (backupPolicy, index) in (backupPolicies ?? []): {
