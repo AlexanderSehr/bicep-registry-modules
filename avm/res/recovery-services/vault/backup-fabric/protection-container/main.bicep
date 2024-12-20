@@ -48,23 +48,13 @@ param protectedItems protectedItemType[]?
 ])
 param containerType string?
 
-resource rsv 'Microsoft.RecoveryServices/vaults@2024-10-01' existing = {
-  name: recoveryVaultName
-}
-
-#disable-next-line BCP081
-resource backupFabric 'Microsoft.RecoveryServices/vaults/backupFabrics@2024-10-01' = {
-  name: 'Azure'
-  parent: rsv
-
-  resource protectionContainer 'protectionContainers@2024-10-01' = {
-    name: name
-    properties: {
-      sourceResourceId: sourceResourceId
-      friendlyName: friendlyName
-      backupManagementType: backupManagementType
-      containerType: any(containerType)
-    }
+resource protectionContainer 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers@2024-10-01' = {
+  name: '${recoveryVaultName}/Azure/${name}'
+  properties: {
+    sourceResourceId: sourceResourceId
+    friendlyName: friendlyName
+    backupManagementType: backupManagementType
+    containerType: any(containerType)
   }
 }
 
@@ -75,7 +65,7 @@ module protectionContainer_protectedItems 'protected-item/main.bicep' = [
       policyResourceId: protectedItem.policyResourceId
       name: protectedItem.name
       protectedItemType: protectedItem.protectedItemType
-      protectionContainerName: backupFabric::protectionContainer.name
+      protectionContainerName: last(split(protectionContainer.name, '/'))
       recoveryVaultName: recoveryVaultName
       sourceResourceId: protectedItem.sourceResourceId
       location: location
@@ -87,10 +77,10 @@ module protectionContainer_protectedItems 'protected-item/main.bicep' = [
 output resourceGroupName string = resourceGroup().name
 
 @description('The resource ID of the Protection Container.')
-output resourceId string = backupFabric::protectionContainer.id
+output resourceId string = protectionContainer.id
 
 @description('The Name of the Protection Container.')
-output name string = backupFabric::protectionContainer.name
+output name string = protectionContainer.name
 
 @export()
 @description('The type for a protected item')
