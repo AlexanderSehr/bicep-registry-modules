@@ -35,6 +35,7 @@ param policyResourceId string
 @description('Required. Resource ID of the resource to back up.')
 param sourceResourceId string
 
+// Does not work
 // resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
 //   name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
 //   location: location
@@ -46,12 +47,13 @@ param sourceResourceId string
 //   }
 // }
 
+// Iterative validation
 resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
   // name: 'alsgrsvmax001/Azure/iaasvmcontainer;IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
-  name: 'alsgrsvmax001/Azure/IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
+  name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
   location: location
   properties: {
-    protectedItemType: 'Microsoft.Compute/virtualMachines'
+    protectedItemType: any(protectedItemType)
     policyId: resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', 'alsgrsvmax001', 'VMpolicy')
     sourceResourceId: sourceResourceId
     extendedProperties: {}
