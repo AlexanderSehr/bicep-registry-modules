@@ -35,7 +35,7 @@ param policyResourceId string
 @description('Required. Resource ID of the resource to back up.')
 param sourceResourceId string
 
-resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2020-02-02' = {
+resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
   name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
   location: location
   properties: {
