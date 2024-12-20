@@ -42,15 +42,16 @@ param sourceResourceId string
 //     protectedItemType: any(protectedItemType)
 //     policyId: policyResourceId
 //     sourceResourceId: sourceResourceId
+//     extendedProperties: []
 //   }
 // }
 
 resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
-  name: 'alsgrsvmax001/Azure/iaasvmcontainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
+  name: 'alsgrsvmax001/Azure/iaasvmcontainer;IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
   location: location
   properties: {
     protectedItemType: 'Microsoft.Compute/virtualMachines'
-    policyId: '/subscriptions/a7439831-1cd9-435d-a091-4aa863c96556/providers/Microsoft.RecoveryServices/vaults/alsgrsvmax001/backupPolicies/DefaultPolicy'
+    policyId: '/subscriptions/a7439831-1cd9-435d-a091-4aa863c96556/providers/Microsoft.RecoveryServices/vaults/alsgrsvmax001/backupPolicies/VMpolicy'
     sourceResourceId: '/subscriptions/a7439831-1cd9-435d-a091-4aa863c96556/resourceGroups/dep-alsg-recoveryservices.vaults-rsvmax-rg/providers/Microsoft.Compute/virtualMachines/dep-alsg-vm-rsvmax'
   }
 }
