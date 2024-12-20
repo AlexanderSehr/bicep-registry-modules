@@ -74,26 +74,13 @@ module testDeployment '../../../main.bicep' = [
         enhancedSecurityState: 'Disabled'
         softDeleteFeatureState: 'Disabled'
       }
-      // protectedItems: [
-      //   {
-      //     name: 'vm;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
-      //     protectionContainerName: 'IaasVMContainer;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
-      //     policyName: 'VMpolicy'
-      //     protectedItemType: 'Microsoft.Compute/virtualMachines'
-      //     sourceResourceId: nestedDependencies.outputs.virtualMachineResourceId
-      //   }
-      // ]
-      protectionContainers: [
+      protectedItems: [
         {
-          name: 'IaasVMContainer;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
-          protectedItems: [
-            {
-              name: 'vm;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
-              policyName: 'VMpolicy'
-              protectedItemType: 'Microsoft.Compute/virtualMachines'
-              sourceResourceId: nestedDependencies.outputs.virtualMachineResourceId
-            }
-          ]
+          name: 'vm;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
+          protectionContainerName: 'IaasVMContainer;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
+          policyName: 'VMpolicy'
+          protectedItemType: 'Microsoft.Compute/virtualMachines'
+          sourceResourceId: nestedDependencies.outputs.virtualMachineResourceId
         }
       ]
       backupPolicies: [

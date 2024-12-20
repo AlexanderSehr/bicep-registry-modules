@@ -21,10 +21,7 @@ param backupPolicies backupPolicyType[]?
 param backupConfig backupConfigType?
 
 @description('Optional. List of all protection containers.')
-param protectionContainers protectionContainerType[]?
-
-// @description('Optional. List of all protection containers.')
-// param protectedItems object[]?
+param protectedItems protectedItemType[]?
 
 @description('Optional. List of all replication fabrics.')
 param replicationFabrics replicationFabricType[]?
@@ -275,38 +272,23 @@ module rsv_backupStorageConfiguration 'backup-storage-config/main.bicep' = if (!
   }
 }
 
-module rsv_backupFabric_protectionContainers 'backup-fabric/protection-container/main.bicep' = [
-  for (protectionContainer, index) in (protectionContainers ?? []): {
-    name: '${uniqueString(deployment().name, location)}-RSV-ProtectionContainers-${index}'
+module protectionContainer_protectedItems 'backup-fabric/protection-container/protected-item/main.bicep' = [
+  for (protectedItem, index) in (protectedItems ?? []): {
+    name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
     params: {
       recoveryVaultName: rsv.name
-      name: protectionContainer.name
-      friendlyName: protectionContainer.?friendlyName
-      backupManagementType: protectionContainer.?backupManagementType
-      containerType: protectionContainer.?containerType
-      protectedItems: protectionContainer.?protectedItems
+      name: protectedItem.name
       location: location
+      policyName: protectedItem.policyName
+      protectedItemType: protectedItem.protectedItemType
+      protectionContainerName: protectedItem.protectionContainerName
+      sourceResourceId: protectedItem.sourceResourceId
     }
+    dependsOn: [
+      rsv_backupPolicies
+    ]
   }
 ]
-
-// module protectionContainer_protectedItems 'protected-item/main.bicep' = [
-//   for (protectedItem, index) in (protectedItems ?? []): {
-//     name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
-//     params: {
-//       recoveryVaultName: rsv.name
-//       name: protectedItem.name
-//       location: location
-//       policyName: protectedItem.policyName
-//       protectedItemType: protectedItem.protectedItemType
-//       protectionContainerName: protectedItem.protectionContainerName
-//       sourceResourceId: protectedItem.sourceResourceId
-//     }
-//     dependsOn: [
-//       rsv_backupPolicies
-//     ]
-//   }
-// ]
 
 module rsv_backupPolicies 'backup-policy/main.bicep' = [
   for (backupPolicy, index) in (backupPolicies ?? []): {
@@ -593,79 +575,36 @@ type replicationAlertSettingsType = {
   sendToOwners: ('DoNotSend' | 'Send')?
 }
 
-// @export()
-// @description('The type for a protected item')
-// type protectedItemType = {
-//   @description('Required. Name of the resource.')
-//   name: string
-
-//   @description('Optional. Location for all resources.')
-//   location: string?
-
-//   @description('Required. Name of the Azure Recovery Service Vault Protection Container.')
-//   protectionContainerName: string
-
-//   @description('Required. The backup item type.')
-//   protectedItemType: (
-//     | 'AzureFileShareProtectedItem'
-//     | 'AzureVmWorkloadSAPAseDatabase'
-//     | 'AzureVmWorkloadSAPHanaDatabase'
-//     | 'AzureVmWorkloadSQLDatabase'
-//     | 'DPMProtectedItem'
-//     | 'GenericProtectedItem'
-//     | 'MabFileFolderProtectedItem'
-//     | 'Microsoft.ClassicCompute/virtualMachines'
-//     | 'Microsoft.Compute/virtualMachines'
-//     | 'Microsoft.Sql/servers/databases')
-
-//   @description('Required. The backup policy with which this item is backed up.')
-//   policyName: string
-
-//   @description('Required. Resource ID of the resource to back up.')
-//   sourceResourceId: string
-// }
-
-import { protectedItemType } from './backup-fabric/protection-container/main.bicep'
-@description('The type for a protection container.')
-type protectionContainerType = {
-  @description('Required. Name of the Azure Recovery Service Vault Protection Container.')
+@export()
+@description('The type for a protected item')
+type protectedItemType = {
+  @description('Required. Name of the resource.')
   name: string
 
   @description('Optional. Location for all resources.')
   location: string?
 
-  @description('Optional. Backup management type to execute the current Protection Container job.')
-  backupManagementType: (
-    | 'AzureBackupServer'
-    | 'AzureIaasVM'
-    | 'AzureSql'
-    | 'AzureStorage'
-    | 'AzureWorkload'
-    | 'DPM'
-    | 'DefaultBackup'
-    | 'Invalid'
-    | 'MAB')?
+  @description('Required. Name of the Azure Recovery Service Vault Protection Container.')
+  protectionContainerName: string
 
-  @description('Optional. Resource ID of the target resource for the Protection Container.')
-  sourceResourceId: string?
-
-  @description('Optional. Friendly name of the Protection Container.')
-  friendlyName: string?
-
-  @description('Optional. Protected items to register in the container.')
-  protectedItems: protectedItemType[]?
-
-  @description('Optional. Type of the container.')
-  containerType: (
-    | 'AzureBackupServerContainer'
-    | 'AzureSqlContainer'
-    | 'GenericContainer'
+  @description('Required. The backup item type.')
+  protectedItemType: (
+    | 'AzureFileShareProtectedItem'
+    | 'AzureVmWorkloadSAPAseDatabase'
+    | 'AzureVmWorkloadSAPHanaDatabase'
+    | 'AzureVmWorkloadSQLDatabase'
+    | 'DPMProtectedItem'
+    | 'GenericProtectedItem'
+    | 'MabFileFolderProtectedItem'
     | 'Microsoft.ClassicCompute/virtualMachines'
     | 'Microsoft.Compute/virtualMachines'
-    | 'SQLAGWorkLoadContainer'
-    | 'StorageContainer'
-    | 'VMAppContainer'
-    | 'Windows')?
+    | 'Microsoft.Sql/servers/databases')
+
+  @description('Required. The backup policy with which this item is backed up.')
+  policyName: string
+
+  @description('Required. Resource ID of the resource to back up.')
+  sourceResourceId: string
 }
 
 @export()
