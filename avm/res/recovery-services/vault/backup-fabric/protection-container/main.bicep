@@ -25,9 +25,6 @@ param location string = resourceGroup().location
 ])
 param backupManagementType string?
 
-@description('Optional. Resource ID of the target resource for the Protection Container.')
-param sourceResourceId string?
-
 @description('Optional. Friendly name of the Protection Container.')
 param friendlyName string?
 
@@ -50,13 +47,10 @@ param containerType string?
 
 resource protectionContainer 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers@2024-10-01' = {
   name: '${recoveryVaultName}/Azure/${name}'
-  // properties: {
-  //   friendlyName: friendlyName
-  //   backupManagementType: backupManagementType
-  //   containerType: any(containerType)
-  // }
   properties: {
-    containerType: ''
+    friendlyName: friendlyName
+    backupManagementType: backupManagementType
+    containerType: any(containerType)
   }
 }
 
