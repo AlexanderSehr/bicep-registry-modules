@@ -17,6 +17,7 @@ param location string = resourceGroup().location
 @allowed([
   'AzureFileShareProtectedItem'
   'AzureVmWorkloadSAPAseDatabase'
+  'AzureVmWorkloadSAPHanaDBInstance'
   'AzureVmWorkloadSAPHanaDatabase'
   'AzureVmWorkloadSQLDatabase'
   'DPMProtectedItem'
@@ -35,22 +36,48 @@ param policyResourceId string
 @description('Required. Resource ID of the resource to back up.')
 param sourceResourceId string
 
-resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
-  // name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
-  name: 'alsgrsvmax001/Azure/iaasvmcontainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
-  location: location
-  properties: {
-    protectedItemType: any(protectedItemType)
-    policyId: policyResourceId
-    sourceResourceId: sourceResourceId
+resource rsv 'Microsoft.RecoveryServices/vaults@2024-10-01' existing = {
+  name: recoveryVaultName
+}
+
+#disable-next-line BCP081
+resource backupFabric 'Microsoft.RecoveryServices/vaults/backupFabrics@2024-10-01' = {
+  name: 'Azure'
+  parent: rsv
+
+  resource protectionContainer 'protectionContainers@2024-10-01' = {
+    name: protectionContainerName
+    properties: {
+      containerType: protectedItemType
+    }
+
+    resource protectedItem 'protectedItems@2024-10-01' = {
+      name: name
+      location: location
+      properties: {
+        protectedItemType: any(protectedItemType)
+        policyId: policyResourceId
+        sourceResourceId: sourceResourceId
+      }
+    }
   }
 }
+
+// resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
+//   name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
+//   location: location
+//   properties: {
+//     protectedItemType: any(protectedItemType)
+//     policyId: policyResourceId
+//     sourceResourceId: sourceResourceId
+//   }
+// }
 
 @description('The name of the Resource Group the protected item was created in.')
 output resourceGroupName string = resourceGroup().name
 
 @description('The resource ID of the protected item.')
-output resourceId string = protectedItem.id
+output resourceId string = backupFabric::protectionContainer::protectedItem.id
 
 @description('The Name of the protected item.')
-output name string = protectedItem.name
+output name string = backupFabric::protectionContainer::protectedItem.name
