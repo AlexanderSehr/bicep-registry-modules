@@ -58,7 +58,7 @@ module protectionContainer_protectedItems 'protected-item/main.bicep' = [
   for (protectedItem, index) in (protectedItems ?? []): {
     name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
     params: {
-      policyResourceId: protectedItem.policyResourceId
+      policyName: protectedItem.policyName
       name: protectedItem.name
       protectedItemType: protectedItem.protectedItemType
       protectionContainerName: last(split(protectionContainer.name, '/'))
@@ -101,8 +101,8 @@ type protectedItemType = {
     | 'Microsoft.Compute/virtualMachines'
     | 'Microsoft.Sql/servers/databases')
 
-  @description('Required. Resource ID of the backup policy with which this item is backed up.')
-  policyResourceId: string
+  @description('Required. The backup policy with which this item is backed up.')
+  policyName: string
 
   @description('Required. Resource ID of the resource to back up.')
   sourceResourceId: string

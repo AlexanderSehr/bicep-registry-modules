@@ -20,11 +20,11 @@ param backupPolicies backupPolicyType[]?
 @description('Optional. The backup configuration.')
 param backupConfig backupConfigType?
 
-// @description('Optional. List of all protection containers.')
-// param protectionContainers protectionContainerType[]?
-
 @description('Optional. List of all protection containers.')
-param protectedItems object[]?
+param protectionContainers protectionContainerType[]?
+
+// @description('Optional. List of all protection containers.')
+// param protectedItems object[]?
 
 @description('Optional. List of all replication fabrics.')
 param replicationFabrics replicationFabricType[]?
@@ -275,39 +275,38 @@ module rsv_backupStorageConfiguration 'backup-storage-config/main.bicep' = if (!
   }
 }
 
-// module rsv_backupFabric_protectionContainers 'backup-fabric/protection-container/main.bicep' = [
-//   for (protectionContainer, index) in (protectionContainers ?? []): {
-//     name: '${uniqueString(deployment().name, location)}-RSV-ProtectionContainers-${index}'
-//     params: {
-//       recoveryVaultName: rsv.name
-//       name: protectionContainer.name
-//       sourceResourceId: protectionContainer.?sourceResourceId
-//       friendlyName: protectionContainer.?friendlyName
-//       backupManagementType: protectionContainer.?backupManagementType
-//       containerType: protectionContainer.?containerType
-//       protectedItems: protectionContainer.?protectedItems
-//       location: location
-//     }
-//   }
-// ]
-
-module protectionContainer_protectedItems 'protected-item/main.bicep' = [
-  for (protectedItem, index) in (protectedItems ?? []): {
-    name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
+module rsv_backupFabric_protectionContainers 'backup-fabric/protection-container/main.bicep' = [
+  for (protectionContainer, index) in (protectionContainers ?? []): {
+    name: '${uniqueString(deployment().name, location)}-RSV-ProtectionContainers-${index}'
     params: {
       recoveryVaultName: rsv.name
-      name: protectedItem.name
+      name: protectionContainer.name
+      friendlyName: protectionContainer.?friendlyName
+      backupManagementType: protectionContainer.?backupManagementType
+      containerType: protectionContainer.?containerType
+      protectedItems: protectionContainer.?protectedItems
       location: location
-      policyName: protectedItem.policyName
-      protectedItemType: protectedItem.protectedItemType
-      protectionContainerName: protectedItem.protectionContainerName
-      sourceResourceId: protectedItem.sourceResourceId
     }
-    dependsOn: [
-      rsv_backupPolicies
-    ]
   }
 ]
+
+// module protectionContainer_protectedItems 'protected-item/main.bicep' = [
+//   for (protectedItem, index) in (protectedItems ?? []): {
+//     name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
+//     params: {
+//       recoveryVaultName: rsv.name
+//       name: protectedItem.name
+//       location: location
+//       policyName: protectedItem.policyName
+//       protectedItemType: protectedItem.protectedItemType
+//       protectionContainerName: protectedItem.protectionContainerName
+//       sourceResourceId: protectedItem.sourceResourceId
+//     }
+//     dependsOn: [
+//       rsv_backupPolicies
+//     ]
+//   }
+// ]
 
 module rsv_backupPolicies 'backup-policy/main.bicep' = [
   for (backupPolicy, index) in (backupPolicies ?? []): {
@@ -619,8 +618,8 @@ type replicationAlertSettingsType = {
 //     | 'Microsoft.Compute/virtualMachines'
 //     | 'Microsoft.Sql/servers/databases')
 
-//   @description('Required. Resource ID of the backup policy with which this item is backed up.')
-//   policyResourceId: string
+//   @description('Required. The backup policy with which this item is backed up.')
+//   policyName: string
 
 //   @description('Required. Resource ID of the resource to back up.')
 //   sourceResourceId: string

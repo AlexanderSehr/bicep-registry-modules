@@ -74,33 +74,28 @@ module testDeployment '../../../main.bicep' = [
         enhancedSecurityState: 'Disabled'
         softDeleteFeatureState: 'Disabled'
       }
-      protectedItems: [
-        {
-          name: 'vm;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
-          protectionContainerName: 'IaasVMContainer;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
-          policyName: 'VMpolicy'
-          protectedItemType: 'Microsoft.Compute/virtualMachines'
-          sourceResourceId: nestedDependencies.outputs.virtualMachineResourceId
-        }
-      ]
-      // protectionContainers: [
+      // protectedItems: [
       //   {
-      //     name: 'iaasvmcontainer;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
-      //     containerType: 'Microsoft.Compute/virtualMachines'
-      //     protectedItems: [
-      //       {
-      //         name: 'vm;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
-      //         policyResourceId: az.resourceId(
-      //           'Microsoft.RecoveryServices/vaults/backupPolicies',
-      //           '${namePrefix}${serviceShort}001',
-      //           'VMpolicy'
-      //         )
-      //         protectedItemType: 'Microsoft.Compute/virtualMachines'
-      //         sourceResourceId: nestedDependencies.outputs.virtualMachineResourceId
-      //       }
-      //     ]
+      //     name: 'vm;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
+      //     protectionContainerName: 'IaasVMContainer;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
+      //     policyName: 'VMpolicy'
+      //     protectedItemType: 'Microsoft.Compute/virtualMachines'
+      //     sourceResourceId: nestedDependencies.outputs.virtualMachineResourceId
       //   }
       // ]
+      protectionContainers: [
+        {
+          name: 'IaasVMContainer;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
+          protectedItems: [
+            {
+              name: 'vm;iaasvmcontainerv2;${resourceGroup.name};${last(split(nestedDependencies.outputs.virtualMachineResourceId, '/'))}'
+              policyName: 'VMpolicy'
+              protectedItemType: 'Microsoft.Compute/virtualMachines'
+              sourceResourceId: nestedDependencies.outputs.virtualMachineResourceId
+            }
+          ]
+        }
+      ]
       backupPolicies: [
         {
           name: 'VMpolicy'
