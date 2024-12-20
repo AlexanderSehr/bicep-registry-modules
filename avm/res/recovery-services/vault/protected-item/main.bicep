@@ -35,29 +35,29 @@ param policyResourceId string
 @description('Required. Resource ID of the resource to back up.')
 param sourceResourceId string
 
+resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
+  name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
+  location: location
+  properties: {
+    protectedItemType: any(protectedItemType)
+    policyId: policyResourceId
+    sourceResourceId: sourceResourceId
+    // extendedProperties: {}
+  }
+}
+
+// Works
 // resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
-//   name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
+//   // name: 'alsgrsvmax001/Azure/iaasvmcontainer;IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
+//      name: 'alsgrsvmax001/Azure/IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
 //   location: location
 //   properties: {
-//     protectedItemType: any(protectedItemType)
-//     policyId: policyResourceId
-//     sourceResourceId: sourceResourceId
+//     protectedItemType: 'Microsoft.Compute/virtualMachines'
+//     policyId: resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', 'alsgrsvmax001', 'VMpolicy')
+//     sourceResourceId: '/subscriptions/a7439831-1cd9-435d-a091-4aa863c96556/resourceGroups/dep-alsg-recoveryservices.vaults-rsvmax-rg/providers/Microsoft.Compute/virtualMachines/dep-alsg-vm-rsvmax'
 //     extendedProperties: {}
 //   }
 // }
-
-resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
-  // name: 'alsgrsvmax001/Azure/iaasvmcontainer;IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
-  name: 'alsgrsvmax001/Azure/IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
-  location: location
-  properties: {
-    protectedItemType: 'Microsoft.Compute/virtualMachines'
-    // policyId: '/subscriptions/a7439831-1cd9-435d-a091-4aa863c96556/providers/Microsoft.RecoveryServices/vaults/alsgrsvmax001/backupPolicies/VMpolicy'
-    policyId: resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', 'alsgrsvmax001', 'VMpolicy')
-    sourceResourceId: '/subscriptions/a7439831-1cd9-435d-a091-4aa863c96556/resourceGroups/dep-alsg-recoveryservices.vaults-rsvmax-rg/providers/Microsoft.Compute/virtualMachines/dep-alsg-vm-rsvmax'
-    extendedProperties: {}
-  }
-}
 
 @description('The name of the Resource Group the protected item was created in.')
 output resourceGroupName string = resourceGroup().name
