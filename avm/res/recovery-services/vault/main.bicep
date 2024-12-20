@@ -295,12 +295,12 @@ module protectionContainer_protectedItems 'protected-item/main.bicep' = [
   for (protectedItem, index) in (protectedItems ?? []): {
     name: '${uniqueString(deployment().name, location)}-ProtectedItem-${index}'
     params: {
-      recoveryVaultName: rsv.name
-      protectionContainerName: protectedItem.protectionContainerName
       name: protectedItem.name
       location: location
       policyResourceId: protectedItem.policyResourceId
       protectedItemType: protectedItem.protectedItemType
+      protectionContainerName: protectedItem.protectionContainerName
+      recoveryVaultName: rsv.name
       sourceResourceId: protectedItem.sourceResourceId
     }
     dependsOn: [
