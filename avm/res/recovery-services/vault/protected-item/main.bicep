@@ -42,7 +42,7 @@ resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protecti
     protectedItemType: any(protectedItemType)
     policyId: policyResourceId
     sourceResourceId: sourceResourceId
-    // extendedProperties: {}
+    extendedProperties: {}
   }
 }
 
