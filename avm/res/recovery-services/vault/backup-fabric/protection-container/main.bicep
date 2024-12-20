@@ -46,15 +46,16 @@ param protectedItems protectedItemType[]?
   'VMAppContainer'
   'Windows'
 ])
-param containerType string?
+param containerType string
 
 resource protectionContainer 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers@2024-10-01' = {
   name: '${recoveryVaultName}/Azure/${name}'
   properties: {
-    sourceResourceId: sourceResourceId
-    friendlyName: friendlyName
-    backupManagementType: backupManagementType
-    containerType: any(containerType)
+    // sourceResourceId: sourceResourceId
+    // friendlyName: friendlyName
+    // backupManagementType: backupManagementType
+    #disable-next-line BCP225
+    containerType: containerType
   }
 }
 
