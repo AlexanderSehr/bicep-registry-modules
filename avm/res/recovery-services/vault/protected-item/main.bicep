@@ -36,11 +36,12 @@ param policyResourceId string
 param sourceResourceId string
 
 resource protectedItem 'Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems@2024-10-01' = {
-  // name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
-  name: 'alsgrsvmax001/Azure/IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
+  name: '${recoveryVaultName}/Azure/${protectionContainerName}/${name}'
+  // name: 'alsgrsvmax001/Azure/IaasVMContainer;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax/vm;iaasvmcontainerv2;dep-alsg-recoveryservices.vaults-rsvmax-rg;dep-alsg-vm-rsvmax'
   location: location
   properties: {
-    protectedItemType: any(protectedItemType)
+    // protectedItemType: any(protectedItemType)
+    protectedItemType: 'Microsoft.Compute/virtualMachines'
     policyId: policyResourceId
     sourceResourceId: sourceResourceId
     extendedProperties: {}
