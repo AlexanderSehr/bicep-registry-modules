@@ -177,7 +177,7 @@ Describe 'File/folder tests' -Tag 'Modules' {
             }
 
             if (-not $relevantCSVRow) {
-                $errorMessage = "Failed to identify module [$moduleName]."
+                $errorMessage = "Failed to identify module [$moduleName] in AVM CSV."
                 Write-Error $errorMessage
                 Set-ItResult -Skipped -Because $errorMessage
             }
@@ -1021,7 +1021,7 @@ Describe 'Module tests' -Tag 'Module' {
                 }
 
                 if (-not $relevantCSVRow) {
-                    $errorMessage = "Failed to identify module [$moduleName]."
+                    $errorMessage = "Failed to identify module [$moduleName] in AVM CSV."
                     Write-Error $errorMessage
                     Set-ItResult -Skipped -Because $errorMessage
                 }
