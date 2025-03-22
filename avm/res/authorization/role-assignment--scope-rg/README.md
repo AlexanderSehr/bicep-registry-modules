@@ -1,6 +1,6 @@
-# Role Assignments (All scopes) `[Authorization/RoleAssignment]`
+# Role Assignments (Resource Group scope) `[Microsoft.Authorization/roleAssignments]`
 
-This module deploys a Role Assignment at a Management Group, Subscription or Resource Group scope.
+This module deploys a Role Assignment at a Resource Group scope.
 
 ## Navigation
 
@@ -22,18 +22,14 @@ The following section provides usage examples for the module, which were used to
 
 >**Note**: Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
 
->**Note**: To reference the module, please use the following syntax `br/public:avm/ptn/authorization/role-assignment:<version>`.
+>**Note**: To reference the module, please use the following syntax `br/public:avm/res/authorization/role-assignment--scope-rg:<version>`.
 
-- [Role Assignments (Management Group scope)](#example-1-role-assignments-management-group-scope)
-- [Role Assignments (Management Group scope)](#example-2-role-assignments-management-group-scope)
-- [Role Assignments (Resource Group scope)](#example-3-role-assignments-resource-group-scope)
-- [Role Assignments (Resource Group)](#example-4-role-assignments-resource-group)
-- [Role Assignments (Subscription scope)](#example-5-role-assignments-subscription-scope)
-- [Role Assignments (Subscription scope)](#example-6-role-assignments-subscription-scope)
+- [Using only defaults](#example-1-using-only-defaults)
+- [Using large parameter set](#example-2-using-large-parameter-set)
 
-### Example 1: _Role Assignments (Management Group scope)_
+### Example 1: _Using only defaults_
 
-This module deploys a Role Assignment at a Management Group scope using minimal parameters.
+This instance deploys the module with the minimum set of required parameters.
 
 
 <details>
@@ -41,175 +37,14 @@ This module deploys a Role Assignment at a Management Group scope using minimal 
 <summary>via Bicep module</summary>
 
 ```bicep
-module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>' = {
-  name: 'roleAssignmentDeployment'
-  params: {
-    // Required parameters
-    principalId: '<principalId>'
-    roleDefinitionIdOrName: 'Resource Policy Contributor'
-    // Non-required parameters
-    location: '<location>'
-    principalType: 'ServicePrincipal'
-  }
-}
-```
-
-</details>
-<p>
-
-<details>
-
-<summary>via JSON parameters file</summary>
-
-```json
-{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    // Required parameters
-    "principalId": {
-      "value": "<principalId>"
-    },
-    "roleDefinitionIdOrName": {
-      "value": "Resource Policy Contributor"
-    },
-    // Non-required parameters
-    "location": {
-      "value": "<location>"
-    },
-    "principalType": {
-      "value": "ServicePrincipal"
-    }
-  }
-}
-```
-
-</details>
-<p>
-
-<details>
-
-<summary>via Bicep parameters file</summary>
-
-```bicep-params
-using 'br/public:avm/ptn/authorization/role-assignment:<version>'
-
-// Required parameters
-param principalId = '<principalId>'
-param roleDefinitionIdOrName = 'Resource Policy Contributor'
-// Non-required parameters
-param location = '<location>'
-param principalType = 'ServicePrincipal'
-```
-
-</details>
-<p>
-
-### Example 2: _Role Assignments (Management Group scope)_
-
-This module deploys a Role Assignment at a Management Group scope using common parameters.
-
-
-<details>
-
-<summary>via Bicep module</summary>
-
-```bicep
-module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>' = {
-  name: 'roleAssignmentDeployment'
-  params: {
-    // Required parameters
-    principalId: '<principalId>'
-    roleDefinitionIdOrName: 'Management Group Reader'
-    // Non-required parameters
-    description: 'Role Assignment (management group scope)'
-    location: '<location>'
-    managementGroupId: '<managementGroupId>'
-    principalType: 'ServicePrincipal'
-  }
-}
-```
-
-</details>
-<p>
-
-<details>
-
-<summary>via JSON parameters file</summary>
-
-```json
-{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    // Required parameters
-    "principalId": {
-      "value": "<principalId>"
-    },
-    "roleDefinitionIdOrName": {
-      "value": "Management Group Reader"
-    },
-    // Non-required parameters
-    "description": {
-      "value": "Role Assignment (management group scope)"
-    },
-    "location": {
-      "value": "<location>"
-    },
-    "managementGroupId": {
-      "value": "<managementGroupId>"
-    },
-    "principalType": {
-      "value": "ServicePrincipal"
-    }
-  }
-}
-```
-
-</details>
-<p>
-
-<details>
-
-<summary>via Bicep parameters file</summary>
-
-```bicep-params
-using 'br/public:avm/ptn/authorization/role-assignment:<version>'
-
-// Required parameters
-param principalId = '<principalId>'
-param roleDefinitionIdOrName = 'Management Group Reader'
-// Non-required parameters
-param description = 'Role Assignment (management group scope)'
-param location = '<location>'
-param managementGroupId = '<managementGroupId>'
-param principalType = 'ServicePrincipal'
-```
-
-</details>
-<p>
-
-### Example 3: _Role Assignments (Resource Group scope)_
-
-This module deploys a Role Assignment at a Resource Group scope using minimal parameters.
-
-
-<details>
-
-<summary>via Bicep module</summary>
-
-```bicep
-module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>' = {
+module roleAssignment 'br/public:avm/res/authorization/role-assignment--scope-rg:<version>' = {
   name: 'roleAssignmentDeployment'
   params: {
     // Required parameters
     principalId: '<principalId>'
     roleDefinitionIdOrName: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'
     // Non-required parameters
-    location: '<location>'
     principalType: 'ServicePrincipal'
-    resourceGroupName: '<resourceGroupName>'
-    subscriptionId: '<subscriptionId>'
   }
 }
 ```
@@ -234,17 +69,8 @@ module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>
       "value": "/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11"
     },
     // Non-required parameters
-    "location": {
-      "value": "<location>"
-    },
     "principalType": {
       "value": "ServicePrincipal"
-    },
-    "resourceGroupName": {
-      "value": "<resourceGroupName>"
-    },
-    "subscriptionId": {
-      "value": "<subscriptionId>"
     }
   }
 }
@@ -258,24 +84,21 @@ module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>
 <summary>via Bicep parameters file</summary>
 
 ```bicep-params
-using 'br/public:avm/ptn/authorization/role-assignment:<version>'
+using 'br/public:avm/res/authorization/role-assignment--scope-rg:<version>'
 
 // Required parameters
 param principalId = '<principalId>'
 param roleDefinitionIdOrName = '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'
 // Non-required parameters
-param location = '<location>'
 param principalType = 'ServicePrincipal'
-param resourceGroupName = '<resourceGroupName>'
-param subscriptionId = '<subscriptionId>'
 ```
 
 </details>
 <p>
 
-### Example 4: _Role Assignments (Resource Group)_
+### Example 2: _Using large parameter set_
 
-This module deploys a Role Assignment at a Resource Group scope using common parameters.
+This instance deploys the module with most of its features enabled.
 
 
 <details>
@@ -283,7 +106,7 @@ This module deploys a Role Assignment at a Resource Group scope using common par
 <summary>via Bicep module</summary>
 
 ```bicep
-module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>' = {
+module roleAssignment 'br/public:avm/res/authorization/role-assignment--scope-rg:<version>' = {
   name: 'roleAssignmentDeployment'
   params: {
     // Required parameters
@@ -293,8 +116,6 @@ module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>
     description: 'Role Assignment (resource group scope)'
     location: '<location>'
     principalType: 'ServicePrincipal'
-    resourceGroupName: '<resourceGroupName>'
-    subscriptionId: '<subscriptionId>'
   }
 }
 ```
@@ -327,12 +148,6 @@ module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>
     },
     "principalType": {
       "value": "ServicePrincipal"
-    },
-    "resourceGroupName": {
-      "value": "<resourceGroupName>"
-    },
-    "subscriptionId": {
-      "value": "<subscriptionId>"
     }
   }
 }
@@ -346,7 +161,7 @@ module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>
 <summary>via Bicep parameters file</summary>
 
 ```bicep-params
-using 'br/public:avm/ptn/authorization/role-assignment:<version>'
+using 'br/public:avm/res/authorization/role-assignment--scope-rg:<version>'
 
 // Required parameters
 param principalId = '<principalId>'
@@ -355,171 +170,6 @@ param roleDefinitionIdOrName = 'Reader'
 param description = 'Role Assignment (resource group scope)'
 param location = '<location>'
 param principalType = 'ServicePrincipal'
-param resourceGroupName = '<resourceGroupName>'
-param subscriptionId = '<subscriptionId>'
-```
-
-</details>
-<p>
-
-### Example 5: _Role Assignments (Subscription scope)_
-
-This module deploys a Role Assignment at a Subscription scope using minimal parameters.
-
-
-<details>
-
-<summary>via Bicep module</summary>
-
-```bicep
-module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>' = {
-  name: 'roleAssignmentDeployment'
-  params: {
-    // Required parameters
-    principalId: '<principalId>'
-    roleDefinitionIdOrName: '<roleDefinitionIdOrName>'
-    // Non-required parameters
-    location: '<location>'
-    principalType: 'ServicePrincipal'
-    subscriptionId: '<subscriptionId>'
-  }
-}
-```
-
-</details>
-<p>
-
-<details>
-
-<summary>via JSON parameters file</summary>
-
-```json
-{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    // Required parameters
-    "principalId": {
-      "value": "<principalId>"
-    },
-    "roleDefinitionIdOrName": {
-      "value": "<roleDefinitionIdOrName>"
-    },
-    // Non-required parameters
-    "location": {
-      "value": "<location>"
-    },
-    "principalType": {
-      "value": "ServicePrincipal"
-    },
-    "subscriptionId": {
-      "value": "<subscriptionId>"
-    }
-  }
-}
-```
-
-</details>
-<p>
-
-<details>
-
-<summary>via Bicep parameters file</summary>
-
-```bicep-params
-using 'br/public:avm/ptn/authorization/role-assignment:<version>'
-
-// Required parameters
-param principalId = '<principalId>'
-param roleDefinitionIdOrName = '<roleDefinitionIdOrName>'
-// Non-required parameters
-param location = '<location>'
-param principalType = 'ServicePrincipal'
-param subscriptionId = '<subscriptionId>'
-```
-
-</details>
-<p>
-
-### Example 6: _Role Assignments (Subscription scope)_
-
-This module deploys a Role Assignment at a Subscription scope using common parameters.
-
-
-<details>
-
-<summary>via Bicep module</summary>
-
-```bicep
-module roleAssignment 'br/public:avm/ptn/authorization/role-assignment:<version>' = {
-  name: 'roleAssignmentDeployment'
-  params: {
-    // Required parameters
-    principalId: '<principalId>'
-    roleDefinitionIdOrName: 'Reader'
-    // Non-required parameters
-    description: 'Role Assignment (subscription scope)'
-    location: '<location>'
-    principalType: 'ServicePrincipal'
-    subscriptionId: '<subscriptionId>'
-  }
-}
-```
-
-</details>
-<p>
-
-<details>
-
-<summary>via JSON parameters file</summary>
-
-```json
-{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    // Required parameters
-    "principalId": {
-      "value": "<principalId>"
-    },
-    "roleDefinitionIdOrName": {
-      "value": "Reader"
-    },
-    // Non-required parameters
-    "description": {
-      "value": "Role Assignment (subscription scope)"
-    },
-    "location": {
-      "value": "<location>"
-    },
-    "principalType": {
-      "value": "ServicePrincipal"
-    },
-    "subscriptionId": {
-      "value": "<subscriptionId>"
-    }
-  }
-}
-```
-
-</details>
-<p>
-
-<details>
-
-<summary>via Bicep parameters file</summary>
-
-```bicep-params
-using 'br/public:avm/ptn/authorization/role-assignment:<version>'
-
-// Required parameters
-param principalId = '<principalId>'
-param roleDefinitionIdOrName = 'Reader'
-// Non-required parameters
-param description = 'Role Assignment (subscription scope)'
-param location = '<location>'
-param principalType = 'ServicePrincipal'
-param subscriptionId = '<subscriptionId>'
 ```
 
 </details>
@@ -544,10 +194,8 @@ param subscriptionId = '<subscriptionId>'
 | [`description`](#parameter-description) | string | The description of the role assignment. |
 | [`enableTelemetry`](#parameter-enabletelemetry) | bool | Enable/Disable usage telemetry for module. |
 | [`location`](#parameter-location) | string | Location deployment metadata. |
-| [`managementGroupId`](#parameter-managementgroupid) | string | Group ID of the Management Group to assign the RBAC role to. If not provided, will use the current scope for deployment. |
+| [`name`](#parameter-name) | string | The name (as GUID) of the role assignment. If not provided, a GUID will be generated. |
 | [`principalType`](#parameter-principaltype) | string | The principal type of the assigned principal ID. |
-| [`resourceGroupName`](#parameter-resourcegroupname) | string | Name of the Resource Group to assign the RBAC role to. If Resource Group name is provided, and Subscription ID is provided, the module deploys at resource group level, therefore assigns the provided RBAC role to the resource group. |
-| [`subscriptionId`](#parameter-subscriptionid) | string | Subscription ID of the subscription to assign the RBAC role to. If no Resource Group name is provided, the module deploys at subscription level, therefore assigns the provided RBAC role to the subscription. |
 
 ### Parameter: `principalId`
 
@@ -569,7 +217,6 @@ The conditions on the role assignment. This limits the resources it can be assig
 
 - Required: No
 - Type: string
-- Default: `''`
 
 ### Parameter: `conditionVersion`
 
@@ -591,7 +238,6 @@ ID of the delegated managed identity resource.
 
 - Required: No
 - Type: string
-- Default: `''`
 
 ### Parameter: `description`
 
@@ -599,7 +245,6 @@ The description of the role assignment.
 
 - Required: No
 - Type: string
-- Default: `''`
 
 ### Parameter: `enableTelemetry`
 
@@ -615,15 +260,14 @@ Location deployment metadata.
 
 - Required: No
 - Type: string
-- Default: `[deployment().location]`
+- Default: `[resourceGroup().location]`
 
-### Parameter: `managementGroupId`
+### Parameter: `name`
 
-Group ID of the Management Group to assign the RBAC role to. If not provided, will use the current scope for deployment.
+The name (as GUID) of the role assignment. If not provided, a GUID will be generated.
 
 - Required: No
 - Type: string
-- Default: `[managementGroup().name]`
 
 ### Parameter: `principalType`
 
@@ -631,11 +275,9 @@ The principal type of the assigned principal ID.
 
 - Required: No
 - Type: string
-- Default: `''`
 - Allowed:
   ```Bicep
   [
-    ''
     'Device'
     'ForeignGroup'
     'Group'
@@ -644,27 +286,12 @@ The principal type of the assigned principal ID.
   ]
   ```
 
-### Parameter: `resourceGroupName`
-
-Name of the Resource Group to assign the RBAC role to. If Resource Group name is provided, and Subscription ID is provided, the module deploys at resource group level, therefore assigns the provided RBAC role to the resource group.
-
-- Required: No
-- Type: string
-- Default: `''`
-
-### Parameter: `subscriptionId`
-
-Subscription ID of the subscription to assign the RBAC role to. If no Resource Group name is provided, the module deploys at subscription level, therefore assigns the provided RBAC role to the subscription.
-
-- Required: No
-- Type: string
-- Default: `''`
-
 ## Outputs
 
 | Output | Type | Description |
 | :-- | :-- | :-- |
 | `name` | string | The GUID of the Role Assignment. |
+| `resourceGroupName` | string | The name of the resource group the role assignment was applied at. |
 | `resourceId` | string | The resource ID of the Role Assignment. |
 | `scope` | string | The scope this Role Assignment applies to. |
 
