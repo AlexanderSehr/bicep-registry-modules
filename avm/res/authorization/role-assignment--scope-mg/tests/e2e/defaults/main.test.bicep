@@ -1,6 +1,7 @@
 targetScope = 'managementGroup'
-metadata name = 'Role Assignments (Management Group scope)'
-metadata description = 'This module deploys a Role Assignment at a Management Group scope using minimal parameters.'
+
+metadata name = 'Using only defaults'
+metadata description = 'This instance deploys the module with the minimum set of required parameters.'
 
 // ========== //
 // Parameters //
@@ -28,7 +29,7 @@ param subscriptionId string = '#_subscriptionId_#'
 
 // General resources
 // =================
-module resourceGroup 'br/public:avm/res/resources/resource-group:0.2.3' = {
+module resourceGroup 'br/public:avm/res/resources/resource-group:0.4.1' = {
   scope: subscription('${subscriptionId}')
   name: '${uniqueString(deployment().name, resourceLocation)}-resourceGroup'
   params: {
@@ -53,12 +54,14 @@ module nestedDependencies 'dependencies.bicep' = {
 // Test Execution //
 // ============== //
 
-module testDeployment '../../../main.bicep' = {
-  name: '${uniqueString(deployment().name)}-test-${serviceShort}'
-  params: {
-    principalId: nestedDependencies.outputs.managedIdentityPrincipalId
-    roleDefinitionIdOrName: 'Resource Policy Contributor'
-    principalType: 'ServicePrincipal'
-    location: resourceLocation
+@batchSize(1)
+module testDeployment '../../../main.bicep' = [
+  for iteration in ['init', 'idem']: {
+    name: '${uniqueString(deployment().name, resourceLocation)}-test-${serviceShort}-${iteration}'
+    params: {
+      principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+      roleDefinitionIdOrName: 'Resource Policy Contributor'
+      principalType: 'ServicePrincipal'
+    }
   }
-}
+]

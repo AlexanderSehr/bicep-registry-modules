@@ -3,23 +3,23 @@ metadata description = 'This module deploys a Role Assignment at a Subscription 
 
 targetScope = 'subscription'
 
+@sys.description('Optional. The name (as GUID) of the role assignment. If not provided, a GUID will be generated.')
+param name string?
+
 @sys.description('Required. You can provide either the display name of the role definition (must be configured in the variable `builtInRoleNames`), or its fully qualified ID in the following format: \'/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11\'.')
 param roleDefinitionIdOrName string
 
 @sys.description('Required. The Principal or Object ID of the Security Principal (User, Group, Service Principal, Managed Identity).')
 param principalId string
 
-@sys.description('Optional. Subscription ID of the subscription to assign the RBAC role to. If not provided, will use the current scope for deployment.')
-param subscriptionId string = subscription().subscriptionId
-
 @sys.description('Optional. The description of the role assignment.')
-param description string = ''
+param description string?
 
 @sys.description('Optional. ID of the delegated managed identity resource.')
-param delegatedManagedIdentityResourceId string = ''
+param delegatedManagedIdentityResourceId string?
 
 @sys.description('Optional. The conditions on the role assignment. This limits the resources it can be assigned to.')
-param condition string = ''
+param condition string?
 
 @sys.description('Optional. Version of the condition. Currently accepted value is "2.0".')
 @allowed([
@@ -34,9 +34,14 @@ param conditionVersion string = '2.0'
   'User'
   'ForeignGroup'
   'Device'
-  ''
 ])
-param principalType string = ''
+param principalType string?
+
+@sys.description('Optional. Enable/Disable usage telemetry for module.')
+param enableTelemetry bool = true
+
+@sys.description('Optional. Location deployment metadata.')
+param location string = deployment().location
 
 var builtInRoleNames = {
   Contributor: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
@@ -52,20 +57,43 @@ var builtInRoleNames = {
   )
 }
 
-var roleDefinitionIdVar = (builtInRoleNames[?roleDefinitionIdOrName] ?? roleDefinitionIdOrName)
+var roleDefinitionIdVar = builtInRoleNames[?roleDefinitionIdOrName] ?? (contains(
+    roleDefinitionIdOrName,
+    '/providers/Microsoft.Authorization/roleDefinitions/'
+  )
+  ? roleDefinitionIdOrName
+  : subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionIdOrName))
+
+#disable-next-line no-deployments-resources
+resource avmTelemetry 'Microsoft.Resources/deployments@2024-03-01' = if (enableTelemetry) {
+  name: '46d3xbcp.ptn.authorization-roleassignment-scope-sub.${replace('-..--..-', '.', '-')}.${substring(uniqueString(deployment().name, location), 0, 4)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+      outputs: {
+        telemetry: {
+          type: 'String'
+          value: 'For more information, see https://aka.ms/avm/TelemetryInfo'
+        }
+      }
+    }
+  }
+  location: location
+}
 
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscriptionId, roleDefinitionIdVar, principalId)
+  name: name ?? guid(subscription().subscriptionId, roleDefinitionIdVar, principalId)
   properties: {
     roleDefinitionId: roleDefinitionIdVar
     principalId: principalId
-    description: !empty(description) ? description : null
-    principalType: !empty(principalType) ? any(principalType) : null
-    delegatedManagedIdentityResourceId: !empty(delegatedManagedIdentityResourceId)
-      ? delegatedManagedIdentityResourceId
-      : null
+    description: description
+    principalType: principalType
+    delegatedManagedIdentityResourceId: delegatedManagedIdentityResourceId
     conditionVersion: !empty(conditionVersion) && !empty(condition) ? conditionVersion : null
-    condition: !empty(condition) ? condition : null
+    condition: condition
   }
 }
 

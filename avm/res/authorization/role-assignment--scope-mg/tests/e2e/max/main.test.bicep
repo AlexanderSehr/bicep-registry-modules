@@ -1,6 +1,7 @@
 targetScope = 'managementGroup'
-metadata name = 'Role Assignments (Subscription scope)'
-metadata description = 'This module deploys a Role Assignment at a Subscription scope using common parameters.'
+
+metadata name = 'Using large parameter set'
+metadata description = 'This instance deploys the module with most of its features enabled.'
 
 // ========== //
 // Parameters //
@@ -14,7 +15,7 @@ param resourceGroupName string = 'dep-${namePrefix}-authorization.roleassignment
 param resourceLocation string = deployment().location
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
-param serviceShort string = 'arasubmax'
+param serviceShort string = 'aramgmax'
 
 @description('Optional. A token to inject into the name of each resource.')
 param namePrefix string = '#_namePrefix_#'
@@ -28,8 +29,7 @@ param subscriptionId string = '#_subscriptionId_#'
 
 // General resources
 // =================
-
-module resourceGroup 'br/public:avm/res/resources/resource-group:0.2.3' = {
+module resourceGroup 'br/public:avm/res/resources/resource-group:0.4.1' = {
   scope: subscription('${subscriptionId}')
   name: '${uniqueString(deployment().name, resourceLocation)}-resourceGroup'
   params: {
@@ -37,9 +37,10 @@ module resourceGroup 'br/public:avm/res/resources/resource-group:0.2.3' = {
     location: resourceLocation
   }
 }
+
 module nestedDependencies 'dependencies.bicep' = {
   scope: az.resourceGroup(subscriptionId, resourceGroupName)
-  name: '${uniqueString(deployment().name, resourceLocation)}-nestedDependencies'
+  name: '${uniqueString(deployment().name, resourceLocation)}-${serviceShort}-nestedDependencies'
   params: {
     managedIdentityName: 'dep-${namePrefix}-msi-${serviceShort}'
     location: resourceLocation
@@ -53,14 +54,17 @@ module nestedDependencies 'dependencies.bicep' = {
 // Test Execution //
 // ============== //
 
-module testDeployment '../../../main.bicep' = {
-  name: '${uniqueString(deployment().name)}-test-${serviceShort}'
-  params: {
-    principalId: nestedDependencies.outputs.managedIdentityPrincipalId
-    roleDefinitionIdOrName: 'Reader'
-    description: 'Role Assignment (subscription scope)'
-    principalType: 'ServicePrincipal'
-    location: resourceLocation
-    subscriptionId: subscriptionId
+@batchSize(1)
+module testDeployment '../../../main.bicep' = [
+  for iteration in ['init', 'idem']: {
+    name: '${uniqueString(deployment().name, resourceLocation)}-test-${serviceShort}-${iteration}'
+    params: {
+      principalId: nestedDependencies.outputs.managedIdentityPrincipalId
+      roleDefinitionIdOrName: 'Management Group Reader'
+      description: 'Role Assignment (management group scope)'
+      managementGroupId: last(split(managementGroup().id, '/'))
+      principalType: 'ServicePrincipal'
+      location: resourceLocation
+    }
   }
-}
+]
