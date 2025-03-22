@@ -9,20 +9,24 @@ param name string
 @description('Optional. Location for all Resources.')
 param location string = 'global'
 
+import { managedIdentityAllType } from 'br/public:avm/utl/types/avm-common-types:0.5.1'
 @description('Optional. The managed identity definition for this resource.')
-param managedIdentities managedIdentitiesType
+param managedIdentities managedIdentityAllType?
 
 @description('Optional. Resource tags.')
 param tags object?
 
+import { lockType } from 'br/public:avm/utl/types/avm-common-types:0.5.1'
 @description('Optional. The lock settings of the service.')
-param lock lockType
+param lock lockType?
 
+import { diagnosticSettingFullType } from 'br/public:avm/utl/types/avm-common-types:0.5.1'
 @description('Optional. The diagnostic settings of the service.')
-param diagnosticSettings diagnosticSettingType
+param diagnosticSettings diagnosticSettingFullType[]?
 
+import { roleAssignmentType } from 'br/public:avm/utl/types/avm-common-types:0.5.1'
 @description('Optional. Array of role assignments to create.')
-param roleAssignments roleAssignmentType
+param roleAssignments roleAssignmentType[]?
 
 @description('Required. The location where the communication service stores its data at rest.')
 param dataLocation string
@@ -185,6 +189,7 @@ output location string = communicationService.location
 
 @description('The principal ID of the system assigned identity.')
 output systemAssignedMIPrincipalId string? = communicationService.?identity.?principalId
+<<<<<<< HEAD
 
 // ================ //
 // Definitions      //
@@ -275,3 +280,5 @@ type diagnosticSettingType = {
   @description('Optional. The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs.')
   marketplacePartnerResourceId: string?
 }[]?
+=======
+>>>>>>> ea3080787d1ce7de8356f375cc80ed27050f8f96
