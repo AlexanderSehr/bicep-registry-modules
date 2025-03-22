@@ -1,16 +1,7 @@
 {
-<<<<<<< HEAD
-    "$schema": "https://aka.ms/bicep-registry-module-version-file-schema#",
-    "version": "0.7",
-    "pathFilters": [
-        "./main.json"
-    ]
-}
-=======
   "$schema": "https://aka.ms/bicep-registry-module-version-file-schema#",
   "version": "0.9",
   "pathFilters": [
     "./main.json"
   ]
 }
->>>>>>> ea3080787d1ce7de8356f375cc80ed27050f8f96

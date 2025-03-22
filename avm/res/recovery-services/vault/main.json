@@ -3718,11 +3718,7 @@
       "metadata": {
         "description": "The principal ID of the system assigned identity."
       },
-<<<<<<< HEAD
-      "value": "[tryGet(tryGet(reference('rsv', '2023-01-01', 'full'), 'identity'), 'principalId')]"
-=======
       "value": "[tryGet(tryGet(reference('rsv', '2024-04-01', 'full'), 'identity'), 'principalId')]"
->>>>>>> ea3080787d1ce7de8356f375cc80ed27050f8f96
     },
     "location": {
       "type": "string",

@@ -3539,11 +3539,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.33.13.18514",
-<<<<<<< HEAD
-              "templateHash": "5455406267618725608"
-=======
               "templateHash": "9363998240971878443"
->>>>>>> ea3080787d1ce7de8356f375cc80ed27050f8f96
             }
           },
           "definitions": {
@@ -3682,11 +3678,7 @@
       "metadata": {
         "description": "The principal ID of the system assigned identity."
       },
-<<<<<<< HEAD
-      "value": "[tryGet(tryGet(reference('databaseAccount', '2023-04-15', 'full'), 'identity'), 'principalId')]"
-=======
       "value": "[tryGet(tryGet(reference('databaseAccount', '2024-11-15', 'full'), 'identity'), 'principalId')]"
->>>>>>> ea3080787d1ce7de8356f375cc80ed27050f8f96
     },
     "location": {
       "type": "string",

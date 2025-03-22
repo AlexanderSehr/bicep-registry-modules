@@ -2991,11 +2991,7 @@
       "metadata": {
         "description": "The principal ID of the system assigned identity."
       },
-<<<<<<< HEAD
-      "value": "[tryGet(tryGet(reference('logAnalyticsWorkspace', '2022-10-01', 'full'), 'identity'), 'principalId')]"
-=======
       "value": "[tryGet(tryGet(reference('logAnalyticsWorkspace', '2023-09-01', 'full'), 'identity'), 'principalId')]"
->>>>>>> ea3080787d1ce7de8356f375cc80ed27050f8f96
     }
   }
 }

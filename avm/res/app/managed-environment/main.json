@@ -598,11 +598,7 @@
       "metadata": {
         "description": "The principal ID of the system assigned identity."
       },
-<<<<<<< HEAD
-      "value": "[tryGet(tryGet(reference('managedEnvironment', '2024-02-02-preview', 'full'), 'identity'), 'principalId')]"
-=======
       "value": "[tryGet(tryGet(reference('managedEnvironment', '2024-10-02-preview', 'full'), 'identity'), 'principalId')]"
->>>>>>> ea3080787d1ce7de8356f375cc80ed27050f8f96
     },
     "defaultDomain": {
       "type": "string",
