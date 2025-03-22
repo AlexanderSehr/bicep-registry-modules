@@ -270,20 +270,6 @@ output location string = digitalTwinsInstance.location
 
 @description('The principal ID of the system assigned identity.')
 output systemAssignedMIPrincipalId string? = digitalTwinsInstance.?identity.?principalId
-<<<<<<< HEAD
-=======
-
-@description('The private endpoints of the key vault.')
-output privateEndpoints privateEndpointOutputType[] = [
-  for (item, index) in (privateEndpoints ?? []): {
-    name: digitalTwinsInstance_privateEndpoints[index].outputs.name
-    resourceId: digitalTwinsInstance_privateEndpoints[index].outputs.resourceId
-    groupId: digitalTwinsInstance_privateEndpoints[index].outputs.?groupId!
-    customDnsConfigs: digitalTwinsInstance_privateEndpoints[index].outputs.customDnsConfigs
-    networkInterfaceResourceIds: digitalTwinsInstance_privateEndpoints[index].outputs.networkInterfaceResourceIds
-  }
-]
->>>>>>> ea3080787d1ce7de8356f375cc80ed27050f8f96
 
 @description('The private endpoints of the key vault.')
 output privateEndpoints privateEndpointOutputType[] = [
