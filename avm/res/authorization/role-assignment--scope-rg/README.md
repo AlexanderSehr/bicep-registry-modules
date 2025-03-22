@@ -26,6 +26,7 @@ The following section provides usage examples for the module, which were used to
 
 - [Using only defaults](#example-1-using-only-defaults)
 - [Using large parameter set](#example-2-using-large-parameter-set)
+- [WAF-aligned](#example-3-waf-aligned)
 
 ### Example 1: _Using only defaults_
 
@@ -169,6 +170,75 @@ param roleDefinitionIdOrName = 'Reader'
 // Non-required parameters
 param description = 'Role Assignment (resource group scope)'
 param location = '<location>'
+param principalType = 'ServicePrincipal'
+```
+
+</details>
+<p>
+
+### Example 3: _WAF-aligned_
+
+This instance deploys the module in alignment with the best-practices of the Well-Architected Framework.
+
+
+<details>
+
+<summary>via Bicep module</summary>
+
+```bicep
+module roleAssignment 'br/public:avm/res/authorization/role-assignment--scope-rg:<version>' = {
+  name: 'roleAssignmentDeployment'
+  params: {
+    // Required parameters
+    principalId: '<principalId>'
+    roleDefinitionIdOrName: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'
+    // Non-required parameters
+    principalType: 'ServicePrincipal'
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via JSON parameters file</summary>
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    // Required parameters
+    "principalId": {
+      "value": "<principalId>"
+    },
+    "roleDefinitionIdOrName": {
+      "value": "/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11"
+    },
+    // Non-required parameters
+    "principalType": {
+      "value": "ServicePrincipal"
+    }
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via Bicep parameters file</summary>
+
+```bicep-params
+using 'br/public:avm/res/authorization/role-assignment--scope-rg:<version>'
+
+// Required parameters
+param principalId = '<principalId>'
+param roleDefinitionIdOrName = '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'
+// Non-required parameters
 param principalType = 'ServicePrincipal'
 ```
 
