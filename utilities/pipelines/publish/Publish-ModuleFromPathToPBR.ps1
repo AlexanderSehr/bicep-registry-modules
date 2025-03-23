@@ -116,7 +116,7 @@ function Publish-ModuleFromPathToPBR {
 
     # Registry
     if (-not (Get-AzContainerRegistry -ResourceGroupName $BicepRegistryRgName -Name $BicepRegistryName -ErrorAction 'SilentlyContinue')) {
-        New-AzContainerRegistry -ResourceGroupName $BicepRegistryRgName -Name $BicepRegistryName -Sku 'Basic'
+        New-AzContainerRegistry -ResourceGroupName $BicepRegistryRgName -Name $BicepRegistryName -Sku 'Basic' -Location $BicepRegistryRgLocation
     }
 
     $publishingTarget = 'br:{0}.azurecr.io/{1}:{2}' -f $BicepRegistryName, $publishedModuleName, $targetVersion

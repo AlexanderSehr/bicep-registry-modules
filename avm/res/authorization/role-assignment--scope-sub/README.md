@@ -259,7 +259,7 @@ param principalType = 'ServicePrincipal'
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
 | [`condition`](#parameter-condition) | string | The conditions on the role assignment. This limits the resources it can be assigned to. |
-| [`conditionVersion`](#parameter-conditionversion) | string | The version of the condition. |
+| [`conditionVersion`](#parameter-conditionversion) | string | Version of the condition. |
 | [`delegatedManagedIdentityResourceId`](#parameter-delegatedmanagedidentityresourceid) | string | ID of the delegated managed identity resource. |
 | [`description`](#parameter-description) | string | The description of the role assignment. |
 | [`enableTelemetry`](#parameter-enabletelemetry) | bool | Enable/Disable usage telemetry for module. |
@@ -290,7 +290,7 @@ The conditions on the role assignment. This limits the resources it can be assig
 
 ### Parameter: `conditionVersion`
 
-The version of the condition.
+Version of the condition.
 
 - Required: No
 - Type: string
