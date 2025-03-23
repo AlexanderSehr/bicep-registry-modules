@@ -21,7 +21,7 @@ param delegatedManagedIdentityResourceId string?
 @sys.description('Optional. The conditions on the role assignment. This limits the resources it can be assigned to.')
 param condition string?
 
-@sys.description('Optional. The version of the condition.')
+@sys.description('Optional. Version of the condition.')
 @allowed([
   '2.0'
 ])

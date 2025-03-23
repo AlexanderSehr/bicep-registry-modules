@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.33.13.18514",
-      "templateHash": "15393783379688147849"
+      "templateHash": "17032647625999886709"
     },
     "name": "Role Assignments (Subscription scope)",
     "description": "This module deploys a Role Assignment at a Subscription scope."
@@ -59,7 +59,7 @@
         "2.0"
       ],
       "metadata": {
-        "description": "Optional. The version of the condition."
+        "description": "Optional. Version of the condition."
       }
     },
     "principalType": {
