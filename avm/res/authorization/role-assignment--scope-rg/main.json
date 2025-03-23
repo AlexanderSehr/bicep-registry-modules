@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.33.13.18514",
-      "templateHash": "1365166855618276491"
+      "templateHash": "11800560512839617209"
     },
     "name": "Role Assignments (Resource Group scope)",
     "description": "This module deploys a Role Assignment at a Resource Group scope."
@@ -59,7 +59,7 @@
         "2.0"
       ],
       "metadata": {
-        "description": "Optional. Version of the condition."
+        "description": "Optional. The version of the condition."
       }
     },
     "principalType": {

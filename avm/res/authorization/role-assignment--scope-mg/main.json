@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.33.13.18514",
-      "templateHash": "264012460299406062"
+      "templateHash": "12506239937575585316"
     },
     "name": "Role Assignments (Management Group scope)",
     "description": "This module deploys a Role Assignment at a Management Group scope."
@@ -66,7 +66,7 @@
         "2.0"
       ],
       "metadata": {
-        "description": "Optional. Version of the condition."
+        "description": "Optional. The version of the condition."
       }
     },
     "principalType": {
