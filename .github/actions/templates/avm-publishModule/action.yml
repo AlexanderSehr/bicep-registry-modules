@@ -28,25 +28,20 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # - name: Log in to Azure
-    #   uses: azure/login@v2
-    #   with:
-    #     client-id: ${{ env.PUBLISH_CLIENT_ID }}
-    #     tenant-id: ${{ env.PUBLISH_TENANT_ID }}
-    #     subscription-id: ${{ env.PUBLISH_SUBSCRIPTION_ID }}
+    - name: Log in to Azure
+      uses: azure/login@v2
+      with:
+        client-id: ${{ env.PUBLISH_CLIENT_ID }}
+        tenant-id: ${{ env.PUBLISH_TENANT_ID }}
+        subscription-id: ${{ env.PUBLISH_SUBSCRIPTION_ID }}
 
-    # - name: "Azure Login - Default"
-    #   uses: azure/login@v2
-    #   with:
-    #     # creds: ${{ env.AZURE_CREDENTIALS }}
-    #     client-id: ${{ env.VALIDATE_CLIENT_ID }}
-    #     tenant-id: ${{ env.VALIDATE_TENANT_ID }}
-    #     subscription-id: ${{ env.VALIDATE_SUBSCRIPTION_ID }}
-    #     enable-AzPSSession: true
-    - name: "Azure Login - Exception"
+    - name: "Azure Login - Default"
       uses: azure/login@v2
       with:
         creds: ${{ env.AZURE_CREDENTIALS }}
+        client-id: ${{ env.VALIDATE_CLIENT_ID }}
+        tenant-id: ${{ env.VALIDATE_TENANT_ID }}
+        subscription-id: ${{ env.VALIDATE_SUBSCRIPTION_ID }}
         enable-AzPSSession: true
 
     # Adding a step to explicitly install the latest Bicep CLI because there is
@@ -73,8 +68,7 @@ runs:
 
           $functionInput = @{
             TemplateFilePath     = Join-Path $env:GITHUB_WORKSPACE "${{ inputs.templateFilePath }}"
-            # PublicRegistryServer = ConvertTo-SecureString '${{ env.PUBLISH_REGISTRY_SERVER }}' -AsPlainText -Force
-            PublicRegistryServer = ConvertTo-SecureString 'dummy' -AsPlainText -Force
+            PublicRegistryServer = ConvertTo-SecureString '${{ env.PUBLISH_REGISTRY_SERVER }}' -AsPlainText -Force
             RepoRoot             = $env:GITHUB_WORKSPACE
           }
 
