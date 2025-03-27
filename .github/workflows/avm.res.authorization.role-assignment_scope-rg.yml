@@ -1,4 +1,4 @@
-name: "avm.res.authorization.role-assignment--scope-rg"
+name: "avm.res.authorization.role-assignment_scope-rg"
 
 on:
   workflow_dispatch:
@@ -28,15 +28,15 @@ on:
     paths:
       - ".github/actions/templates/avm-**"
       - ".github/workflows/avm.template.module.yml"
-      - ".github/workflows/avm.res.authorization.role-assignment--scope-rg.yml"
-      - "avm/res/authorization/role-assignment--scope-rg/**"
+      - ".github/workflows/avm.res.authorization.role-assignment_scope-rg.yml"
+      - "avm/res/authorization/role-assignment_scope-rg/**"
       - "utilities/pipelines/**"
       - "!utilities/pipelines/platform/**"
       - "!*/**/README.md"
 
 env:
-  modulePath: "avm/res/authorization/role-assignment--scope-rg"
-  workflowPath: ".github/workflows/avm.res.authorization.role-assignment--scope-rg.yml"
+  modulePath: "avm/res/authorization/role-assignment_scope-rg"
+  workflowPath: ".github/workflows/avm.res.authorization.role-assignment_scope-rg.yml"
 
 concurrency:
   group: ${{ github.workflow }}
