@@ -19,7 +19,8 @@ function Get-ModifiedFileList {
 
     # if ((Get-GitBranchName) -eq 'main') {
     Write-Verbose 'Gathering modified files from the previous head' -Verbose
-    $Diff = git diff --name-only --diff-filter=AM HEAD^ HEAD
+    # $Diff = git diff --name-only --diff-filter=AM HEAD^ HEAD
+    $Diff = git diff --name-only main
     # }
     $ModifiedFiles = $Diff ? ($Diff | Get-Item -Force) : @()
 
