@@ -98,6 +98,7 @@ runs:
           OutputFilePath    = Join-Path $env:GITHUB_WORKSPACE 'avm' 'Pester-output.md'
           GitHubRepository  = $env:GITHUB_REPOSITORY
           BranchName        = $env:GITHUB_REF
+          ErrorAction       = 'SilentlyContinue'
         }
 
         Write-Verbose 'Invoke Pester formatting function with' -Verbose
@@ -105,10 +106,11 @@ runs:
 
         Set-PesterGitHubOutput @functionInput -Verbose
 
-        Write-Output ('{0}={1}' -f 'formattedPesterResultsPath', $functionInput.outputFilePath) >> $env:GITHUB_OUTPUT
-
+        if(Test-Path $functionInput.outputFilePath) {
+          Write-Output ('{0}={1}' -f 'formattedPesterResultsPath', $functionInput.outputFilePath) >> $env:GITHUB_OUTPUT
+        }
     - name: "Output to GitHub job summaries"
-      if: always()
+      if: always() && steps.pester_run_step.outputs.formattedPesterResultsPath != ''
       shell: pwsh
       run: |
         # Grouping task logs
