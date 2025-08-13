@@ -19,13 +19,18 @@ function Get-ModifiedFileList {
 
     git remote add 'upstream' 'https://github.com/AlexanderSehr/bicep-registry-modules.git' 2>$null # Add remote source if not already added
     git fetch 'upstream' 'main' -q # Fetch the latest changes from upstream main
+    Start-Sleep 5 # Wait for git to finish fetching
     $currentBranch = Get-GitBranchName
     $inUpstream = (git remote get-url origin) -match '\/AlexanderSehr\/' # If in upstream the value would be [https://github.com/Azure/bicep-registry-modules.git]
 
     # Note: Fetches only the name of the modified files
     if ($inUpstream -and $currentBranch -eq 'main') {
-        Write-Verbose 'Currently in upstream [main]. Fetching changes against [main^-1].' -Verbose
-        $diff = git diff --name-only --diff-filter=AM 'upstream/main^'
+        # Write-Verbose 'Currently in upstream [main]. Fetching changes against [main^-1].' -Verbose
+        # $diff = git diff --name-only --diff-filter=AM 'upstream/main^'
+        $currentCommit = git rev-parse 'main' # Get the current main's commit
+        $previousCommit = git rev-parse 'upstream/main^' # Get the previous main's commit in upstream
+        Write-Verbose ('Currently in upstream [main]. Fetching changes of current commit [{0}] against [main^-1] [{1}].' -f $currentCommit.Substring(0, 7), $previousCommit.Substring(0, 7)) -Verbose
+        $diff = git diff --name-only --diff-filter=AM $currentCommit $previousCommit
     } else {
         Write-Verbose ('{0} Fetching changes against upstream [main]' -f ($inUpstream ? "Currently in upstream [$currentBranch]." : 'Currently in a fork.')) -Verbose
         $diff = git diff --name-only --diff-filter=AM 'upstream/main'
