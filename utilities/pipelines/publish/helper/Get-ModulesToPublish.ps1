@@ -36,7 +36,21 @@ function Get-ModifiedFileList {
         $diff = git diff --name-only --diff-filter=AM 'upstream/main'
     }
 
+    if ($diff.Count -gt 0) {
+        Write-Verbose ("[{0}] Plain diff files found `git diff`:`n[{1}]" -f $diff.Count, ($diff.FullName | ConvertTo-Json | Out-String)) -Verbose
+    } else {
+        Write-Verbose 'Plain diff files found via `git diff`.' -Verbose
+    }
+
+
     $modifiedFiles = $diff | Get-Item -Force
+
+    if ($modifiedFiles.Count -gt 0) {
+        Write-Verbose ("[{0}] Modified files found `git diff`:`n[{1}]" -f $modifiedFiles.Count, ($modifiedFiles.FullName | ConvertTo-Json | Out-String)) -Verbose
+    } else {
+        Write-Verbose 'No modified files found via `git diff`.' -Verbose
+    }
+
 
     return $modifiedFiles
 }
