@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.33.93.31351",
-      "templateHash": "1921273306230635404"
+      "version": "0.37.4.10188",
+      "templateHash": "17473939649094028710"
     },
     "name": "Azure Maps Account",
     "description": "This module deploys an Azure Maps Account."
