@@ -108,8 +108,12 @@ function Get-TemplateFileToPublish {
 
     $ModuleRelativeFolderPath = (($ModuleFolderPath -split '[\/|\\](avm)[\/|\\](res|ptn|utl)[\/|\\]')[-3..-1] -join '/') -replace '\\', '/'
     $ModifiedFiles = Get-ModifiedFileList -Verbose
+
+    Write-Verbose ('Found [{0}] modified files' -f $ModifiedFiles.Count) -Verbose
+
     Write-Verbose "Looking for modified files under: [$ModuleRelativeFolderPath]" -Verbose
     $modifiedModuleFiles = $ModifiedFiles.FullName | Where-Object { $_ -like "*$ModuleFolderPath*" }
+    Write-Verbose ('Found [{0}] modified files in path [{1}]' -f $ModifiedFiles.Count, $ModuleFolderPath) -Verbose
 
     $relevantPaths = @()
     foreach ($modifiedFile in $modifiedModuleFiles) {
