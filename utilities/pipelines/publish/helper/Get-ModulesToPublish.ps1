@@ -17,10 +17,10 @@ Get modified files between previous and current commit depending on if you are r
 #>
 function Get-ModifiedFileList {
 
-    git remote add 'upstream' 'https://github.com/Azure/bicep-registry-modules.git' 2>$null # Add remote source if not already added
+    git remote add 'upstream' 'https://github.com/AlexanderSehr/bicep-registry-modules.git' 2>$null # Add remote source if not already added
     git fetch 'upstream' 'main' -q # Fetch the latest changes from upstream main
     $currentBranch = Get-GitBranchName
-    $inUpstream = (git remote get-url origin) -match '\/Azure\/' # If in upstream the value would be [https://github.com/Azure/bicep-registry-modules.git]
+    $inUpstream = (git remote get-url origin) -match '\/AlexanderSehr\/' # If in upstream the value would be [https://github.com/Azure/bicep-registry-modules.git]
 
     # Note: Fetches only the name of the modified files
     if ($inUpstream -and $currentBranch -eq 'main') {
@@ -113,7 +113,7 @@ function Get-TemplateFileToPublish {
 
     Write-Verbose "Looking for modified files under: [$ModuleRelativeFolderPath]" -Verbose
     $modifiedModuleFiles = $ModifiedFiles.FullName | Where-Object { $_ -like "*$ModuleFolderPath*" }
-    Write-Verbose ('Found [{0}] modified files in path [{1}]' -f $ModifiedFiles.Count, $ModuleFolderPath) -Verbose
+    Write-Verbose ('Found [{0}] modified files in path [{1}]' -f $modifiedModuleFiles.Count, $ModuleFolderPath) -Verbose
 
     $relevantPaths = @()
     foreach ($modifiedFile in $modifiedModuleFiles) {
