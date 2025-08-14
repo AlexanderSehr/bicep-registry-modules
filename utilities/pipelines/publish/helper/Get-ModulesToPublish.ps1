@@ -27,9 +27,9 @@ function Get-ModifiedFileList {
     if ($inUpstream -and $currentBranch -eq 'main') {
         Write-Verbose 'Currently in upstream [main]. Fetching changes against [main^-1].' -Verbose
         $diff = git diff --name-only --diff-filter=AM 'upstream/main^'
-        # $currentCommit = git rev-parse 'main' # Get the current main's commit
-        # $previousCommit = git rev-parse 'upstream/main^' # Get the previous main's commit in upstream
-        # Write-Verbose ('Currently in upstream [main]. Fetching changes of current commit [{0}] against [main^-1] [{1}].' -f $currentCommit.Substring(0, 7), $previousCommit.Substring(0, 7)) -Verbose
+        $currentCommit = git rev-parse 'main' # Get the current main's commit
+        $previousCommit = git rev-parse 'upstream/main^' # Get the previous main's commit in upstream
+        Write-Verbose ('Currently in upstream [main]. Fetching changes of current commit [{0}] against [main^-1] [{1}].' -f $currentCommit.Substring(0, 7), $previousCommit.Substring(0, 7)) -Verbose
         # $diff = git diff --name-only --diff-filter=AM $currentCommit $previousCommit
     } else {
         Write-Verbose ('{0} Fetching changes against upstream [main]' -f ($inUpstream ? "Currently in upstream [$currentBranch]." : 'Currently in a fork.')) -Verbose
