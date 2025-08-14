@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.37.4.10188",
-      "templateHash": "6151400759094139789"
+      "templateHash": "8926822663303591751"
     },
     "name": "Kubernetes Configuration Flux Configurations",
     "description": "This module deploys a Kubernetes Configuration Flux Configuration."
@@ -190,7 +190,7 @@
       "condition": "[equals(parameters('clusterType'), 'managedCluster')]",
       "existing": true,
       "type": "Microsoft.ContainerService/managedClusters",
-      "apiVersion": "2025-04-01",
+      "apiVersion": "2023-11-02-preview",
       "name": "[parameters('clusterName')]"
     },
     "connectedCluster": {
