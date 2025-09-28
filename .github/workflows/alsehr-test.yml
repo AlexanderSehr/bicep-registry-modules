@@ -5,8 +5,8 @@ on:
     push:
         branches:
             - main
-        paths:
-            - ".github/workflows/alsehr-test.yml"
+        # paths:
+        #     - ".github/workflows/alsehr-test.yml"
 
 jobs:
     run_pipeline:
@@ -21,9 +21,6 @@ jobs:
               shell: pwsh
               run: |
                   function Get-GitBranchName {
-                      [CmdletBinding()]
-                      param ()
-
                       # Get branch name from Git
                       $BranchName = git branch --show-current
 
