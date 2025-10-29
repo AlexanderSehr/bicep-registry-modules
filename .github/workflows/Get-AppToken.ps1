@@ -9,14 +9,6 @@
         [string] $PrivateKey
     )
 
-    # Variables
-    # $ApplicationId = '<YOUR_APP_ID>'
-    # $InstallationId = '<YOUR_INSTALLATION_ID>'
-    # $PrivateKey = 'C:\path\to\private-key.pem'
-
-    # Load private key
-    # $PrivateKey = Get-Content $PrivateKeyPath -Raw
-
     # Create JWT header and payload
     $header = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject @{
                     alg = 'RS256'
@@ -29,28 +21,33 @@
                     iss = $ApplicationId
                 }))).TrimEnd('=').Replace('+', '-').Replace('/', '_')
 
-    Write-Host 'Importing RSA Private Key'
+    Write-Verbose 'Importing RSA Key' -Verbose
     $RSA = [System.Security.Cryptography.RSA]::Create()
     $RSA.ImportFromPem($PrivateKey)
 
     $signature = [Convert]::ToBase64String($rsa.SignData([System.Text.Encoding]::UTF8.GetBytes("$header.$payload"), [System.Security.Cryptography.HashAlgorithmName]::SHA256, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)).TrimEnd('=').Replace('+', '-').Replace('/', '_')
 
-    Write-Host 'Building JWT'
+    Write-Verbose 'Building JWT' -Verbose
     $jwt = "$header.$payload.$signature"
 
-    Write-Host ('Generated JWT: {0}' -f $jwt.Substring(0, 5))
-
-    Write-Host 'Exhanging JWT for installation token'
+    Write-Verbose 'Exhanging JWT for installation token' -Verbose
     # Exchange JWT for installation token
-    $TokenResponse = Invoke-RestMethod -Uri "https://api.github.com/app/installations/$InstallationId/access_tokens" `
-        -Method 'POST' `
-        -Headers @{ Authorization = "Bearer $jwt"; Accept = 'application/vnd.github+json' }
+    $restInputObject = @{
+        Uri     = "https://api.github.com/app/installations/$InstallationId/access_tokens"
+        Method  = 'POST'
+        Headers = @{
+            Authorization = "Bearer $jwt"
+            Accept        = 'application/vnd.github+json'
+        }
+    }
+    $TokenResponse = Invoke-RestMethod @restInputObject
 
-    Write-Host (ConvertTo-Json $TokenResponse -Depth 3 -Compress | Out-String)
 
-    Write-Host 'Reviewing output'
-    Write-Host ('Installation Token: {0}' -f $TokenResponse.token.Substring(0, 5))
-    Write-Host "Expires at: $($TokenResponse.expires_at)"
+    if ([String]::IsNullOrEmpty($TokenResponse.token)) {
+        throw 'Failed to obtain installation token.'
+    }
+
+    Write-Verbose ('Token expires at [{0}]' -f $TokenResponse.expires_at)-Verbose
 
     return $TokenResponse.token
 }
