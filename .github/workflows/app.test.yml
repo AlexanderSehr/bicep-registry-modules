@@ -33,4 +33,5 @@ jobs:
                   ls
                   Get-ChildItem -Path ./other-repo -Recurse | ForEach-Object {
                     Write-Verbose $_.FullName -Verbose
+                    Write-Verbose (Get-Content $_.FullName -Raw | Out-String) -Verbose
                   }
