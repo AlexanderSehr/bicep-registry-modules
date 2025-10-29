@@ -1,0 +1,36 @@
+name: Checkout Another Private Repo
+
+on:
+    workflow_dispatch:
+    push:
+
+jobs:
+    checkout:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Generate GitHub App Token
+              id: app-token
+              uses: tibdex/github-app-token@v2
+              with:
+                  app_id: ${{ secrets.APP_APP_ID }}
+                  #   installation_id: ${{ secrets.APP_INSTALLATION_ID }}
+                  private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+            - name: Checkout Current Repo
+              uses: actions/checkout@v4
+
+            - name: Checkout Another Private Repo
+              uses: actions/checkout@v4
+              with:
+                  repository: AlexanderSehr/private-repo
+                  token: ${{ steps.app-token.outputs.token }}
+                  path: other-repo
+
+            - name: "Get content"
+              id: get-content
+              shell: pwsh
+              run: |
+                  ls
+                  Get-ChildItem -Path ./other-repo -Recurse | ForEach-Object {
+                    Write-Verbose $_.FullName -Verbose
+                  }
