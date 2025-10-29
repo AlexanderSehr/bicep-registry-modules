@@ -47,6 +47,8 @@
         -Method POST `
         -Headers @{ Authorization = "Bearer $JWT"; Accept = 'application/vnd.github+json' }
 
+    Write-Host (ConvertTo-Json $TokenResponse -Depth 3 -Compress)
+
     Write-Host ('Installation Token: {0}' -f $TokenResponse.token.Substring(0, 5))
     Write-Host "Expires at: $($TokenResponse.expires_at)"
 
