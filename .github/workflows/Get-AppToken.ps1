@@ -1,11 +1,35 @@
-﻿function Get-AppToken {
+﻿<#
+.SYNOPSIS
+Get a GitHub Access (/ installation) token based on a given GitHub application's information
+
+.DESCRIPTION
+Get a GitHub Access (/ installation) token based on a given GitHub application's information
+
+.PARAMETER ApplicationId
+Mandatory. The Application ID of the application
+
+.PARAMETER InstallationId
+Mandatory. The Installation ID of the application
+
+.PARAMETER PrivateKey
+The private key of the application in PEM format
+
+.EXAMPLE
+Get-AppToken -ApplicationId '12345' -InstallationId '67890' -PrivateKey $pemKey
+
+Get a GitHub Access token for the given application with id '12345' and installation id '67890' using the provided PEM key.
+#>
+function Get-AppToken {
+
     [CmdletBinding()]
     param (
-        [Parameter()]
+        [Parameter(Mandatory)]
         [string] $ApplicationId,
-        [Parameter()]
+
+        [Parameter(Mandatory)]
         [string] $InstallationId,
-        [Parameter()]
+
+        [Parameter(Mandatory)]
         [string] $PrivateKey
     )
 
@@ -16,7 +40,7 @@
                 }))).TrimEnd('=').Replace('+', '-').Replace('/', '_')
 
     $payload = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject @{
-                    iat = [System.DateTimeOffset]::UtcNow.AddSeconds(-10).ToUnixTimeSeconds()
+                    iat = [System.DateTimeOffset]::UtcNow.AddSeconds(-60).ToUnixTimeSeconds()
                     exp = [System.DateTimeOffset]::UtcNow.AddMinutes(10).ToUnixTimeSeconds()
                     iss = $ApplicationId
                 }))).TrimEnd('=').Replace('+', '-').Replace('/', '_')
