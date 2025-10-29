@@ -34,21 +34,21 @@
     $RSA.ImportFromPem($PrivateKey)
 
     $signature = [Convert]::ToBase64String($rsa.SignData([System.Text.Encoding]::UTF8.GetBytes("$header.$payload"), [System.Security.Cryptography.HashAlgorithmName]::SHA256, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)).TrimEnd('=').Replace('+', '-').Replace('/', '_')
-    $jwt = "$header.$payload.$signature"
 
     Write-Host 'Building JWT'
-    $JWT = "$UnsignedToken.$SignatureEncoded"
+    $jwt = "$header.$payload.$signature"
 
-    Write-Host ('Generated JWT: {0}' -f $JWT.Substring(0, 5))
+    Write-Host ('Generated JWT: {0}' -f $jwt.Substring(0, 5))
 
     Write-Host 'Exhanging JWT for installation token'
     # Exchange JWT for installation token
     $TokenResponse = Invoke-RestMethod -Uri "https://api.github.com/app/installations/$InstallationId/access_tokens" `
-        -Method POST `
-        -Headers @{ Authorization = "Bearer $JWT"; Accept = 'application/vnd.github+json' }
+        -Method 'POST' `
+        -Headers @{ Authorization = "Bearer $jwt"; Accept = 'application/vnd.github+json' }
 
-    Write-Host (ConvertTo-Json $TokenResponse -Depth 3 -Compress)
+    Write-Host (ConvertTo-Json $TokenResponse -Depth 3 -Compress | Out-String)
 
+    Write-Host 'Reviewing output'
     Write-Host ('Installation Token: {0}' -f $TokenResponse.token.Substring(0, 5))
     Write-Host "Expires at: $($TokenResponse.expires_at)"
 
