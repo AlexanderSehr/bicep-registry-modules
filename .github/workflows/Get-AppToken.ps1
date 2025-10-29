@@ -18,29 +18,23 @@
     # $PrivateKey = Get-Content $PrivateKeyPath -Raw
 
     # Create JWT header and payload
-    $Header = @{ alg = 'RS256'; typ = 'JWT' }
-    $Payload = @{
-        iat = [int][double]::Parse((Get-Date -UFormat %s))       # Issued at
-        exp = [int][double]::Parse((Get-Date).AddMinutes(10).ToUniversalTime().ToString('u') -replace '\D') # Expiration
-        iss = $AppId                                              # GitHub App ID
-    }
+    $header = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject @{
+                    alg = 'RS256'
+                    typ = 'JWT'
+                }))).TrimEnd('=').Replace('+', '-').Replace('/', '_')
 
-    # Convert to Base64Url
-    function ConvertTo-Base64Url($input) {
-        $bytes = [System.Text.Encoding]::UTF8.GetBytes($input)
-        $base64 = [Convert]::ToBase64String($bytes)
-        return $base64.TrimEnd('=').Replace('+', '-').Replace('/', '_')
-    }
+    $payload = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject @{
+                    iat = [System.DateTimeOffset]::UtcNow.AddSeconds(-10).ToUnixTimeSeconds()
+                    exp = [System.DateTimeOffset]::UtcNow.AddMinutes(10).ToUnixTimeSeconds()
+                    iss = $ApplicationId
+                }))).TrimEnd('=').Replace('+', '-').Replace('/', '_')
 
-    $HeaderEncoded = ConvertTo-Base64Url((ConvertTo-Json $Header -Compress))
-    $PayloadEncoded = ConvertTo-Base64Url((ConvertTo-Json $Payload -Compress))
-    $UnsignedToken = "$HeaderEncoded.$PayloadEncoded"
-
-    # Sign JWT using RS256
     $RSA = [System.Security.Cryptography.RSA]::Create()
     $RSA.ImportFromPem($PrivateKey)
-    $SignatureBytes = $RSA.SignData([System.Text.Encoding]::UTF8.GetBytes($UnsignedToken), [System.Security.Cryptography.HashAlgorithmName]::SHA256, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)
-    $SignatureEncoded = [Convert]::ToBase64String($SignatureBytes).TrimEnd('=').Replace('+', '-').Replace('/', '_')
+
+    $signature = [Convert]::ToBase64String($rsa.SignData([System.Text.Encoding]::UTF8.GetBytes("$header.$payload"), [System.Security.Cryptography.HashAlgorithmName]::SHA256, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)).TrimEnd('=').Replace('+', '-').Replace('/', '_')
+    $jwt = "$header.$payload.$signature"
+    Write-Host $jwt
 
     $JWT = "$UnsignedToken.$SignatureEncoded"
 
