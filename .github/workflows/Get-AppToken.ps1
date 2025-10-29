@@ -53,4 +53,6 @@
 
     Write-Host ('Installation Token: {0}' -f $TokenResponse.token.Substring(0, 5))
     Write-Host "Expires at: $($TokenResponse.expires_at)"
+
+    return %$TokenResponse.token
 }
