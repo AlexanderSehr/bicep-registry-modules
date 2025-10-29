@@ -29,17 +29,19 @@
                     iss = $ApplicationId
                 }))).TrimEnd('=').Replace('+', '-').Replace('/', '_')
 
+    Write-Host 'Importing RSA Private Key'
     $RSA = [System.Security.Cryptography.RSA]::Create()
     $RSA.ImportFromPem($PrivateKey)
 
     $signature = [Convert]::ToBase64String($rsa.SignData([System.Text.Encoding]::UTF8.GetBytes("$header.$payload"), [System.Security.Cryptography.HashAlgorithmName]::SHA256, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)).TrimEnd('=').Replace('+', '-').Replace('/', '_')
     $jwt = "$header.$payload.$signature"
-    Write-Host $jwt
 
+    Write-Host 'Building JWT'
     $JWT = "$UnsignedToken.$SignatureEncoded"
 
     Write-Host ('Generated JWT: {0}' -f $JWT.Substring(0, 5))
 
+    Write-Host 'Exhanging JWT for installation token'
     # Exchange JWT for installation token
     $TokenResponse = Invoke-RestMethod -Uri "https://api.github.com/app/installations/$InstallationId/access_tokens" `
         -Method POST `
@@ -48,5 +50,5 @@
     Write-Host ('Installation Token: {0}' -f $TokenResponse.token.Substring(0, 5))
     Write-Host "Expires at: $($TokenResponse.expires_at)"
 
-    return %$TokenResponse.token
+    return $TokenResponse.token
 }
