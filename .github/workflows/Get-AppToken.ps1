@@ -57,7 +57,8 @@ function Get-AppToken {
     Write-Verbose 'Exhanging JWT for installation token' -Verbose
     # Exchange JWT for installation token
     $restInputObject = @{
-        Uri     = "https://api.github.com/app/installations/$InstallationId/access_tokens"
+        Uri     = "https://api.github.com/app/installations/$InstallationId/access_tokens" # To be used for classic GitHub
+        # Uri     = "https://<customerUrl>/api/v3/app/installations/$InstallationId/access_tokens" # To be used for GH Enterprise
         Method  = 'POST'
         Headers = @{
             Authorization = "Bearer $jwt"
