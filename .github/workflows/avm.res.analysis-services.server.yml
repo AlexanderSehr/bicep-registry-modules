@@ -1,5 +1,5 @@
 name: "avm.res.analysis-services.server"
-run-name: "${{ github.event_name == 'pull_request' &&  format('PR: {0} by @{1}', github.event.pull_request.title, github.actor) || format('Commit: {0} by @{1}', github.event.head_commit.message, github.actor) }}"
+run-name: "${{ github.event_name == 'pull_request' &&  format('PR: {0} by @{1}', github.event.pull_request.title, github.actor) || format('Commit: {0} by @{1}', github.event.workflow_dispatch.head_commit.message, github.actor) }}"
 
 on:
   workflow_dispatch:
@@ -8,12 +8,12 @@ on:
         type: boolean
         description: "Execute static validation"
         required: false
-        default: true
+        default: false # true
       deploymentValidation:
         type: boolean
         description: "Execute deployment validation"
         required: false
-        default: true
+        default: false # true
       removeDeployment:
         type: boolean
         description: "Remove deployed module"
@@ -24,17 +24,17 @@ on:
         description: "Default location overwrite (e.g., eastus)"
         required: false
   push:
-    branches:
-      - main
-    paths:
-      - ".github/actions/templates/avm-**"
-      - ".github/workflows/avm.template.module.yml"
-      - ".github/workflows/avm.res.analysis-services.server.yml"
-      - "avm/res/analysis-services/server/**"
-      - "utilities/pipelines/**"
-      - "!utilities/pipelines/platform/**"
-      - "!*/**/child-module-publish-allowed-list.json"
-      - "!*/**/README.md"
+    # branches:
+    #   - main
+    # paths:
+    #   - ".github/actions/templates/avm-**"
+    #   - ".github/workflows/avm.template.module.yml"
+    #   - ".github/workflows/avm.res.analysis-services.server.yml"
+    #   - "avm/res/analysis-services/server/**"
+    #   - "utilities/pipelines/**"
+    #   - "!utilities/pipelines/platform/**"
+    #   - "!*/**/child-module-publish-allowed-list.json"
+    #   - "!*/**/README.md"
 
 env:
   modulePath: "avm/res/analysis-services/server"
