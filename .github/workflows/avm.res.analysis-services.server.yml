@@ -64,7 +64,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "${{ github.event_name }}"
-          $events = ${{ toJson(github.event) }}
+          $events = "${{ toJson(github) }}"
     #   - name: "Set input parameters to output variables"
     #     id: get-workflow-param
     #     uses: ./.github/actions/templates/avm-getWorkflowInput
