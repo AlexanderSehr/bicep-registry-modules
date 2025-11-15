@@ -1,10 +1,10 @@
 name: "avm.res.analysis-services.server"
 run-name: >
-  "${{ github.event_name == 'pull_request' &&
-    format('PR: {0} by @{1}', github.event.pull_request.title, github.actor) ||
+  ${{ github.event_name == 'pull_request' &&
+    format('PR: [{0}] by [@{1}]', github.event.pull_request.title, github.actor) ||
     github.event_name == 'push' &&
-      format('Commit: {0} by @{1}', github.event.head_commit.message, github.actor) ||
-      format('Commit: {0} by @{1}', github.event.workflow_run.head_commit.message, github.actor) }}"
+      format('Push: [{0}] by [@{1}]', github.event.head_commit.message, github.actor) ||
+      format('Dispatch: [{0}] by [@{1}]', github.event.head_commit.message, github.actor) }}
 
 on:
   workflow_dispatch:
