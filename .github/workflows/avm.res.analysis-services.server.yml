@@ -45,8 +45,8 @@ env:
   modulePath: "avm/res/analysis-services/server"
   workflowPath: ".github/workflows/avm.res.analysis-services.server.yml"
 
-concurrency:
-  group: ${{ github.workflow }}
+# concurrency:
+#   group: ${{ github.workflow }}
 
 jobs:
   ###########################
